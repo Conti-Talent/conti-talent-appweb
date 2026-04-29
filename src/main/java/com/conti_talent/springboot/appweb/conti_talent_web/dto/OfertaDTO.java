@@ -1,0 +1,65 @@
+package com.conti_talent.springboot.appweb.conti_talent_web.dto;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class OfertaDTO {
+
+    private String id;
+    private String titulo;
+    private String tipo;
+    private String areaId;
+    private String modalidad;
+    private String ubicacion;
+    private int vacantes;
+    private boolean destacada;
+    private String descripcion;
+    private List<String> requisitos;
+    private List<String> beneficios;
+    private long creadaEn;
+
+    public OfertaDTO() {
+        this.requisitos = new ArrayList<>();
+        this.beneficios = new ArrayList<>();
+    }
+
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
+
+    public String getTitulo() { return titulo; }
+    public void setTitulo(String titulo) { this.titulo = titulo; }
+
+    public String getTipo() { return tipo; }
+    public void setTipo(String tipo) { this.tipo = tipo; }
+
+    public String getAreaId() { return areaId; }
+    public void setAreaId(String areaId) { this.areaId = areaId; }
+
+    public String getModalidad() { return modalidad; }
+    public void setModalidad(String modalidad) { this.modalidad = modalidad; }
+
+    public String getUbicacion() { return ubicacion; }
+    public void setUbicacion(String ubicacion) { this.ubicacion = ubicacion; }
+
+    public int getVacantes() { return vacantes; }
+    public void setVacantes(int vacantes) { this.vacantes = vacantes; }
+
+    public boolean isDestacada() { return destacada; }
+    public void setDestacada(boolean destacada) { this.destacada = destacada; }
+
+    public String getDescripcion() { return descripcion; }
+    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+
+    public List<String> getRequisitos() { return requisitos; }
+    public void setRequisitos(List<String> requisitos) {
+        this.requisitos = requisitos != null ? new ArrayList<>(requisitos) : new ArrayList<>();
+    }
+
+    public List<String> getBeneficios() { return beneficios; }
+    public void setBeneficios(List<String> beneficios) {
+        this.beneficios = beneficios != null ? new ArrayList<>(beneficios) : new ArrayList<>();
+    }
+
+    public long getCreadaEn() { return creadaEn; }
+    public void setCreadaEn(long creadaEn) { this.creadaEn = creadaEn; }
+}
