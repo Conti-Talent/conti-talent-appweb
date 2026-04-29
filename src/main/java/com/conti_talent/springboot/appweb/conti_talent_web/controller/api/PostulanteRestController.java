@@ -3,7 +3,7 @@ package com.conti_talent.springboot.appweb.conti_talent_web.controller.api;
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.PostulanteDTO;
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.request.PostularRequest;
 import com.conti_talent.springboot.appweb.conti_talent_web.model.enums.EstadoPostulante;
-import com.conti_talent.springboot.appweb.conti_talent_web.service.PostulanteService;
+import com.conti_talent.springboot.appweb.conti_talent_web.service.IPostulanteService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,16 +15,16 @@ import java.util.Map;
 @RequestMapping("/api/postulantes")
 public class PostulanteRestController {
 
-    private final PostulanteService service;
+    private final IPostulanteService service;
 
-    public PostulanteRestController(PostulanteService service) {
+    public PostulanteRestController(IPostulanteService service) {
         this.service = service;
     }
 
     /**
-     * GET /api/postulantes                       → todos
-     * GET /api/postulantes?oferta=o1             → por oferta
-     * GET /api/postulantes?usuario=u2            → por usuario
+     * GET /api/postulantes                       -> todos
+     * GET /api/postulantes?oferta=o1             -> por oferta
+     * GET /api/postulantes?usuario=u2            -> por usuario
      */
     @GetMapping
     public List<PostulanteDTO> listar(@RequestParam(value = "oferta",  required = false) String ofertaId,
@@ -47,7 +47,6 @@ public class PostulanteRestController {
     /**
      * PATCH /api/postulantes/{id}/estado
      * Body: { "estado": "ENTREVISTA" }
-     * Valida transición legal (lanza 400 si no lo es).
      */
     @PatchMapping("/{id}/estado")
     public PostulanteDTO cambiarEstado(@PathVariable String id, @RequestBody Map<String, String> body) {
@@ -61,7 +60,7 @@ public class PostulanteRestController {
         return ResponseEntity.noContent().build();
     }
 
-    /** Eliminación lógica → estado RECHAZADO. */
+    /** Eliminacion logica -> estado RECHAZADO. */
     @PostMapping("/{id}/rechazar")
     public PostulanteDTO rechazar(@PathVariable String id) {
         return service.softDelete(id);

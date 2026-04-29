@@ -6,7 +6,7 @@ import com.conti_talent.springboot.appweb.conti_talent_web.dto.auth.RegistroRequ
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.auth.SesionDTO;
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.response.ApiResponse;
 import com.conti_talent.springboot.appweb.conti_talent_web.exception.UnauthorizedException;
-import com.conti_talent.springboot.appweb.conti_talent_web.service.AuthService;
+import com.conti_talent.springboot.appweb.conti_talent_web.service.IAuthService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.*;
 /**
  * Auth basado en HttpSession (sin Spring Security).
  * Contrato compatible con el frontend (auth.js / page-login.js):
- *  - login → { ok, data: SesionDTO } o { ok:false, error }
- *  - me    → SesionDTO (200) o 401
- *  - logout→ { ok: true }
+ *  - login   -> ApiResponse<SesionDTO>
+ *  - me      -> SesionDTO (200) o 401
+ *  - logout  -> ApiResponse<Void>
  */
 @RestController
 @RequestMapping("/api/auth")
@@ -25,9 +25,9 @@ public class AuthRestController {
 
     public static final String SESSION_ATTR = "session";
 
-    private final AuthService authService;
+    private final IAuthService authService;
 
-    public AuthRestController(AuthService authService) {
+    public AuthRestController(IAuthService authService) {
         this.authService = authService;
     }
 

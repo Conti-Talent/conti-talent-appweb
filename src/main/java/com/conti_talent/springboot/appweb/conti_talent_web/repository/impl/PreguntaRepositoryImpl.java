@@ -1,7 +1,7 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.repository.impl;
 
 import com.conti_talent.springboot.appweb.conti_talent_web.model.Pregunta;
-import com.conti_talent.springboot.appweb.conti_talent_web.repository.PreguntaRepository;
+import com.conti_talent.springboot.appweb.conti_talent_web.repository.IPreguntaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 @Repository
-public class InMemoryPreguntaRepository implements PreguntaRepository {
+public class PreguntaRepositoryImpl implements IPreguntaRepository {
 
     private static final String ID_PREFIX = "q";
 

@@ -5,7 +5,7 @@ import com.conti_talent.springboot.appweb.conti_talent_web.model.Pregunta;
 import java.util.List;
 import java.util.Optional;
 
-public interface PreguntaRepository {
+public interface IPreguntaRepository {
 
     List<Pregunta> findAll();
 

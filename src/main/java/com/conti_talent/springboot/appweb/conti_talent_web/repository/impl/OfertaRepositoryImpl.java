@@ -1,7 +1,7 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.repository.impl;
 
-import com.conti_talent.springboot.appweb.conti_talent_web.model.Postulante;
-import com.conti_talent.springboot.appweb.conti_talent_web.repository.PostulanteRepository;
+import com.conti_talent.springboot.appweb.conti_talent_web.model.Oferta;
+import com.conti_talent.springboot.appweb.conti_talent_web.repository.IOfertaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
@@ -10,50 +10,49 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 @Repository
-public class InMemoryPostulanteRepository implements PostulanteRepository {
+public class OfertaRepositoryImpl implements IOfertaRepository {
 
-    private static final String ID_PREFIX = "p";
+    private static final String ID_PREFIX = "o";
 
-    private final Map<String, Postulante> store = new ConcurrentHashMap<>();
+    private final Map<String, Oferta> store = new ConcurrentHashMap<>();
     private final AtomicLong counter = new AtomicLong(0);
 
     @Override
-    public List<Postulante> findAll() {
+    public List<Oferta> findAll() {
         return new ArrayList<>(store.values());
     }
 
     @Override
-    public Optional<Postulante> findById(String id) {
+    public Optional<Oferta> findById(String id) {
         if (id == null) return Optional.empty();
         return Optional.ofNullable(store.get(id));
     }
 
     @Override
-    public List<Postulante> findByOfertaId(String ofertaId) {
-        if (ofertaId == null) return List.of();
+    public List<Oferta> findByAreaId(String areaId) {
+        if (areaId == null) return List.of();
         return store.values().stream()
-                .filter(p -> ofertaId.equals(p.getOfertaId()))
+                .filter(o -> areaId.equals(o.getAreaId()))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<Postulante> findByUsuarioId(String usuarioId) {
-        if (usuarioId == null) return List.of();
+    public List<Oferta> findFeatured() {
         return store.values().stream()
-                .filter(p -> usuarioId.equals(p.getUsuarioId()))
+                .filter(Oferta::isDestacada)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public Postulante save(Postulante postulante) {
-        if (postulante == null) return null;
-        if (postulante.getId() == null || postulante.getId().isBlank()) {
-            postulante.setId(ID_PREFIX + counter.incrementAndGet());
+    public Oferta save(Oferta oferta) {
+        if (oferta == null) return null;
+        if (oferta.getId() == null || oferta.getId().isBlank()) {
+            oferta.setId(ID_PREFIX + counter.incrementAndGet());
         } else {
-            alignCounter(postulante.getId());
+            alignCounter(oferta.getId());
         }
-        store.put(postulante.getId(), postulante);
-        return postulante;
+        store.put(oferta.getId(), oferta);
+        return oferta;
     }
 
     @Override

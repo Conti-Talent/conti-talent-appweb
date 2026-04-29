@@ -7,19 +7,19 @@ import com.conti_talent.springboot.appweb.conti_talent_web.exception.ResourceNot
 import com.conti_talent.springboot.appweb.conti_talent_web.mapper.UsuarioMapper;
 import com.conti_talent.springboot.appweb.conti_talent_web.model.Usuario;
 import com.conti_talent.springboot.appweb.conti_talent_web.model.enums.Rol;
-import com.conti_talent.springboot.appweb.conti_talent_web.repository.UsuarioRepository;
-import com.conti_talent.springboot.appweb.conti_talent_web.service.UsuarioService;
+import com.conti_talent.springboot.appweb.conti_talent_web.repository.IUsuarioRepository;
+import com.conti_talent.springboot.appweb.conti_talent_web.service.IUsuarioService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class UsuarioServiceImpl implements UsuarioService {
+public class UsuarioServiceImpl implements IUsuarioService {
 
-    private final UsuarioRepository repository;
+    private final IUsuarioRepository repository;
     private final UsuarioMapper mapper;
 
-    public UsuarioServiceImpl(UsuarioRepository repository, UsuarioMapper mapper) {
+    public UsuarioServiceImpl(IUsuarioRepository repository, UsuarioMapper mapper) {
         this.repository = repository;
         this.mapper = mapper;
     }

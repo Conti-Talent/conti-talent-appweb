@@ -30,19 +30,19 @@ public class DataLoader implements CommandLineRunner {
 
     private static final long DAY_MS = 86_400_000L;
 
-    private final UsuarioRepository usuarioRepository;
-    private final AreaRepository areaRepository;
-    private final OfertaRepository ofertaRepository;
-    private final PreguntaRepository preguntaRepository;
-    private final PostulanteRepository postulanteRepository;
-    private final MetricasRepository metricasRepository;
+    private final IUsuarioRepository usuarioRepository;
+    private final IAreaRepository areaRepository;
+    private final IOfertaRepository ofertaRepository;
+    private final IPreguntaRepository preguntaRepository;
+    private final IPostulanteRepository postulanteRepository;
+    private final IMetricasRepository metricasRepository;
 
-    public DataLoader(UsuarioRepository usuarioRepository,
-                      AreaRepository areaRepository,
-                      OfertaRepository ofertaRepository,
-                      PreguntaRepository preguntaRepository,
-                      PostulanteRepository postulanteRepository,
-                      MetricasRepository metricasRepository) {
+    public DataLoader(IUsuarioRepository usuarioRepository,
+                      IAreaRepository areaRepository,
+                      IOfertaRepository ofertaRepository,
+                      IPreguntaRepository preguntaRepository,
+                      IPostulanteRepository postulanteRepository,
+                      IMetricasRepository metricasRepository) {
         this.usuarioRepository = usuarioRepository;
         this.areaRepository = areaRepository;
         this.ofertaRepository = ofertaRepository;

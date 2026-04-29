@@ -5,7 +5,7 @@ import com.conti_talent.springboot.appweb.conti_talent_web.dto.auth.LoginRequest
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.auth.RegistroRequest;
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.auth.SesionDTO;
 
-public interface AuthService {
+public interface IAuthService {
 
     /** Valida credenciales y devuelve la sesión. Lanza UnauthorizedException si fallan. */
     SesionDTO login(LoginRequest request);

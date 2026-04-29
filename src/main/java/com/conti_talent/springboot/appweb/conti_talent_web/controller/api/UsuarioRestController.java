@@ -2,7 +2,7 @@ package com.conti_talent.springboot.appweb.conti_talent_web.controller.api;
 
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.UsuarioDTO;
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.request.UsuarioRequest;
-import com.conti_talent.springboot.appweb.conti_talent_web.service.UsuarioService;
+import com.conti_talent.springboot.appweb.conti_talent_web.service.IUsuarioService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,9 +13,9 @@ import java.util.List;
 @RequestMapping("/api/usuarios")
 public class UsuarioRestController {
 
-    private final UsuarioService service;
+    private final IUsuarioService service;
 
-    public UsuarioRestController(UsuarioService service) {
+    public UsuarioRestController(IUsuarioService service) {
         this.service = service;
     }
 

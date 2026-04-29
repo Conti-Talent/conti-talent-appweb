@@ -4,13 +4,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
 /**
- * MVC controller — vistas públicas servidas por Thymeleaf.
- * Solo retornan el nombre de la plantilla. Toda la lógica vive en services
- * y se consume desde el JS modular existente vía /api/*.
+ * MVC controller — vistas publicas servidas por Thymeleaf.
+ * Solo retornan el nombre de la plantilla. Toda la logica vive en services
+ * y se consume desde el JS modular existente via /api/*.
  *
- * NOTA: Aceptamos también las rutas con sufijo .html para no romper enlaces
- * actuales del frontend (ej. <a href="ofertas.html">). Cuando todo el front
- * esté migrado pueden eliminarse y dejar solo las rutas limpias.
+ * Aceptamos tambien las rutas con sufijo .html para no romper los enlaces
+ * actuales del frontend (ej. <a href="ofertas.html">).
  */
 @Controller
 public class PublicViewController {

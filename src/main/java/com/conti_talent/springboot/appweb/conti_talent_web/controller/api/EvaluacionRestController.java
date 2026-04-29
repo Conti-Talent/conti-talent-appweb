@@ -2,7 +2,7 @@ package com.conti_talent.springboot.appweb.conti_talent_web.controller.api;
 
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.EvaluacionDTO;
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.request.EvaluacionRequest;
-import com.conti_talent.springboot.appweb.conti_talent_web.service.EvaluacionService;
+import com.conti_talent.springboot.appweb.conti_talent_web.service.IEvaluacionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,17 +11,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/evaluaciones")
 public class EvaluacionRestController {
 
-    private final EvaluacionService service;
+    private final IEvaluacionService service;
 
-    public EvaluacionRestController(EvaluacionService service) {
+    public EvaluacionRestController(IEvaluacionService service) {
         this.service = service;
     }
 
-    /**
-     * POST /api/evaluaciones
-     * Body: { "postulanteId": "p1", "respuestas": { "q1": 1, "q2": 0, ... } }
-     * Calcula puntaje, evita doble evaluación y mueve estado automáticamente.
-     */
     @PostMapping
     public ResponseEntity<EvaluacionDTO> calificar(@RequestBody EvaluacionRequest body) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.calificar(body));

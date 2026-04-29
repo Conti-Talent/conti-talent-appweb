@@ -5,23 +5,23 @@ import com.conti_talent.springboot.appweb.conti_talent_web.exception.BusinessExc
 import com.conti_talent.springboot.appweb.conti_talent_web.exception.ResourceNotFoundException;
 import com.conti_talent.springboot.appweb.conti_talent_web.mapper.PreguntaMapper;
 import com.conti_talent.springboot.appweb.conti_talent_web.model.Pregunta;
-import com.conti_talent.springboot.appweb.conti_talent_web.repository.OfertaRepository;
-import com.conti_talent.springboot.appweb.conti_talent_web.repository.PreguntaRepository;
-import com.conti_talent.springboot.appweb.conti_talent_web.service.PreguntaService;
+import com.conti_talent.springboot.appweb.conti_talent_web.repository.IOfertaRepository;
+import com.conti_talent.springboot.appweb.conti_talent_web.repository.IPreguntaRepository;
+import com.conti_talent.springboot.appweb.conti_talent_web.service.IPreguntaService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class PreguntaServiceImpl implements PreguntaService {
+public class PreguntaServiceImpl implements IPreguntaService {
 
-    private final PreguntaRepository preguntaRepository;
-    private final OfertaRepository ofertaRepository;
+    private final IPreguntaRepository preguntaRepository;
+    private final IOfertaRepository ofertaRepository;
     private final PreguntaMapper mapper;
 
-    public PreguntaServiceImpl(PreguntaRepository preguntaRepository,
-                               OfertaRepository ofertaRepository,
+    public PreguntaServiceImpl(IPreguntaRepository preguntaRepository,
+                               IOfertaRepository ofertaRepository,
                                PreguntaMapper mapper) {
         this.preguntaRepository = preguntaRepository;
         this.ofertaRepository = ofertaRepository;

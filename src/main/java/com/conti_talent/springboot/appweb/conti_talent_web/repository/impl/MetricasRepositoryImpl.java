@@ -1,11 +1,11 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.repository.impl;
 
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.MetricasDTO;
-import com.conti_talent.springboot.appweb.conti_talent_web.repository.MetricasRepository;
+import com.conti_talent.springboot.appweb.conti_talent_web.repository.IMetricasRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class InMemoryMetricasRepository implements MetricasRepository {
+public class MetricasRepositoryImpl implements IMetricasRepository {
 
     /**
      * Volátil: el snapshot lo escribe el DataLoader una vez al arrancar y se

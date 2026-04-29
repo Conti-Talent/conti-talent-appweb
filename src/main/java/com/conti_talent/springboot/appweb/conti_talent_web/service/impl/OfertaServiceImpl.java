@@ -5,28 +5,28 @@ import com.conti_talent.springboot.appweb.conti_talent_web.exception.BusinessExc
 import com.conti_talent.springboot.appweb.conti_talent_web.exception.ResourceNotFoundException;
 import com.conti_talent.springboot.appweb.conti_talent_web.mapper.OfertaMapper;
 import com.conti_talent.springboot.appweb.conti_talent_web.model.Oferta;
-import com.conti_talent.springboot.appweb.conti_talent_web.repository.AreaRepository;
-import com.conti_talent.springboot.appweb.conti_talent_web.repository.OfertaRepository;
-import com.conti_talent.springboot.appweb.conti_talent_web.repository.PreguntaRepository;
-import com.conti_talent.springboot.appweb.conti_talent_web.service.OfertaService;
+import com.conti_talent.springboot.appweb.conti_talent_web.repository.IAreaRepository;
+import com.conti_talent.springboot.appweb.conti_talent_web.repository.IOfertaRepository;
+import com.conti_talent.springboot.appweb.conti_talent_web.repository.IPreguntaRepository;
+import com.conti_talent.springboot.appweb.conti_talent_web.service.IOfertaService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class OfertaServiceImpl implements OfertaService {
+public class OfertaServiceImpl implements IOfertaService {
 
     private static final List<String> TIPOS_VALIDOS = List.of("Práctica", "Trabajo");
 
-    private final OfertaRepository ofertaRepository;
-    private final AreaRepository areaRepository;
-    private final PreguntaRepository preguntaRepository;
+    private final IOfertaRepository ofertaRepository;
+    private final IAreaRepository areaRepository;
+    private final IPreguntaRepository preguntaRepository;
     private final OfertaMapper mapper;
 
-    public OfertaServiceImpl(OfertaRepository ofertaRepository,
-                             AreaRepository areaRepository,
-                             PreguntaRepository preguntaRepository,
+    public OfertaServiceImpl(IOfertaRepository ofertaRepository,
+                             IAreaRepository areaRepository,
+                             IPreguntaRepository preguntaRepository,
                              OfertaMapper mapper) {
         this.ofertaRepository = ofertaRepository;
         this.areaRepository = areaRepository;

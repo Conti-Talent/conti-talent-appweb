@@ -5,8 +5,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
- * Vistas del panel de administración (carpeta templates/admin/).
- * Sin lógica de negocio; los datos los pinta el JS modular consumiendo /api/*.
+ * Vistas del panel de administracion (carpeta templates/admin/).
+ * Sin logica de negocio; los datos los pinta el JS modular consumiendo /api/*.
  */
 @Controller
 @RequestMapping("/admin")

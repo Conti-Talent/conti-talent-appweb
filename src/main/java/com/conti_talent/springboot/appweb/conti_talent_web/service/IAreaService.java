@@ -4,7 +4,7 @@ import com.conti_talent.springboot.appweb.conti_talent_web.dto.AreaDTO;
 
 import java.util.List;
 
-public interface AreaService {
+public interface IAreaService {
 
     List<AreaDTO> listar();
 

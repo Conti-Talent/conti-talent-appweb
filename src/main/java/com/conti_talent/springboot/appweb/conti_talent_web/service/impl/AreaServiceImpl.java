@@ -5,22 +5,22 @@ import com.conti_talent.springboot.appweb.conti_talent_web.exception.BusinessExc
 import com.conti_talent.springboot.appweb.conti_talent_web.exception.ResourceNotFoundException;
 import com.conti_talent.springboot.appweb.conti_talent_web.mapper.AreaMapper;
 import com.conti_talent.springboot.appweb.conti_talent_web.model.Area;
-import com.conti_talent.springboot.appweb.conti_talent_web.repository.AreaRepository;
-import com.conti_talent.springboot.appweb.conti_talent_web.repository.OfertaRepository;
-import com.conti_talent.springboot.appweb.conti_talent_web.service.AreaService;
+import com.conti_talent.springboot.appweb.conti_talent_web.repository.IAreaRepository;
+import com.conti_talent.springboot.appweb.conti_talent_web.repository.IOfertaRepository;
+import com.conti_talent.springboot.appweb.conti_talent_web.service.IAreaService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class AreaServiceImpl implements AreaService {
+public class AreaServiceImpl implements IAreaService {
 
-    private final AreaRepository areaRepository;
-    private final OfertaRepository ofertaRepository;
+    private final IAreaRepository areaRepository;
+    private final IOfertaRepository ofertaRepository;
     private final AreaMapper mapper;
 
-    public AreaServiceImpl(AreaRepository areaRepository,
-                           OfertaRepository ofertaRepository,
+    public AreaServiceImpl(IAreaRepository areaRepository,
+                           IOfertaRepository ofertaRepository,
                            AreaMapper mapper) {
         this.areaRepository = areaRepository;
         this.ofertaRepository = ofertaRepository;

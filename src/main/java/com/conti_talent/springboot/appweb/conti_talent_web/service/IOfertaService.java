@@ -4,7 +4,7 @@ import com.conti_talent.springboot.appweb.conti_talent_web.dto.OfertaDTO;
 
 import java.util.List;
 
-public interface OfertaService {
+public interface IOfertaService {
 
     List<OfertaDTO> listar();
 

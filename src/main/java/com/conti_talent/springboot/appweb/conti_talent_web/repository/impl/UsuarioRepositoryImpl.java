@@ -1,7 +1,7 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.repository.impl;
 
 import com.conti_talent.springboot.appweb.conti_talent_web.model.Usuario;
-import com.conti_talent.springboot.appweb.conti_talent_web.repository.UsuarioRepository;
+import com.conti_talent.springboot.appweb.conti_talent_web.repository.IUsuarioRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
@@ -9,13 +9,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Implementación in-memory thread-safe del UsuarioRepository.
+ * Implementación in-memory thread-safe del IUsuarioRepository.
  * Usa un ConcurrentHashMap como almacenamiento principal y un AtomicLong como
  * contador para simular auto-incremento (los IDs nuevos quedan como "u<n>"
  * para mantener la convención del seed.js — opacos para el frontend).
  */
 @Repository
-public class InMemoryUsuarioRepository implements UsuarioRepository {
+public class UsuarioRepositoryImpl implements IUsuarioRepository {
 
     private static final String ID_PREFIX = "u";
 

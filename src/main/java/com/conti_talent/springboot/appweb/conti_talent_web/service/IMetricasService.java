@@ -7,7 +7,7 @@ import com.conti_talent.springboot.appweb.conti_talent_web.model.enums.EstadoPos
 import java.util.List;
 import java.util.Map;
 
-public interface MetricasService {
+public interface IMetricasService {
 
     /** Series + KPIs precomputados (mantiene la forma del seed.js). */
     MetricasDTO obtenerDashboard();

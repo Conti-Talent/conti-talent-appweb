@@ -7,9 +7,9 @@ import com.conti_talent.springboot.appweb.conti_talent_web.exception.ResourceNot
 import com.conti_talent.springboot.appweb.conti_talent_web.model.Postulante;
 import com.conti_talent.springboot.appweb.conti_talent_web.model.Pregunta;
 import com.conti_talent.springboot.appweb.conti_talent_web.model.enums.EstadoPostulante;
-import com.conti_talent.springboot.appweb.conti_talent_web.repository.PostulanteRepository;
-import com.conti_talent.springboot.appweb.conti_talent_web.repository.PreguntaRepository;
-import com.conti_talent.springboot.appweb.conti_talent_web.service.EvaluacionService;
+import com.conti_talent.springboot.appweb.conti_talent_web.repository.IPostulanteRepository;
+import com.conti_talent.springboot.appweb.conti_talent_web.repository.IPreguntaRepository;
+import com.conti_talent.springboot.appweb.conti_talent_web.service.IEvaluacionService;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -23,15 +23,15 @@ import java.util.Map;
  *  - Mueve estado: APROBADO_TECNICO si >= 70, sino EN_EVALUACION.
  */
 @Service
-public class EvaluacionServiceImpl implements EvaluacionService {
+public class EvaluacionServiceImpl implements IEvaluacionService {
 
     private static final int UMBRAL_APROBACION = 70;
 
-    private final PostulanteRepository postulanteRepository;
-    private final PreguntaRepository preguntaRepository;
+    private final IPostulanteRepository postulanteRepository;
+    private final IPreguntaRepository preguntaRepository;
 
-    public EvaluacionServiceImpl(PostulanteRepository postulanteRepository,
-                                 PreguntaRepository preguntaRepository) {
+    public EvaluacionServiceImpl(IPostulanteRepository postulanteRepository,
+                                 IPreguntaRepository preguntaRepository) {
         this.postulanteRepository = postulanteRepository;
         this.preguntaRepository = preguntaRepository;
     }

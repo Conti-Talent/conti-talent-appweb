@@ -10,7 +10,7 @@ import java.util.Optional;
  * implementación pueda cambiar (in-memory hoy, JPA mañana) sin afectar la
  * capa de servicios.
  */
-public interface UsuarioRepository {
+public interface IUsuarioRepository {
 
     List<Usuario> findAll();
 

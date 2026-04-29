@@ -4,7 +4,7 @@ import com.conti_talent.springboot.appweb.conti_talent_web.dto.PreguntaDTO;
 
 import java.util.List;
 
-public interface PreguntaService {
+public interface IPreguntaService {
 
     /** Vista admin: incluye `correcta`. */
     List<PreguntaDTO> listar();

@@ -5,25 +5,25 @@ import com.conti_talent.springboot.appweb.conti_talent_web.dto.response.RankingI
 import com.conti_talent.springboot.appweb.conti_talent_web.model.Oferta;
 import com.conti_talent.springboot.appweb.conti_talent_web.model.Postulante;
 import com.conti_talent.springboot.appweb.conti_talent_web.model.enums.EstadoPostulante;
-import com.conti_talent.springboot.appweb.conti_talent_web.repository.MetricasRepository;
-import com.conti_talent.springboot.appweb.conti_talent_web.repository.OfertaRepository;
-import com.conti_talent.springboot.appweb.conti_talent_web.repository.PostulanteRepository;
-import com.conti_talent.springboot.appweb.conti_talent_web.service.MetricasService;
+import com.conti_talent.springboot.appweb.conti_talent_web.repository.IMetricasRepository;
+import com.conti_talent.springboot.appweb.conti_talent_web.repository.IOfertaRepository;
+import com.conti_talent.springboot.appweb.conti_talent_web.repository.IPostulanteRepository;
+import com.conti_talent.springboot.appweb.conti_talent_web.service.IMetricasService;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class MetricasServiceImpl implements MetricasService {
+public class MetricasServiceImpl implements IMetricasService {
 
-    private final MetricasRepository metricasRepository;
-    private final PostulanteRepository postulanteRepository;
-    private final OfertaRepository ofertaRepository;
+    private final IMetricasRepository metricasRepository;
+    private final IPostulanteRepository postulanteRepository;
+    private final IOfertaRepository ofertaRepository;
 
-    public MetricasServiceImpl(MetricasRepository metricasRepository,
-                               PostulanteRepository postulanteRepository,
-                               OfertaRepository ofertaRepository) {
+    public MetricasServiceImpl(IMetricasRepository metricasRepository,
+                               IPostulanteRepository postulanteRepository,
+                               IOfertaRepository ofertaRepository) {
         this.metricasRepository = metricasRepository;
         this.postulanteRepository = postulanteRepository;
         this.ofertaRepository = ofertaRepository;

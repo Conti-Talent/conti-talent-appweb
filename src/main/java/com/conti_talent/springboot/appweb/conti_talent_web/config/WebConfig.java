@@ -5,10 +5,9 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
- * Configuración MVC: Spring Boot ya sirve por defecto static/** y templates/**,
- * pero declaramos explícitamente los handlers para dejar el contrato visible
- * y permitir caching más adelante si se desea. No se mueve ningún archivo
- * existente del frontend.
+ * Configuracion MVC: Spring Boot ya sirve por defecto static/** y templates/**,
+ * pero declaramos explicitamente los handlers para dejar el contrato visible.
+ * No se mueve ningun archivo existente del frontend.
  */
 @Configuration
 public class WebConfig implements WebMvcConfigurer {

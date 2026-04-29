@@ -1,7 +1,7 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.controller.api;
 
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.PreguntaDTO;
-import com.conti_talent.springboot.appweb.conti_talent_web.service.PreguntaService;
+import com.conti_talent.springboot.appweb.conti_talent_web.service.IPreguntaService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,16 +12,16 @@ import java.util.List;
 @RequestMapping("/api/preguntas")
 public class PreguntaRestController {
 
-    private final PreguntaService service;
+    private final IPreguntaService service;
 
-    public PreguntaRestController(PreguntaService service) {
+    public PreguntaRestController(IPreguntaService service) {
         this.service = service;
     }
 
     /**
-     * GET /api/preguntas                     → admin (incluye `correcta`)
-     * GET /api/preguntas?oferta=o1           → admin filtrado por oferta
-     * GET /api/preguntas?oferta=o1&publico=1 → público (sin `correcta`) — para postular
+     * GET /api/preguntas                     -> admin (incluye `correcta`)
+     * GET /api/preguntas?oferta=o1           -> admin filtrado por oferta
+     * GET /api/preguntas?oferta=o1&publico=1 -> publico (sin `correcta`)
      */
     @GetMapping
     public List<PreguntaDTO> listar(@RequestParam(value = "oferta", required = false) String ofertaId,

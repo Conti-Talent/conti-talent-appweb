@@ -9,17 +9,17 @@ import com.conti_talent.springboot.appweb.conti_talent_web.exception.Unauthorize
 import com.conti_talent.springboot.appweb.conti_talent_web.mapper.UsuarioMapper;
 import com.conti_talent.springboot.appweb.conti_talent_web.model.Usuario;
 import com.conti_talent.springboot.appweb.conti_talent_web.model.enums.Rol;
-import com.conti_talent.springboot.appweb.conti_talent_web.repository.UsuarioRepository;
-import com.conti_talent.springboot.appweb.conti_talent_web.service.AuthService;
+import com.conti_talent.springboot.appweb.conti_talent_web.repository.IUsuarioRepository;
+import com.conti_talent.springboot.appweb.conti_talent_web.service.IAuthService;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AuthServiceImpl implements AuthService {
+public class AuthServiceImpl implements IAuthService {
 
-    private final UsuarioRepository usuarioRepository;
+    private final IUsuarioRepository usuarioRepository;
     private final UsuarioMapper usuarioMapper;
 
-    public AuthServiceImpl(UsuarioRepository usuarioRepository, UsuarioMapper usuarioMapper) {
+    public AuthServiceImpl(IUsuarioRepository usuarioRepository, UsuarioMapper usuarioMapper) {
         this.usuarioRepository = usuarioRepository;
         this.usuarioMapper = usuarioMapper;
     }

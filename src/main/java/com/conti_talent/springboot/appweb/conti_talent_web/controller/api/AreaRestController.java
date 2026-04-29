@@ -1,7 +1,7 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.controller.api;
 
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.AreaDTO;
-import com.conti_talent.springboot.appweb.conti_talent_web.service.AreaService;
+import com.conti_talent.springboot.appweb.conti_talent_web.service.IAreaService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,9 +13,9 @@ import java.util.Map;
 @RequestMapping("/api/areas")
 public class AreaRestController {
 
-    private final AreaService service;
+    private final IAreaService service;
 
-    public AreaRestController(AreaService service) {
+    public AreaRestController(IAreaService service) {
         this.service = service;
     }
 

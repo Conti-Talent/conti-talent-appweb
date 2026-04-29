@@ -5,7 +5,7 @@ import com.conti_talent.springboot.appweb.conti_talent_web.model.Oferta;
 import java.util.List;
 import java.util.Optional;
 
-public interface OfertaRepository {
+public interface IOfertaRepository {
 
     List<Oferta> findAll();
 

@@ -1,7 +1,7 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.repository.impl;
 
 import com.conti_talent.springboot.appweb.conti_talent_web.model.Area;
-import com.conti_talent.springboot.appweb.conti_talent_web.repository.AreaRepository;
+import com.conti_talent.springboot.appweb.conti_talent_web.repository.IAreaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
-public class InMemoryAreaRepository implements AreaRepository {
+public class AreaRepositoryImpl implements IAreaRepository {
 
     private static final String ID_PREFIX = "a";
 

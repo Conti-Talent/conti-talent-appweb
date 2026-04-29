@@ -6,7 +6,7 @@ import com.conti_talent.springboot.appweb.conti_talent_web.model.enums.EstadoPos
 
 import java.util.List;
 
-public interface PostulanteService {
+public interface IPostulanteService {
 
     List<PostulanteDTO> listar();
 

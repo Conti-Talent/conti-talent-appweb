@@ -1,7 +1,7 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.controller.api;
 
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.OfertaDTO;
-import com.conti_talent.springboot.appweb.conti_talent_web.service.OfertaService;
+import com.conti_talent.springboot.appweb.conti_talent_web.service.IOfertaService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,16 +12,16 @@ import java.util.List;
 @RequestMapping("/api/ofertas")
 public class OfertaRestController {
 
-    private final OfertaService service;
+    private final IOfertaService service;
 
-    public OfertaRestController(OfertaService service) {
+    public OfertaRestController(IOfertaService service) {
         this.service = service;
     }
 
     /**
-     * GET /api/ofertas              → todas las ofertas
-     * GET /api/ofertas?area=a1      → filtra por área
-     * GET /api/ofertas?destacadas   → solo destacadas
+     * GET /api/ofertas              -> todas las ofertas
+     * GET /api/ofertas?area=a1      -> filtra por área
+     * GET /api/ofertas?destacadas   -> solo destacadas
      */
     @GetMapping
     public List<OfertaDTO> listar(@RequestParam(value = "area", required = false) String areaId,

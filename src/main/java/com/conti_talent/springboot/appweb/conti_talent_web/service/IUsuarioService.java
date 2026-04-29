@@ -5,7 +5,7 @@ import com.conti_talent.springboot.appweb.conti_talent_web.dto.request.UsuarioRe
 
 import java.util.List;
 
-public interface UsuarioService {
+public interface IUsuarioService {
 
     List<UsuarioDTO> listar();
 

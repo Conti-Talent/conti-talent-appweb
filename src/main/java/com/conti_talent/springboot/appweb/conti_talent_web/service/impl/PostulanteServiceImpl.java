@@ -8,9 +8,9 @@ import com.conti_talent.springboot.appweb.conti_talent_web.exception.ResourceNot
 import com.conti_talent.springboot.appweb.conti_talent_web.mapper.PostulanteMapper;
 import com.conti_talent.springboot.appweb.conti_talent_web.model.Postulante;
 import com.conti_talent.springboot.appweb.conti_talent_web.model.enums.EstadoPostulante;
-import com.conti_talent.springboot.appweb.conti_talent_web.repository.OfertaRepository;
-import com.conti_talent.springboot.appweb.conti_talent_web.repository.PostulanteRepository;
-import com.conti_talent.springboot.appweb.conti_talent_web.service.PostulanteService;
+import com.conti_talent.springboot.appweb.conti_talent_web.repository.IOfertaRepository;
+import com.conti_talent.springboot.appweb.conti_talent_web.repository.IPostulanteRepository;
+import com.conti_talent.springboot.appweb.conti_talent_web.service.IPostulanteService;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -18,14 +18,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class PostulanteServiceImpl implements PostulanteService {
+public class PostulanteServiceImpl implements IPostulanteService {
 
-    private final PostulanteRepository postulanteRepository;
-    private final OfertaRepository ofertaRepository;
+    private final IPostulanteRepository postulanteRepository;
+    private final IOfertaRepository ofertaRepository;
     private final PostulanteMapper mapper;
 
-    public PostulanteServiceImpl(PostulanteRepository postulanteRepository,
-                                 OfertaRepository ofertaRepository,
+    public PostulanteServiceImpl(IPostulanteRepository postulanteRepository,
+                                 IOfertaRepository ofertaRepository,
                                  PostulanteMapper mapper) {
         this.postulanteRepository = postulanteRepository;
         this.ofertaRepository = ofertaRepository;
