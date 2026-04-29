@@ -1,0 +1,77 @@
+package com.conti_talent.springboot.appweb.conti_talent_web.controller.view;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+
+/**
+ * MVC controller — vistas públicas servidas por Thymeleaf.
+ * Solo retornan el nombre de la plantilla. Toda la lógica vive en services
+ * y se consume desde el JS modular existente vía /api/*.
+ *
+ * NOTA: Aceptamos también las rutas con sufijo .html para no romper enlaces
+ * actuales del frontend (ej. <a href="ofertas.html">). Cuando todo el front
+ * esté migrado pueden eliminarse y dejar solo las rutas limpias.
+ */
+@Controller
+public class PublicViewController {
+
+    @GetMapping({"/", "/index", "/index.html"})
+    public String home() {
+        return "index";
+    }
+
+    @GetMapping({"/login", "/login.html"})
+    public String login() {
+        return "login";
+    }
+
+    @GetMapping({"/registro", "/registro.html"})
+    public String registro() {
+        return "registro";
+    }
+
+    @GetMapping({"/ofertas", "/ofertas.html"})
+    public String ofertas() {
+        return "ofertas";
+    }
+
+    @GetMapping({"/detalle-oferta", "/detalle-oferta.html"})
+    public String detalleOferta() {
+        return "detalle-oferta";
+    }
+
+    @GetMapping({"/postular", "/postular.html"})
+    public String postular() {
+        return "postular";
+    }
+
+    @GetMapping({"/evaluacion", "/evaluacion.html"})
+    public String evaluacion() {
+        return "evaluacion";
+    }
+
+    @GetMapping({"/areas", "/areas.html"})
+    public String areas() {
+        return "areas";
+    }
+
+    @GetMapping({"/contacto", "/contacto.html"})
+    public String contacto() {
+        return "contacto";
+    }
+
+    @GetMapping({"/publicidad", "/publicidad.html"})
+    public String publicidad() {
+        return "publicidad";
+    }
+
+    @GetMapping({"/mi-estado", "/mi-estado.html"})
+    public String miEstado() {
+        return "mi-estado";
+    }
+
+    @GetMapping({"/mis-respuestas", "/mis-respuestas.html"})
+    public String misRespuestas() {
+        return "mis-respuestas";
+    }
+}
