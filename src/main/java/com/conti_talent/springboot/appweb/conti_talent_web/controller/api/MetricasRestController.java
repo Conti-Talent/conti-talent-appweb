@@ -2,7 +2,7 @@ package com.conti_talent.springboot.appweb.conti_talent_web.controller.api;
 
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.MetricasDTO;
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.response.RankingItemDTO;
-import com.conti_talent.springboot.appweb.conti_talent_web.model.enums.EstadoPostulante;
+import com.conti_talent.springboot.appweb.conti_talent_web.model.enums.EstadoCodigo;
 import com.conti_talent.springboot.appweb.conti_talent_web.service.IMetricasService;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,30 +13,34 @@ import java.util.Map;
 @RequestMapping("/api/metricas")
 public class MetricasRestController {
 
-    private final IMetricasService service;
+    private final IMetricasService metricasService;
 
-    public MetricasRestController(IMetricasService service) {
-        this.service = service;
+    public MetricasRestController(IMetricasService metricasService) {
+        this.metricasService = metricasService;
     }
 
+    /** Dashboard: series + KPIs precomputados (forma identica a localStorage 'metricas'). */
     @GetMapping
     public MetricasDTO dashboard() {
-        return service.obtenerDashboard();
+        return metricasService.obtenerDashboard();
     }
 
+    /** Top postulantes ordenados por puntaje (ofertaId opcional). */
     @GetMapping("/ranking")
     public List<RankingItemDTO> ranking(@RequestParam(value = "oferta", required = false) String ofertaId,
                                         @RequestParam(value = "limit",  defaultValue = "10") int limite) {
-        return service.ranking(ofertaId, limite);
+        return metricasService.ranking(ofertaId, limite);
     }
 
+    /** Conteo de postulantes agrupado por estado. */
     @GetMapping("/por-estado")
-    public Map<EstadoPostulante, Long> porEstado() {
-        return service.postulantesPorEstado();
+    public Map<EstadoCodigo, Long> porEstado() {
+        return metricasService.postulantesPorEstado();
     }
 
+    /** Top ofertas por numero de postulaciones. */
     @GetMapping("/ofertas-top")
     public List<Map<String, Object>> ofertasTop(@RequestParam(value = "limit", defaultValue = "5") int limite) {
-        return service.ofertasTop(limite);
+        return metricasService.ofertasTop(limite);
     }
 }

@@ -6,9 +6,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Contrato del repositorio de Usuario. Definido como interfaz para que la
- * implementación pueda cambiar (in-memory hoy, JPA mañana) sin afectar la
- * capa de servicios.
+ * Contrato del repositorio de Usuario. Implementacion intercambiable
+ * (memoria hoy, JPA mañana) sin afectar la capa de servicios.
  */
 public interface IUsuarioRepository {
 
@@ -17,6 +16,8 @@ public interface IUsuarioRepository {
     Optional<Usuario> findById(String id);
 
     Optional<Usuario> findByEmail(String email);
+
+    List<Usuario> findByRolId(String rolId);
 
     Usuario save(Usuario usuario);
 

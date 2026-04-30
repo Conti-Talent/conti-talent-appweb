@@ -1,10 +1,15 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.dto;
 
-import com.conti_talent.springboot.appweb.conti_talent_web.model.enums.EstadoPostulante;
-
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * DTO de Postulante. Incluye el estado como objeto embebido (EstadoDTO)
+ * y como String compatible con el frontend (campo `estado` con el codigo
+ * en mayusculas: POSTULADO, EN_EVALUACION, etc.) para no romper el JS
+ * existente que hace comparaciones tipo:
+ *   p.estado === 'APROBADO_TECNICO'
+ */
 public class PostulanteDTO {
 
     private String id;
@@ -16,7 +21,9 @@ public class PostulanteDTO {
     private String experiencia;
     private String habilidades;
     private String cv;
-    private EstadoPostulante estado;
+    private String estadoId;
+    private String estado;
+    private EstadoDTO estadoDetalle;
     private int puntaje;
     private Map<String, Integer> respuestas;
     private long creadoEn;
@@ -52,8 +59,14 @@ public class PostulanteDTO {
     public String getCv() { return cv; }
     public void setCv(String cv) { this.cv = cv; }
 
-    public EstadoPostulante getEstado() { return estado; }
-    public void setEstado(EstadoPostulante estado) { this.estado = estado; }
+    public String getEstadoId() { return estadoId; }
+    public void setEstadoId(String estadoId) { this.estadoId = estadoId; }
+
+    public String getEstado() { return estado; }
+    public void setEstado(String estado) { this.estado = estado; }
+
+    public EstadoDTO getEstadoDetalle() { return estadoDetalle; }
+    public void setEstadoDetalle(EstadoDTO estadoDetalle) { this.estadoDetalle = estadoDetalle; }
 
     public int getPuntaje() { return puntaje; }
     public void setPuntaje(int puntaje) { this.puntaje = puntaje; }

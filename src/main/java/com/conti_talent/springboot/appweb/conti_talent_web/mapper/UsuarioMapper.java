@@ -1,34 +1,63 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.mapper;
 
+import com.conti_talent.springboot.appweb.conti_talent_web.dto.RolDTO;
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.UsuarioDTO;
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.auth.SesionDTO;
+import com.conti_talent.springboot.appweb.conti_talent_web.model.Rol;
 import com.conti_talent.springboot.appweb.conti_talent_web.model.Usuario;
+import com.conti_talent.springboot.appweb.conti_talent_web.repository.IRolRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Mapper manual entre Usuario (entidad) y sus DTOs públicos.
- * Garantiza que la password nunca abandone la capa de dominio.
+ * Mapper manual de Usuario. Resuelve la entidad Rol asociada al construir
+ * el DTO publico, evitando que las capas superiores tengan que hacer
+ * lookups manuales. Garantiza que la password nunca abandone la capa de
+ * dominio.
  */
 @Component
 public class UsuarioMapper {
 
-    public UsuarioDTO toDTO(Usuario u) {
-        if (u == null) return null;
+    private final IRolRepository rolRepository;
+    private final RolMapper rolMapper;
+
+    public UsuarioMapper(IRolRepository rolRepository, RolMapper rolMapper) {
+        this.rolRepository = rolRepository;
+        this.rolMapper = rolMapper;
+    }
+
+    /** Convierte un Usuario a su DTO publico, embebiendo el RolDTO resuelto. */
+    public UsuarioDTO convertirADTO(Usuario usuario) {
+        if (usuario == null) return null;
+        RolDTO rolEmbebido = rolRepository.buscarPorId(usuario.getRolId())
+                .map(rolMapper::convertirADTO)
+                .orElse(null);
         return new UsuarioDTO(
-                u.getId(), u.getNombre(), u.getApellido(),
-                u.getEmail(), u.getRol(), u.isActivo(), u.getCreadoEn());
+                usuario.getId(), usuario.getNombre(), usuario.getApellido(),
+                usuario.getEmail(), usuario.getRolId(), rolEmbebido,
+                usuario.isActivo(), usuario.getCreadoEn());
     }
 
-    public List<UsuarioDTO> toDTOList(List<Usuario> usuarios) {
+    /** Convierte una lista de usuarios a una lista de DTOs. */
+    public List<UsuarioDTO> convertirALista(List<Usuario> usuarios) {
         if (usuarios == null) return List.of();
-        return usuarios.stream().map(this::toDTO).collect(Collectors.toList());
+        return usuarios.stream().map(this::convertirADTO).collect(Collectors.toList());
     }
 
-    public SesionDTO toSesionDTO(Usuario u) {
-        if (u == null) return null;
-        return new SesionDTO(u.getId(), u.getNombre(), u.getApellido(), u.getEmail(), u.getRol());
+    /**
+     * Construye el SesionDTO consumido por el frontend tras login.
+     * Resuelve el codigo del rol y lo expone en minuscula ('admin', 'postulante').
+     */
+    public SesionDTO convertirASesion(Usuario usuario) {
+        if (usuario == null) return null;
+        String codigoRolMinuscula = rolRepository.buscarPorId(usuario.getRolId())
+                .map(Rol::getCodigo)
+                .map(String::toLowerCase)
+                .orElse("");
+        return new SesionDTO(
+                usuario.getId(), usuario.getNombre(), usuario.getApellido(),
+                usuario.getEmail(), codigoRolMinuscula);
     }
 }

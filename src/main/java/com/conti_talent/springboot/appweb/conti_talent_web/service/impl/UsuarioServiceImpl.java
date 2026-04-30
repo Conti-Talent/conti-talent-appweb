@@ -5,8 +5,10 @@ import com.conti_talent.springboot.appweb.conti_talent_web.dto.request.UsuarioRe
 import com.conti_talent.springboot.appweb.conti_talent_web.exception.BusinessException;
 import com.conti_talent.springboot.appweb.conti_talent_web.exception.ResourceNotFoundException;
 import com.conti_talent.springboot.appweb.conti_talent_web.mapper.UsuarioMapper;
+import com.conti_talent.springboot.appweb.conti_talent_web.model.Rol;
 import com.conti_talent.springboot.appweb.conti_talent_web.model.Usuario;
-import com.conti_talent.springboot.appweb.conti_talent_web.model.enums.Rol;
+import com.conti_talent.springboot.appweb.conti_talent_web.model.enums.RolCodigo;
+import com.conti_talent.springboot.appweb.conti_talent_web.repository.IRolRepository;
 import com.conti_talent.springboot.appweb.conti_talent_web.repository.IUsuarioRepository;
 import com.conti_talent.springboot.appweb.conti_talent_web.service.IUsuarioService;
 import org.springframework.stereotype.Service;
@@ -16,79 +18,121 @@ import java.util.List;
 @Service
 public class UsuarioServiceImpl implements IUsuarioService {
 
-    private final IUsuarioRepository repository;
-    private final UsuarioMapper mapper;
+    private final IUsuarioRepository usuarioRepository;
+    private final IRolRepository rolRepository;
+    private final UsuarioMapper usuarioMapper;
 
-    public UsuarioServiceImpl(IUsuarioRepository repository, UsuarioMapper mapper) {
-        this.repository = repository;
-        this.mapper = mapper;
+    public UsuarioServiceImpl(IUsuarioRepository usuarioRepository,
+                              IRolRepository rolRepository,
+                              UsuarioMapper usuarioMapper) {
+        this.usuarioRepository = usuarioRepository;
+        this.rolRepository = rolRepository;
+        this.usuarioMapper = usuarioMapper;
     }
 
     @Override
     public List<UsuarioDTO> listar() {
-        return mapper.toDTOList(repository.findAll());
+        return usuarioMapper.convertirALista(usuarioRepository.findAll());
     }
 
     @Override
     public UsuarioDTO obtener(String id) {
-        Usuario u = repository.findById(id)
+        Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado: " + id));
-        return mapper.toDTO(u);
+        return usuarioMapper.convertirADTO(usuario);
     }
 
     @Override
-    public UsuarioDTO crear(UsuarioRequest req) {
-        validateNew(req);
-        if (repository.existsByEmail(req.getEmail())) {
+    public UsuarioDTO crear(UsuarioRequest request) {
+        validarDatosNuevoUsuario(request);
+        if (usuarioRepository.existsByEmail(request.getEmail())) {
             throw new BusinessException("Ya existe un usuario con ese correo");
         }
-        Usuario u = new Usuario();
-        u.setNombre(req.getNombre().trim());
-        u.setApellido(req.getApellido() != null ? req.getApellido().trim() : "");
-        u.setEmail(req.getEmail().trim());
-        u.setPassword(req.getPassword());
-        u.setRol(req.getRol() != null ? req.getRol() : Rol.POSTULANTE);
-        u.setActivo(req.getActivo() == null || req.getActivo());
-        u.setCreadoEn(System.currentTimeMillis());
-        return mapper.toDTO(repository.save(u));
+        Rol rolAsignado = resolverRolDesdeRequest(request);
+
+        Usuario nuevoUsuario = new Usuario();
+        nuevoUsuario.setNombre(request.getNombre().trim());
+        nuevoUsuario.setApellido(request.getApellido() != null ? request.getApellido().trim() : "");
+        nuevoUsuario.setEmail(request.getEmail().trim());
+        nuevoUsuario.setPassword(request.getPassword());
+        nuevoUsuario.setRolId(rolAsignado.getId());
+        nuevoUsuario.setActivo(request.getActivo() == null || request.getActivo());
+        nuevoUsuario.setCreadoEn(System.currentTimeMillis());
+        return usuarioMapper.convertirADTO(usuarioRepository.save(nuevoUsuario));
     }
 
     @Override
-    public UsuarioDTO actualizar(String id, UsuarioRequest req) {
-        Usuario u = repository.findById(id)
+    public UsuarioDTO actualizar(String id, UsuarioRequest request) {
+        Usuario usuarioExistente = usuarioRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado: " + id));
 
-        if (req.getNombre()   != null) u.setNombre(req.getNombre().trim());
-        if (req.getApellido() != null) u.setApellido(req.getApellido().trim());
-        if (req.getEmail()    != null) {
-            String newEmail = req.getEmail().trim();
-            if (!newEmail.equalsIgnoreCase(u.getEmail()) && repository.existsByEmail(newEmail)) {
+        if (request.getNombre()   != null) usuarioExistente.setNombre(request.getNombre().trim());
+        if (request.getApellido() != null) usuarioExistente.setApellido(request.getApellido().trim());
+        if (request.getEmail()    != null) {
+            String emailNuevo = request.getEmail().trim();
+            if (!emailNuevo.equalsIgnoreCase(usuarioExistente.getEmail())
+                    && usuarioRepository.existsByEmail(emailNuevo)) {
                 throw new BusinessException("Ya existe un usuario con ese correo");
             }
-            u.setEmail(newEmail);
+            usuarioExistente.setEmail(emailNuevo);
         }
-        if (req.getPassword() != null && !req.getPassword().isEmpty()) u.setPassword(req.getPassword());
-        if (req.getRol()      != null) u.setRol(req.getRol());
-        if (req.getActivo()   != null) u.setActivo(req.getActivo());
+        if (esTextoNoVacio(request.getPassword())) {
+            usuarioExistente.setPassword(request.getPassword());
+        }
+        if (request.getRolId() != null || request.getRolCodigo() != null) {
+            Rol rolNuevo = resolverRolDesdeRequest(request);
+            usuarioExistente.setRolId(rolNuevo.getId());
+        }
+        if (request.getActivo() != null) usuarioExistente.setActivo(request.getActivo());
 
-        return mapper.toDTO(repository.save(u));
+        return usuarioMapper.convertirADTO(usuarioRepository.save(usuarioExistente));
     }
 
     @Override
     public void eliminar(String id) {
-        if (repository.findById(id).isEmpty()) {
+        if (usuarioRepository.findById(id).isEmpty()) {
             throw new ResourceNotFoundException("Usuario no encontrado: " + id);
         }
-        repository.deleteById(id);
+        usuarioRepository.deleteById(id);
     }
 
-    private static void validateNew(UsuarioRequest r) {
-        if (r == null || isBlank(r.getNombre()) || isBlank(r.getEmail()) || isBlank(r.getPassword())) {
+    /* ============ Helpers privados ============ */
+
+    private static void validarDatosNuevoUsuario(UsuarioRequest request) {
+        if (request == null
+                || esTextoVacio(request.getNombre())
+                || esTextoVacio(request.getEmail())
+                || esTextoVacio(request.getPassword())) {
             throw new BusinessException("Nombre, email y password son obligatorios");
         }
     }
 
-    private static boolean isBlank(String s) {
-        return s == null || s.trim().isEmpty();
+    /**
+     * Resuelve el rol que se debe asignar al usuario:
+     *  1. Si el request trae rolId, se busca por id.
+     *  2. Si no, si trae rolCodigo, se busca por codigo.
+     *  3. Si no envia ninguno, se asigna POSTULANTE por defecto.
+     */
+    private Rol resolverRolDesdeRequest(UsuarioRequest request) {
+        if (esTextoNoVacio(request.getRolId())) {
+            return rolRepository.buscarPorId(request.getRolId())
+                    .orElseThrow(() -> new BusinessException(
+                            "Rol no encontrado: " + request.getRolId()));
+        }
+        if (esTextoNoVacio(request.getRolCodigo())) {
+            return rolRepository.buscarPorCodigo(request.getRolCodigo().trim().toUpperCase())
+                    .orElseThrow(() -> new BusinessException(
+                            "Rol con codigo '" + request.getRolCodigo() + "' no existe"));
+        }
+        return rolRepository.buscarPorCodigo(RolCodigo.POSTULANTE.name())
+                .orElseThrow(() -> new BusinessException("No se encontro el rol POSTULANTE por defecto"));
+    }
+
+    private static boolean esTextoVacio(String texto) {
+        return texto == null || texto.trim().isEmpty();
+    }
+
+    private static boolean esTextoNoVacio(String texto) {
+        return !esTextoVacio(texto);
     }
 }

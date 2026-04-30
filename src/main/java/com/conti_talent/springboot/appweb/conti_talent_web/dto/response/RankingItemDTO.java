@@ -1,10 +1,9 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.dto.response;
 
-import com.conti_talent.springboot.appweb.conti_talent_web.model.enums.EstadoPostulante;
-
 /**
- * Fila del ranking de postulantes (usada por /api/metricas/ranking).
- * Aplana los datos del postulante para que el frontend pueda renderear sin joins.
+ * Fila del ranking de postulantes. Aplana los datos para evitar joins en el
+ * cliente. El estado se expone como codigo en mayusculas (POSTULADO,
+ * EN_EVALUACION, etc.) para mantener compatibilidad con el JS del front.
  */
 public class RankingItemDTO {
 
@@ -13,7 +12,7 @@ public class RankingItemDTO {
     private String nombre;
     private String ofertaId;
     private String ofertaTitulo;
-    private EstadoPostulante estado;
+    private String estadoCodigo;
     private int puntaje;
 
     public RankingItemDTO() {
@@ -21,13 +20,13 @@ public class RankingItemDTO {
 
     public RankingItemDTO(int posicion, String postulanteId, String nombre,
                           String ofertaId, String ofertaTitulo,
-                          EstadoPostulante estado, int puntaje) {
+                          String estadoCodigo, int puntaje) {
         this.posicion = posicion;
         this.postulanteId = postulanteId;
         this.nombre = nombre;
         this.ofertaId = ofertaId;
         this.ofertaTitulo = ofertaTitulo;
-        this.estado = estado;
+        this.estadoCodigo = estadoCodigo;
         this.puntaje = puntaje;
     }
 
@@ -46,8 +45,8 @@ public class RankingItemDTO {
     public String getOfertaTitulo() { return ofertaTitulo; }
     public void setOfertaTitulo(String ofertaTitulo) { this.ofertaTitulo = ofertaTitulo; }
 
-    public EstadoPostulante getEstado() { return estado; }
-    public void setEstado(EstadoPostulante estado) { this.estado = estado; }
+    public String getEstadoCodigo() { return estadoCodigo; }
+    public void setEstadoCodigo(String estadoCodigo) { this.estadoCodigo = estadoCodigo; }
 
     public int getPuntaje() { return puntaje; }
     public void setPuntaje(int puntaje) { this.puntaje = puntaje; }

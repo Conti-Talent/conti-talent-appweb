@@ -1,11 +1,10 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.dto;
 
-import com.conti_talent.springboot.appweb.conti_talent_web.model.enums.Rol;
-
 /**
- * DTO de Usuario para exposición externa.
+ * DTO de Usuario para exposicion externa.
  * IMPORTANTE: nunca incluye password.
- * El campo password en la entrada se gestiona vía RegistroRequest / UsuarioCreateDTO.
+ * Incluye el rol como objeto embebido (RolDTO) para evitar que el frontend
+ * tenga que hacer un segundo request para obtener el nombre del rol.
  */
 public class UsuarioDTO {
 
@@ -13,7 +12,8 @@ public class UsuarioDTO {
     private String nombre;
     private String apellido;
     private String email;
-    private Rol rol;
+    private String rolId;
+    private RolDTO rol;
     private boolean activo;
     private long creadoEn;
 
@@ -21,11 +21,12 @@ public class UsuarioDTO {
     }
 
     public UsuarioDTO(String id, String nombre, String apellido, String email,
-                      Rol rol, boolean activo, long creadoEn) {
+                      String rolId, RolDTO rol, boolean activo, long creadoEn) {
         this.id = id;
         this.nombre = nombre;
         this.apellido = apellido;
         this.email = email;
+        this.rolId = rolId;
         this.rol = rol;
         this.activo = activo;
         this.creadoEn = creadoEn;
@@ -43,8 +44,11 @@ public class UsuarioDTO {
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
 
-    public Rol getRol() { return rol; }
-    public void setRol(Rol rol) { this.rol = rol; }
+    public String getRolId() { return rolId; }
+    public void setRolId(String rolId) { this.rolId = rolId; }
+
+    public RolDTO getRol() { return rol; }
+    public void setRol(RolDTO rol) { this.rol = rol; }
 
     public boolean isActivo() { return activo; }
     public void setActivo(boolean activo) { this.activo = activo; }

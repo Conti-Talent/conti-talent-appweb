@@ -1,10 +1,10 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.model;
 
-import com.conti_talent.springboot.appweb.conti_talent_web.model.enums.Rol;
-
 /**
- * Entidad Usuario. POJO simple. Cuando se migre a JPA bastará con anotar
- * @Entity / @Id y conservar getters/setters.
+ * Entidad Usuario. Representa una cuenta autenticable en el sistema.
+ * El rol del usuario se referencia por FK ({@code rolId}) hacia la tabla
+ * de roles, en lugar de almacenarlo como enum, para permitir extension
+ * dinamica del catalogo y migracion limpia a base de datos relacional.
  */
 public class Usuario {
 
@@ -13,7 +13,7 @@ public class Usuario {
     private String apellido;
     private String email;
     private String password;
-    private Rol rol;
+    private String rolId;
     private boolean activo;
     private long creadoEn;
 
@@ -21,13 +21,13 @@ public class Usuario {
     }
 
     public Usuario(String id, String nombre, String apellido, String email,
-                   String password, Rol rol, boolean activo, long creadoEn) {
+                   String password, String rolId, boolean activo, long creadoEn) {
         this.id = id;
         this.nombre = nombre;
         this.apellido = apellido;
         this.email = email;
         this.password = password;
-        this.rol = rol;
+        this.rolId = rolId;
         this.activo = activo;
         this.creadoEn = creadoEn;
     }
@@ -47,8 +47,8 @@ public class Usuario {
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
 
-    public Rol getRol() { return rol; }
-    public void setRol(Rol rol) { this.rol = rol; }
+    public String getRolId() { return rolId; }
+    public void setRolId(String rolId) { this.rolId = rolId; }
 
     public boolean isActivo() { return activo; }
     public void setActivo(boolean activo) { this.activo = activo; }

@@ -1,14 +1,14 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.model;
 
-import com.conti_talent.springboot.appweb.conti_talent_web.model.enums.EstadoPostulante;
-
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Postulante a una oferta concreta. Almacena además las respuestas marcadas
- * en la evaluación técnica como Map<preguntaId, indiceElegido> para que el
- * frontend pueda renderear "mis respuestas" sin pedir más información al server.
+ * Postulante a una oferta concreta. Almacena ademas las respuestas
+ * marcadas en la evaluacion tecnica como Map<preguntaId, indiceElegido>.
+ *
+ * El estado actual del postulante se referencia por FK ({@code estadoId})
+ * hacia la tabla TBL_ESTADO, en lugar de almacenarlo como enum directo.
  */
 public class Postulante {
 
@@ -21,14 +21,13 @@ public class Postulante {
     private String experiencia;
     private String habilidades;
     private String cv;
-    private EstadoPostulante estado;
+    private String estadoId;
     private int puntaje;
-    /** preguntaId -> índice elegido. */
+    /** preguntaId -> indice elegido. */
     private Map<String, Integer> respuestas;
     private long creadoEn;
 
     public Postulante() {
-        this.estado = EstadoPostulante.POSTULADO;
         this.respuestas = new HashMap<>();
     }
 
@@ -59,8 +58,8 @@ public class Postulante {
     public String getCv() { return cv; }
     public void setCv(String cv) { this.cv = cv; }
 
-    public EstadoPostulante getEstado() { return estado; }
-    public void setEstado(EstadoPostulante estado) { this.estado = estado; }
+    public String getEstadoId() { return estadoId; }
+    public void setEstadoId(String estadoId) { this.estadoId = estadoId; }
 
     public int getPuntaje() { return puntaje; }
     public void setPuntaje(int puntaje) { this.puntaje = puntaje; }
