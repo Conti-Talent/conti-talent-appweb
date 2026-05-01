@@ -4,14 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Resultado consolidado de una evaluación técnica.
- * Se usa como objeto de dominio para encapsular la lógica de calificación
- * antes de persistirla en el Postulante.
+ * Resultado consolidado de una evaluacion tecnica.
+ * NO es entidad JPA: las respuestas y el puntaje se persisten en TBL_POSTULANTE.
+ * Esta clase encapsula el resultado de calcular una evaluacion antes de
+ * traducirlo a EvaluacionDTO.
  */
 public class Evaluacion {
 
-    private String postulanteId;
-    private String ofertaId;
+    private Long postulanteId;
+    private Long ofertaId;
     private int puntaje;
     private int correctas;
     private int total;
@@ -22,7 +23,7 @@ public class Evaluacion {
         this.respuestas = new ArrayList<>();
     }
 
-    public Evaluacion(String postulanteId, String ofertaId, int puntaje,
+    public Evaluacion(Long postulanteId, Long ofertaId, int puntaje,
                       int correctas, int total, List<Respuesta> respuestas, long evaluadoEn) {
         this.postulanteId = postulanteId;
         this.ofertaId = ofertaId;
@@ -33,11 +34,11 @@ public class Evaluacion {
         this.evaluadoEn = evaluadoEn;
     }
 
-    public String getPostulanteId() { return postulanteId; }
-    public void setPostulanteId(String postulanteId) { this.postulanteId = postulanteId; }
+    public Long getPostulanteId() { return postulanteId; }
+    public void setPostulanteId(Long postulanteId) { this.postulanteId = postulanteId; }
 
-    public String getOfertaId() { return ofertaId; }
-    public void setOfertaId(String ofertaId) { this.ofertaId = ofertaId; }
+    public Long getOfertaId() { return ofertaId; }
+    public void setOfertaId(Long ofertaId) { this.ofertaId = ofertaId; }
 
     public int getPuntaje() { return puntaje; }
     public void setPuntaje(int puntaje) { this.puntaje = puntaje; }

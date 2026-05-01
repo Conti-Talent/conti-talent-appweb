@@ -3,7 +3,8 @@
    ========================================================= */
 
 (() => {
-  const init = () => {
+  const init = async () => {
+    await Storage.ready;
     const form = document.getElementById('contacto-form');
     if (!form) return;
 

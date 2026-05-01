@@ -8,15 +8,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * Endpoints REST para la gestion del catalogo de roles.
- *  GET    /api/roles               -> listar todos
- *  GET    /api/roles?activos=true  -> listar solo activos
- *  GET    /api/roles/{id}          -> obtener uno
- *  POST   /api/roles               -> crear
- *  PUT    /api/roles/{id}          -> actualizar
- *  DELETE /api/roles/{id}          -> eliminar
- */
 @RestController
 @RequestMapping("/api/roles")
 public class RolRestController {
@@ -34,7 +25,7 @@ public class RolRestController {
     }
 
     @GetMapping("/{id}")
-    public RolDTO obtener(@PathVariable String id) {
+    public RolDTO obtener(@PathVariable Long id) {
         return rolService.obtenerPorId(id);
     }
 
@@ -44,12 +35,12 @@ public class RolRestController {
     }
 
     @PutMapping("/{id}")
-    public RolDTO actualizar(@PathVariable String id, @RequestBody RolDTO body) {
+    public RolDTO actualizar(@PathVariable Long id, @RequestBody RolDTO body) {
         return rolService.actualizar(id, body);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable String id) {
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         rolService.eliminar(id);
         return ResponseEntity.noContent().build();
     }

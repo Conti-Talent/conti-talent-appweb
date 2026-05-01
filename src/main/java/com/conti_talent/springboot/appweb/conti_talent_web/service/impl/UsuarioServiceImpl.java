@@ -12,6 +12,7 @@ import com.conti_talent.springboot.appweb.conti_talent_web.repository.IRolReposi
 import com.conti_talent.springboot.appweb.conti_talent_web.repository.IUsuarioRepository;
 import com.conti_talent.springboot.appweb.conti_talent_web.service.IUsuarioService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -31,21 +32,24 @@ public class UsuarioServiceImpl implements IUsuarioService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<UsuarioDTO> listar() {
         return usuarioMapper.convertirALista(usuarioRepository.findAll());
     }
 
     @Override
-    public UsuarioDTO obtener(String id) {
+    @Transactional(readOnly = true)
+    public UsuarioDTO obtener(Long id) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado: " + id));
         return usuarioMapper.convertirADTO(usuario);
     }
 
     @Override
+    @Transactional
     public UsuarioDTO crear(UsuarioRequest request) {
         validarDatosNuevoUsuario(request);
-        if (usuarioRepository.existsByEmail(request.getEmail())) {
+        if (usuarioRepository.existsByEmailIgnoreCase(request.getEmail())) {
             throw new BusinessException("Ya existe un usuario con ese correo");
         }
         Rol rolAsignado = resolverRolDesdeRequest(request);
@@ -55,14 +59,15 @@ public class UsuarioServiceImpl implements IUsuarioService {
         nuevoUsuario.setApellido(request.getApellido() != null ? request.getApellido().trim() : "");
         nuevoUsuario.setEmail(request.getEmail().trim());
         nuevoUsuario.setPassword(request.getPassword());
-        nuevoUsuario.setRolId(rolAsignado.getId());
+        nuevoUsuario.setRol(rolAsignado);
         nuevoUsuario.setActivo(request.getActivo() == null || request.getActivo());
         nuevoUsuario.setCreadoEn(System.currentTimeMillis());
         return usuarioMapper.convertirADTO(usuarioRepository.save(nuevoUsuario));
     }
 
     @Override
-    public UsuarioDTO actualizar(String id, UsuarioRequest request) {
+    @Transactional
+    public UsuarioDTO actualizar(Long id, UsuarioRequest request) {
         Usuario usuarioExistente = usuarioRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado: " + id));
 
@@ -71,7 +76,7 @@ public class UsuarioServiceImpl implements IUsuarioService {
         if (request.getEmail()    != null) {
             String emailNuevo = request.getEmail().trim();
             if (!emailNuevo.equalsIgnoreCase(usuarioExistente.getEmail())
-                    && usuarioRepository.existsByEmail(emailNuevo)) {
+                    && usuarioRepository.existsByEmailIgnoreCase(emailNuevo)) {
                 throw new BusinessException("Ya existe un usuario con ese correo");
             }
             usuarioExistente.setEmail(emailNuevo);
@@ -79,9 +84,9 @@ public class UsuarioServiceImpl implements IUsuarioService {
         if (esTextoNoVacio(request.getPassword())) {
             usuarioExistente.setPassword(request.getPassword());
         }
-        if (request.getRolId() != null || request.getRolCodigo() != null) {
+        if (request.getRolId() != null || esTextoNoVacio(request.getRolCodigo())) {
             Rol rolNuevo = resolverRolDesdeRequest(request);
-            usuarioExistente.setRolId(rolNuevo.getId());
+            usuarioExistente.setRol(rolNuevo);
         }
         if (request.getActivo() != null) usuarioExistente.setActivo(request.getActivo());
 
@@ -89,8 +94,9 @@ public class UsuarioServiceImpl implements IUsuarioService {
     }
 
     @Override
-    public void eliminar(String id) {
-        if (usuarioRepository.findById(id).isEmpty()) {
+    @Transactional
+    public void eliminar(Long id) {
+        if (!usuarioRepository.existsById(id)) {
             throw new ResourceNotFoundException("Usuario no encontrado: " + id);
         }
         usuarioRepository.deleteById(id);
@@ -107,24 +113,17 @@ public class UsuarioServiceImpl implements IUsuarioService {
         }
     }
 
-    /**
-     * Resuelve el rol que se debe asignar al usuario:
-     *  1. Si el request trae rolId, se busca por id.
-     *  2. Si no, si trae rolCodigo, se busca por codigo.
-     *  3. Si no envia ninguno, se asigna POSTULANTE por defecto.
-     */
     private Rol resolverRolDesdeRequest(UsuarioRequest request) {
-        if (esTextoNoVacio(request.getRolId())) {
-            return rolRepository.buscarPorId(request.getRolId())
-                    .orElseThrow(() -> new BusinessException(
-                            "Rol no encontrado: " + request.getRolId()));
+        if (request.getRolId() != null) {
+            return rolRepository.findById(request.getRolId())
+                    .orElseThrow(() -> new BusinessException("Rol no encontrado: " + request.getRolId()));
         }
         if (esTextoNoVacio(request.getRolCodigo())) {
-            return rolRepository.buscarPorCodigo(request.getRolCodigo().trim().toUpperCase())
+            return rolRepository.findByCodigo(request.getRolCodigo().trim().toUpperCase())
                     .orElseThrow(() -> new BusinessException(
                             "Rol con codigo '" + request.getRolCodigo() + "' no existe"));
         }
-        return rolRepository.buscarPorCodigo(RolCodigo.POSTULANTE.name())
+        return rolRepository.findByCodigo(RolCodigo.POSTULANTE.name())
                 .orElseThrow(() -> new BusinessException("No se encontro el rol POSTULANTE por defecto"));
     }
 

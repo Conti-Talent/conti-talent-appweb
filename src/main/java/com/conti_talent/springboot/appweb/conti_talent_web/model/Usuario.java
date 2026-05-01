@@ -1,39 +1,60 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.model;
 
+import jakarta.persistence.*;
+
 /**
- * Entidad Usuario. Representa una cuenta autenticable en el sistema.
- * El rol del usuario se referencia por FK ({@code rolId}) hacia la tabla
- * de roles, en lugar de almacenarlo como enum, para permitir extension
- * dinamica del catalogo y migracion limpia a base de datos relacional.
+ * Entidad Usuario. Cuenta autenticable con relacion ManyToOne a Rol.
+ * Tabla TBL_USUARIO.
  */
+@Entity
+@Table(name = "tbl_usuario", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_usuario_email", columnNames = "email")
+})
 public class Usuario {
 
-    private String id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "nombre", nullable = false, length = 60)
     private String nombre;
+
+    @Column(name = "apellido", length = 60)
     private String apellido;
+
+    @Column(name = "email", nullable = false, length = 120)
     private String email;
+
+    @Column(name = "password", nullable = false, length = 255)
     private String password;
-    private String rolId;
+
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "rol_id", nullable = false,
+            foreignKey = @ForeignKey(name = "fk_usuario_rol"))
+    private Rol rol;
+
+    @Column(name = "activo", nullable = false)
     private boolean activo;
+
+    @Column(name = "creado_en", nullable = false)
     private long creadoEn;
 
     public Usuario() {
     }
 
-    public Usuario(String id, String nombre, String apellido, String email,
-                   String password, String rolId, boolean activo, long creadoEn) {
-        this.id = id;
+    public Usuario(String nombre, String apellido, String email, String password,
+                   Rol rol, boolean activo, long creadoEn) {
         this.nombre = nombre;
         this.apellido = apellido;
         this.email = email;
         this.password = password;
-        this.rolId = rolId;
+        this.rol = rol;
         this.activo = activo;
         this.creadoEn = creadoEn;
     }
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
@@ -47,8 +68,11 @@ public class Usuario {
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
 
-    public String getRolId() { return rolId; }
-    public void setRolId(String rolId) { this.rolId = rolId; }
+    public Rol getRol() { return rol; }
+    public void setRol(Rol rol) { this.rol = rol; }
+
+    /** Atajo para no exponer la entidad completa cuando solo se requiere el id. */
+    public Long getRolId() { return rol != null ? rol.getId() : null; }
 
     public boolean isActivo() { return activo; }
     public void setActivo(boolean activo) { this.activo = activo; }

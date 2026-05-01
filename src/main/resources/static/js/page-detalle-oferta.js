@@ -6,7 +6,8 @@
   const params = new URLSearchParams(window.location.search);
   const id     = params.get('id');
 
-  const init = () => {
+  const init = async () => {
+    await Storage.ready;
     const oferta = Ofertas.get(id);
     if (!oferta) {
       const main = document.getElementById('detalle-main');

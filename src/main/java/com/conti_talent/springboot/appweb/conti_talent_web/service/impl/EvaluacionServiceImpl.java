@@ -13,17 +13,17 @@ import com.conti_talent.springboot.appweb.conti_talent_web.repository.IPostulant
 import com.conti_talent.springboot.appweb.conti_talent_web.repository.IPreguntaRepository;
 import com.conti_talent.springboot.appweb.conti_talent_web.service.IEvaluacionService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Logica de evaluacion tecnica del postulante:
- *  - Evita doble evaluacion (un postulante solo puede rendir una vez).
+ * Logica de evaluacion tecnica:
+ *  - Evita doble evaluacion.
  *  - Calcula puntaje sobre 100.
- *  - Mueve estado automaticamente: APROBADO_TECNICO si puntaje >= 70,
- *    en caso contrario EN_EVALUACION.
+ *  - Mueve estado: APROBADO_TECNICO si >= 70, sino EN_EVALUACION.
  */
 @Service
 public class EvaluacionServiceImpl implements IEvaluacionService {
@@ -43,6 +43,7 @@ public class EvaluacionServiceImpl implements IEvaluacionService {
     }
 
     @Override
+    @Transactional
     public EvaluacionDTO calificar(EvaluacionRequest request) {
         validarRequest(request);
         Postulante postulante = buscarPostulanteOFallar(request.getPostulanteId());
@@ -51,13 +52,13 @@ public class EvaluacionServiceImpl implements IEvaluacionService {
         verificarQueEsteEnEtapaQuePermiteEvaluar(postulante);
 
         List<Pregunta> preguntasOferta = preguntaRepository.findByOfertaId(postulante.getOfertaId());
-        Map<String, Integer> respuestasMarcadas = request.getRespuestas() != null
+        Map<Long, Integer> respuestasMarcadas = request.getRespuestas() != null
                 ? request.getRespuestas()
                 : new HashMap<>();
 
-        int totalPreguntas    = preguntasOferta.size();
+        int totalPreguntas      = preguntasOferta.size();
         int respuestasCorrectas = contarRespuestasCorrectas(preguntasOferta, respuestasMarcadas);
-        int puntajeFinal      = calcularPuntajeSobre100(respuestasCorrectas, totalPreguntas);
+        int puntajeFinal        = calcularPuntajeSobre100(respuestasCorrectas, totalPreguntas);
 
         actualizarPostulanteConEvaluacion(postulante, puntajeFinal, respuestasMarcadas);
 
@@ -68,7 +69,8 @@ public class EvaluacionServiceImpl implements IEvaluacionService {
     }
 
     @Override
-    public EvaluacionDTO obtenerPorPostulante(String postulanteId) {
+    @Transactional(readOnly = true)
+    public EvaluacionDTO obtenerPorPostulante(Long postulanteId) {
         Postulante postulante = buscarPostulanteOFallar(postulanteId);
         if (postulante.getRespuestas() == null || postulante.getRespuestas().isEmpty()) {
             throw new ResourceNotFoundException(
@@ -86,12 +88,12 @@ public class EvaluacionServiceImpl implements IEvaluacionService {
     /* ============ Helpers privados ============ */
 
     private static void validarRequest(EvaluacionRequest request) {
-        if (request == null || esTextoVacio(request.getPostulanteId())) {
+        if (request == null || request.getPostulanteId() == null) {
             throw new BusinessException("postulanteId requerido");
         }
     }
 
-    private Postulante buscarPostulanteOFallar(String id) {
+    private Postulante buscarPostulanteOFallar(Long id) {
         return postulanteRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Postulante no encontrado: " + id));
     }
@@ -103,11 +105,8 @@ public class EvaluacionServiceImpl implements IEvaluacionService {
     }
 
     private void verificarQueEsteEnEtapaQuePermiteEvaluar(Postulante postulante) {
-        Estado estadoActual = estadoRepository.buscarPorId(postulante.getEstadoId())
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Estado del postulante no encontrado: " + postulante.getEstadoId()));
+        Estado estadoActual = postulante.getEstado();
         EstadoCodigo codigoActual = EstadoCodigo.valueOf(estadoActual.getCodigo());
-
         if (codigoActual != EstadoCodigo.POSTULADO && codigoActual != EstadoCodigo.EN_EVALUACION) {
             throw new BusinessException(
                     "El postulante no esta en una etapa que permita evaluar (estado actual: "
@@ -116,7 +115,7 @@ public class EvaluacionServiceImpl implements IEvaluacionService {
     }
 
     private static int contarRespuestasCorrectas(List<Pregunta> preguntas,
-                                                 Map<String, Integer> respuestas) {
+                                                 Map<Long, Integer> respuestas) {
         int correctas = 0;
         for (Pregunta pregunta : preguntas) {
             Integer indiceMarcado = respuestas.get(pregunta.getId());
@@ -134,22 +133,18 @@ public class EvaluacionServiceImpl implements IEvaluacionService {
 
     private void actualizarPostulanteConEvaluacion(Postulante postulante,
                                                    int puntajeFinal,
-                                                   Map<String, Integer> respuestas) {
+                                                   Map<Long, Integer> respuestas) {
         postulante.setPuntaje(puntajeFinal);
         postulante.setRespuestas(new HashMap<>(respuestas));
 
         EstadoCodigo codigoSiguiente = puntajeFinal >= UMBRAL_APROBACION
                 ? EstadoCodigo.APROBADO_TECNICO
                 : EstadoCodigo.EN_EVALUACION;
-        Estado estadoSiguiente = estadoRepository.buscarPorCodigo(codigoSiguiente.name())
+        Estado estadoSiguiente = estadoRepository.findByCodigo(codigoSiguiente.name())
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Estado '" + codigoSiguiente + "' no esta cargado en el sistema"));
-        postulante.setEstadoId(estadoSiguiente.getId());
+        postulante.setEstado(estadoSiguiente);
 
         postulanteRepository.save(postulante);
-    }
-
-    private static boolean esTextoVacio(String texto) {
-        return texto == null || texto.trim().isEmpty();
     }
 }

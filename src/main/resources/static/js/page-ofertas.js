@@ -6,7 +6,8 @@
 (() => {
   const params = new URLSearchParams(window.location.search);
 
-  const init = () => {
+  const init = async () => {
+    await Storage.ready;
     populateAreaFilter();
     populateTipoFilter();
 

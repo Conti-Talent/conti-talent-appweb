@@ -1,24 +1,32 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.repository;
 
 import com.conti_talent.springboot.appweb.conti_talent_web.model.Estado;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 /**
- * Contrato de persistencia para Estado.
+ * Repositorio JPA del catalogo de estados del flujo de seleccion.
  */
-public interface IEstadoRepository {
+@Repository
+public interface IEstadoRepository extends JpaRepository<Estado, Long> {
 
-    List<Estado> listarTodos();
+    Optional<Estado> findByCodigo(String codigo);
 
-    Optional<Estado> buscarPorId(String id);
+    boolean existsByCodigo(String codigo);
 
-    Optional<Estado> buscarPorCodigo(String codigo);
+    /* ===== Atajos en español ===== */
 
-    Estado guardar(Estado estado);
+    default java.util.List<Estado> listarTodos() { return findAll(); }
 
-    void eliminarPorId(String id);
+    default Optional<Estado> buscarPorId(Long id) { return findById(id); }
 
-    boolean existePorCodigo(String codigo);
+    default Optional<Estado> buscarPorCodigo(String codigo) { return findByCodigo(codigo); }
+
+    default Estado guardar(Estado estado) { return save(estado); }
+
+    default void eliminarPorId(Long id) { deleteById(id); }
+
+    default boolean existePorCodigo(String codigo) { return existsByCodigo(codigo); }
 }

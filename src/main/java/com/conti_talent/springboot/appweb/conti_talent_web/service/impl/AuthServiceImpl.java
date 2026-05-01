@@ -14,6 +14,7 @@ import com.conti_talent.springboot.appweb.conti_talent_web.repository.IRolReposi
 import com.conti_talent.springboot.appweb.conti_talent_web.repository.IUsuarioRepository;
 import com.conti_talent.springboot.appweb.conti_talent_web.service.IAuthService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AuthServiceImpl implements IAuthService {
@@ -31,13 +32,14 @@ public class AuthServiceImpl implements IAuthService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public SesionDTO login(LoginRequest request) {
         if (request == null
                 || esTextoVacio(request.getEmail())
                 || esTextoVacio(request.getPassword())) {
             throw new UnauthorizedException("Credenciales invalidas");
         }
-        Usuario usuario = usuarioRepository.findByEmail(request.getEmail())
+        Usuario usuario = usuarioRepository.findByEmailIgnoreCase(request.getEmail())
                 .orElseThrow(() -> new UnauthorizedException("Credenciales invalidas o cuenta desactivada"));
 
         if (!usuario.isActivo() || !usuario.getPassword().equals(request.getPassword())) {
@@ -47,17 +49,17 @@ public class AuthServiceImpl implements IAuthService {
     }
 
     @Override
+    @Transactional
     public UsuarioDTO register(RegistroRequest request) {
         if (request == null
                 || esTextoVacio(request.getEmail())
                 || esTextoVacio(request.getPassword())) {
             throw new BusinessException("Email y password son obligatorios");
         }
-        if (usuarioRepository.existsByEmail(request.getEmail())) {
+        if (usuarioRepository.existsByEmailIgnoreCase(request.getEmail())) {
             throw new BusinessException("Ya existe una cuenta con este correo");
         }
-
-        Rol rolPostulante = rolRepository.buscarPorCodigo(RolCodigo.POSTULANTE.name())
+        Rol rolPostulante = rolRepository.findByCodigo(RolCodigo.POSTULANTE.name())
                 .orElseThrow(() -> new BusinessException(
                         "No se encontro el rol POSTULANTE en el sistema"));
 
@@ -66,7 +68,7 @@ public class AuthServiceImpl implements IAuthService {
         nuevoUsuario.setApellido(textoSeguro(request.getApellido()));
         nuevoUsuario.setEmail(request.getEmail().trim());
         nuevoUsuario.setPassword(request.getPassword());
-        nuevoUsuario.setRolId(rolPostulante.getId());
+        nuevoUsuario.setRol(rolPostulante);
         nuevoUsuario.setActivo(true);
         nuevoUsuario.setCreadoEn(System.currentTimeMillis());
 
@@ -80,12 +82,9 @@ public class AuthServiceImpl implements IAuthService {
         String codigoRolMinuscula = usuario.getRol() != null && usuario.getRol().getCodigo() != null
                 ? usuario.getRol().getCodigo().toLowerCase()
                 : "";
-        return new SesionDTO(
-                usuario.getId(), usuario.getNombre(), usuario.getApellido(),
+        return new SesionDTO(usuario.getId(), usuario.getNombre(), usuario.getApellido(),
                 usuario.getEmail(), codigoRolMinuscula);
     }
-
-    /* ============ Helpers privados ============ */
 
     private static boolean esTextoVacio(String texto) {
         return texto == null || texto.trim().isEmpty();

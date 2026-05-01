@@ -21,20 +21,20 @@ public class PostulanteRestController {
     }
 
     /**
-     * GET /api/postulantes                       -> todos
-     * GET /api/postulantes?oferta=o1             -> por oferta
-     * GET /api/postulantes?usuario=u2            -> por usuario
+     * GET /api/postulantes                -> todos
+     * GET /api/postulantes?oferta=1       -> por oferta
+     * GET /api/postulantes?usuario=2      -> por usuario
      */
     @GetMapping
-    public List<PostulanteDTO> listar(@RequestParam(value = "oferta",  required = false) String ofertaId,
-                                      @RequestParam(value = "usuario", required = false) String usuarioId) {
-        if (ofertaId  != null && !ofertaId.isBlank())  return postulanteService.listarPorOferta(ofertaId);
-        if (usuarioId != null && !usuarioId.isBlank()) return postulanteService.listarPorUsuario(usuarioId);
+    public List<PostulanteDTO> listar(@RequestParam(value = "oferta",  required = false) Long ofertaId,
+                                      @RequestParam(value = "usuario", required = false) Long usuarioId) {
+        if (ofertaId  != null) return postulanteService.listarPorOferta(ofertaId);
+        if (usuarioId != null) return postulanteService.listarPorUsuario(usuarioId);
         return postulanteService.listarTodos();
     }
 
     @GetMapping("/{id}")
-    public PostulanteDTO obtener(@PathVariable String id) {
+    public PostulanteDTO obtener(@PathVariable Long id) {
         return postulanteService.obtenerPorId(id);
     }
 
@@ -46,24 +46,23 @@ public class PostulanteRestController {
     /**
      * PATCH /api/postulantes/{id}/estado
      * Body: { "estado": "ENTREVISTA" }   <- codigo logico
-     *   o:  { "estadoId": "e4" }         <- id de tabla
-     * Valida transicion legal (HTTP 409 si no lo es).
+     *   o:  { "estadoId": "4" }          <- id numerico de tabla
      */
     @PatchMapping("/{id}/estado")
-    public PostulanteDTO cambiarEstado(@PathVariable String id, @RequestBody Map<String, String> body) {
+    public PostulanteDTO cambiarEstado(@PathVariable Long id, @RequestBody Map<String, String> body) {
         String referenciaEstado = body.containsKey("estadoId") ? body.get("estadoId") : body.get("estado");
         return postulanteService.cambiarEstado(id, referenciaEstado);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable String id) {
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         postulanteService.eliminar(id);
         return ResponseEntity.noContent().build();
     }
 
     /** Eliminacion logica: marca al postulante como RECHAZADO. */
     @PostMapping("/{id}/rechazar")
-    public PostulanteDTO rechazar(@PathVariable String id) {
+    public PostulanteDTO rechazar(@PathVariable Long id) {
         return postulanteService.marcarComoRechazado(id);
     }
 }

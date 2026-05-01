@@ -3,43 +3,37 @@ package com.conti_talent.springboot.appweb.conti_talent_web.dto;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * DTO de Postulante. Incluye el estado como objeto embebido (EstadoDTO)
- * y como String compatible con el frontend (campo `estado` con el codigo
- * en mayusculas: POSTULADO, EN_EVALUACION, etc.) para no romper el JS
- * existente que hace comparaciones tipo:
- *   p.estado === 'APROBADO_TECNICO'
- */
 public class PostulanteDTO {
 
-    private String id;
-    private String usuarioId;
-    private String ofertaId;
+    private Long id;
+    private Long usuarioId;
+    private Long ofertaId;
     private String nombre;
     private String email;
     private String telefono;
     private String experiencia;
     private String habilidades;
     private String cv;
-    private String estadoId;
+    private Long estadoId;
+    /** Codigo del estado en mayusculas: POSTULADO, EN_EVALUACION, etc. */
     private String estado;
     private EstadoDTO estadoDetalle;
     private int puntaje;
-    private Map<String, Integer> respuestas;
+    private Map<Long, Integer> respuestas;
     private long creadoEn;
 
     public PostulanteDTO() {
         this.respuestas = new HashMap<>();
     }
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public String getUsuarioId() { return usuarioId; }
-    public void setUsuarioId(String usuarioId) { this.usuarioId = usuarioId; }
+    public Long getUsuarioId() { return usuarioId; }
+    public void setUsuarioId(Long usuarioId) { this.usuarioId = usuarioId; }
 
-    public String getOfertaId() { return ofertaId; }
-    public void setOfertaId(String ofertaId) { this.ofertaId = ofertaId; }
+    public Long getOfertaId() { return ofertaId; }
+    public void setOfertaId(Long ofertaId) { this.ofertaId = ofertaId; }
 
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
@@ -59,8 +53,8 @@ public class PostulanteDTO {
     public String getCv() { return cv; }
     public void setCv(String cv) { this.cv = cv; }
 
-    public String getEstadoId() { return estadoId; }
-    public void setEstadoId(String estadoId) { this.estadoId = estadoId; }
+    public Long getEstadoId() { return estadoId; }
+    public void setEstadoId(Long estadoId) { this.estadoId = estadoId; }
 
     public String getEstado() { return estado; }
     public void setEstado(String estado) { this.estado = estado; }
@@ -71,8 +65,8 @@ public class PostulanteDTO {
     public int getPuntaje() { return puntaje; }
     public void setPuntaje(int puntaje) { this.puntaje = puntaje; }
 
-    public Map<String, Integer> getRespuestas() { return respuestas; }
-    public void setRespuestas(Map<String, Integer> respuestas) {
+    public Map<Long, Integer> getRespuestas() { return respuestas; }
+    public void setRespuestas(Map<Long, Integer> respuestas) {
         this.respuestas = respuestas != null ? new HashMap<>(respuestas) : new HashMap<>();
     }
 

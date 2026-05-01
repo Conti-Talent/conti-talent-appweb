@@ -9,15 +9,11 @@ import java.util.Map;
 
 public interface IMetricasService {
 
-    /** Series + KPIs precomputados (forma identica al seed.js del frontend). */
     MetricasDTO obtenerDashboard();
 
-    /** Top postulantes ordenados por puntaje. ofertaId opcional. */
-    List<RankingItemDTO> ranking(String ofertaId, int limite);
+    List<RankingItemDTO> ranking(Long ofertaId, int limite);
 
-    /** Conteo de postulantes agrupado por codigo de estado. */
     Map<EstadoCodigo, Long> postulantesPorEstado();
 
-    /** Top ofertas por numero de postulaciones. */
     List<Map<String, Object>> ofertasTop(int limite);
 }

@@ -5,10 +5,10 @@ import java.util.List;
 
 public class OfertaDTO {
 
-    private String id;
+    private Long id;
     private String titulo;
     private String tipo;
-    private String areaId;
+    private Long areaId;
     private String modalidad;
     private String ubicacion;
     private int vacantes;
@@ -23,8 +23,8 @@ public class OfertaDTO {
         this.beneficios = new ArrayList<>();
     }
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
     public String getTitulo() { return titulo; }
     public void setTitulo(String titulo) { this.titulo = titulo; }
@@ -32,8 +32,8 @@ public class OfertaDTO {
     public String getTipo() { return tipo; }
     public void setTipo(String tipo) { this.tipo = tipo; }
 
-    public String getAreaId() { return areaId; }
-    public void setAreaId(String areaId) { this.areaId = areaId; }
+    public Long getAreaId() { return areaId; }
+    public void setAreaId(Long areaId) { this.areaId = areaId; }
 
     public String getModalidad() { return modalidad; }
     public void setModalidad(String modalidad) { this.modalidad = modalidad; }

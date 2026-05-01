@@ -10,31 +10,22 @@ import java.util.stream.Collectors;
 @Component
 public class OfertaMapper {
 
-    public OfertaDTO toDTO(Oferta o) {
-        if (o == null) return null;
+    public OfertaDTO toDTO(Oferta oferta) {
+        if (oferta == null) return null;
         OfertaDTO dto = new OfertaDTO();
-        dto.setId(o.getId());
-        dto.setTitulo(o.getTitulo());
-        dto.setTipo(o.getTipo());
-        dto.setAreaId(o.getAreaId());
-        dto.setModalidad(o.getModalidad());
-        dto.setUbicacion(o.getUbicacion());
-        dto.setVacantes(o.getVacantes());
-        dto.setDestacada(o.isDestacada());
-        dto.setDescripcion(o.getDescripcion());
-        dto.setRequisitos(o.getRequisitos());
-        dto.setBeneficios(o.getBeneficios());
-        dto.setCreadaEn(o.getCreadaEn());
+        dto.setId(oferta.getId());
+        dto.setTitulo(oferta.getTitulo());
+        dto.setTipo(oferta.getTipo());
+        dto.setAreaId(oferta.getAreaId());
+        dto.setModalidad(oferta.getModalidad());
+        dto.setUbicacion(oferta.getUbicacion());
+        dto.setVacantes(oferta.getVacantes());
+        dto.setDestacada(oferta.isDestacada());
+        dto.setDescripcion(oferta.getDescripcion());
+        dto.setRequisitos(oferta.getRequisitos());
+        dto.setBeneficios(oferta.getBeneficios());
+        dto.setCreadaEn(oferta.getCreadaEn());
         return dto;
-    }
-
-    public Oferta toEntity(OfertaDTO dto) {
-        if (dto == null) return null;
-        return new Oferta(
-                dto.getId(), dto.getTitulo(), dto.getTipo(), dto.getAreaId(),
-                dto.getModalidad(), dto.getUbicacion(), dto.getVacantes(),
-                dto.isDestacada(), dto.getDescripcion(),
-                dto.getRequisitos(), dto.getBeneficios(), dto.getCreadaEn());
     }
 
     public List<OfertaDTO> toDTOList(List<Oferta> ofertas) {

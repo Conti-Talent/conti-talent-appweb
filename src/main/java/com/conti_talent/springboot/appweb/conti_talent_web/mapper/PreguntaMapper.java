@@ -10,29 +10,23 @@ import java.util.stream.Collectors;
 @Component
 public class PreguntaMapper {
 
-    /** DTO completo (uso administrativo). Incluye `correcta`. */
-    public PreguntaDTO toAdminDTO(Pregunta q) {
-        if (q == null) return null;
+    /** DTO completo (uso administrativo). Incluye el indice correcto. */
+    public PreguntaDTO toAdminDTO(Pregunta pregunta) {
+        if (pregunta == null) return null;
         PreguntaDTO dto = new PreguntaDTO();
-        dto.setId(q.getId());
-        dto.setOfertaId(q.getOfertaId());
-        dto.setPregunta(q.getPregunta());
-        dto.setOpciones(q.getOpciones());
-        dto.setCorrecta(q.getCorrecta());
+        dto.setId(pregunta.getId());
+        dto.setOfertaId(pregunta.getOfertaId());
+        dto.setPregunta(pregunta.getPregunta());
+        dto.setOpciones(pregunta.getOpciones());
+        dto.setCorrecta(pregunta.getCorrecta());
         return dto;
     }
 
-    /** DTO público (uso al postular): omite la respuesta correcta. */
-    public PreguntaDTO toPublicDTO(Pregunta q) {
-        PreguntaDTO dto = toAdminDTO(q);
+    /** DTO publico (al postular): omite la respuesta correcta. */
+    public PreguntaDTO toPublicDTO(Pregunta pregunta) {
+        PreguntaDTO dto = toAdminDTO(pregunta);
         if (dto != null) dto.setCorrecta(null);
         return dto;
-    }
-
-    public Pregunta toEntity(PreguntaDTO dto) {
-        if (dto == null) return null;
-        int correcta = dto.getCorrecta() != null ? dto.getCorrecta() : -1;
-        return new Pregunta(dto.getId(), dto.getOfertaId(), dto.getPregunta(), dto.getOpciones(), correcta);
     }
 
     public List<PreguntaDTO> toAdminDTOList(List<Pregunta> preguntas) {

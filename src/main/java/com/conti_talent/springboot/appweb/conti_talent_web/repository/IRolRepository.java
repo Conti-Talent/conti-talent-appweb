@@ -1,26 +1,33 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.repository;
 
 import com.conti_talent.springboot.appweb.conti_talent_web.model.Rol;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 /**
- * Contrato de persistencia para Rol. Definido como interfaz para permitir
- * intercambiar la implementacion (memoria hoy, JPA mañana) sin afectar a
- * services ni controllers.
+ * Repositorio JPA del catalogo de roles.
+ * Mantiene los nombres de metodos en español que ya consumen los services.
  */
-public interface IRolRepository {
+@Repository
+public interface IRolRepository extends JpaRepository<Rol, Long> {
 
-    List<Rol> listarTodos();
+    Optional<Rol> findByCodigo(String codigo);
 
-    Optional<Rol> buscarPorId(String id);
+    boolean existsByCodigo(String codigo);
 
-    Optional<Rol> buscarPorCodigo(String codigo);
+    /* ===== Atajos en español para no romper signatures de los services ===== */
 
-    Rol guardar(Rol rol);
+    default java.util.List<Rol> listarTodos() { return findAll(); }
 
-    void eliminarPorId(String id);
+    default Optional<Rol> buscarPorId(Long id) { return findById(id); }
 
-    boolean existePorCodigo(String codigo);
+    default Optional<Rol> buscarPorCodigo(String codigo) { return findByCodigo(codigo); }
+
+    default Rol guardar(Rol rol) { return save(rol); }
+
+    default void eliminarPorId(Long id) { deleteById(id); }
+
+    default boolean existePorCodigo(String codigo) { return existsByCodigo(codigo); }
 }

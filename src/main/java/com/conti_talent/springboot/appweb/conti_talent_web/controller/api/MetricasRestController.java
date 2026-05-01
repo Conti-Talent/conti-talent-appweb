@@ -19,26 +19,22 @@ public class MetricasRestController {
         this.metricasService = metricasService;
     }
 
-    /** Dashboard: series + KPIs precomputados (forma identica a localStorage 'metricas'). */
     @GetMapping
     public MetricasDTO dashboard() {
         return metricasService.obtenerDashboard();
     }
 
-    /** Top postulantes ordenados por puntaje (ofertaId opcional). */
     @GetMapping("/ranking")
-    public List<RankingItemDTO> ranking(@RequestParam(value = "oferta", required = false) String ofertaId,
+    public List<RankingItemDTO> ranking(@RequestParam(value = "oferta", required = false) Long ofertaId,
                                         @RequestParam(value = "limit",  defaultValue = "10") int limite) {
         return metricasService.ranking(ofertaId, limite);
     }
 
-    /** Conteo de postulantes agrupado por estado. */
     @GetMapping("/por-estado")
     public Map<EstadoCodigo, Long> porEstado() {
         return metricasService.postulantesPorEstado();
     }
 
-    /** Top ofertas por numero de postulaciones. */
     @GetMapping("/ofertas-top")
     public List<Map<String, Object>> ofertasTop(@RequestParam(value = "limit", defaultValue = "5") int limite) {
         return metricasService.ofertasTop(limite);

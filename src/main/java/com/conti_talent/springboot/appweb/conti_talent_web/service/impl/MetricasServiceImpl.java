@@ -2,16 +2,15 @@ package com.conti_talent.springboot.appweb.conti_talent_web.service.impl;
 
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.MetricasDTO;
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.response.RankingItemDTO;
-import com.conti_talent.springboot.appweb.conti_talent_web.model.Estado;
 import com.conti_talent.springboot.appweb.conti_talent_web.model.Oferta;
 import com.conti_talent.springboot.appweb.conti_talent_web.model.Postulante;
 import com.conti_talent.springboot.appweb.conti_talent_web.model.enums.EstadoCodigo;
-import com.conti_talent.springboot.appweb.conti_talent_web.repository.IEstadoRepository;
 import com.conti_talent.springboot.appweb.conti_talent_web.repository.IMetricasRepository;
 import com.conti_talent.springboot.appweb.conti_talent_web.repository.IOfertaRepository;
 import com.conti_talent.springboot.appweb.conti_talent_web.repository.IPostulanteRepository;
 import com.conti_talent.springboot.appweb.conti_talent_web.service.IMetricasService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -22,16 +21,13 @@ public class MetricasServiceImpl implements IMetricasService {
     private final IMetricasRepository metricasRepository;
     private final IPostulanteRepository postulanteRepository;
     private final IOfertaRepository ofertaRepository;
-    private final IEstadoRepository estadoRepository;
 
     public MetricasServiceImpl(IMetricasRepository metricasRepository,
                                IPostulanteRepository postulanteRepository,
-                               IOfertaRepository ofertaRepository,
-                               IEstadoRepository estadoRepository) {
+                               IOfertaRepository ofertaRepository) {
         this.metricasRepository = metricasRepository;
         this.postulanteRepository = postulanteRepository;
         this.ofertaRepository = ofertaRepository;
-        this.estadoRepository = estadoRepository;
     }
 
     @Override
@@ -40,19 +36,18 @@ public class MetricasServiceImpl implements IMetricasService {
     }
 
     @Override
-    public List<RankingItemDTO> ranking(String ofertaId, int limite) {
-        Map<String, String> codigosEstadoPorId = construirMapaCodigosEstado();
-        String idEstadoRechazado = obtenerIdEstadoPorCodigo(EstadoCodigo.RECHAZADO.name());
-
-        List<Postulante> base = (ofertaId == null || ofertaId.isBlank())
+    @Transactional(readOnly = true)
+    public List<RankingItemDTO> ranking(Long ofertaId, int limite) {
+        List<Postulante> base = ofertaId == null
                 ? postulanteRepository.findAll()
                 : postulanteRepository.findByOfertaId(ofertaId);
 
-        Map<String, String> titulosOferta = ofertaRepository.findAll().stream()
+        Map<Long, String> titulosOferta = ofertaRepository.findAll().stream()
                 .collect(Collectors.toMap(Oferta::getId, Oferta::getTitulo, (a, b) -> a));
 
         List<Postulante> ordenados = base.stream()
-                .filter(p -> idEstadoRechazado == null || !idEstadoRechazado.equals(p.getEstadoId()))
+                .filter(p -> p.getEstado() == null
+                        || !EstadoCodigo.RECHAZADO.name().equals(p.getEstado().getCodigo()))
                 .sorted(Comparator.comparingInt(Postulante::getPuntaje).reversed())
                 .limit(Math.max(1, limite))
                 .collect(Collectors.toList());
@@ -60,24 +55,27 @@ public class MetricasServiceImpl implements IMetricasService {
         List<RankingItemDTO> filas = new ArrayList<>(ordenados.size());
         for (int i = 0; i < ordenados.size(); i++) {
             Postulante postulante = ordenados.get(i);
+            String codigoEstado = postulante.getEstado() != null
+                    ? postulante.getEstado().getCodigo()
+                    : "DESCONOCIDO";
             filas.add(new RankingItemDTO(
                     i + 1,
                     postulante.getId(),
                     postulante.getNombre(),
                     postulante.getOfertaId(),
                     titulosOferta.getOrDefault(postulante.getOfertaId(), "—"),
-                    codigosEstadoPorId.getOrDefault(postulante.getEstadoId(), "DESCONOCIDO"),
+                    codigoEstado,
                     postulante.getPuntaje()));
         }
         return filas;
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Map<EstadoCodigo, Long> postulantesPorEstado() {
-        Map<String, String> codigosPorId = construirMapaCodigosEstado();
-
         Map<EstadoCodigo, Long> conteoCrudo = postulanteRepository.findAll().stream()
-                .map(p -> codigosPorId.get(p.getEstadoId()))
+                .filter(p -> p.getEstado() != null)
+                .map(p -> p.getEstado().getCodigo())
                 .filter(Objects::nonNull)
                 .collect(Collectors.groupingBy(EstadoCodigo::valueOf, Collectors.counting()));
 
@@ -89,15 +87,17 @@ public class MetricasServiceImpl implements IMetricasService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Map<String, Object>> ofertasTop(int limite) {
-        Map<String, Long> conteoPorOferta = postulanteRepository.findAll().stream()
+        Map<Long, Long> conteoPorOferta = postulanteRepository.findAll().stream()
+                .filter(p -> p.getOfertaId() != null)
                 .collect(Collectors.groupingBy(Postulante::getOfertaId, Collectors.counting()));
 
-        Map<String, String> titulos = ofertaRepository.findAll().stream()
+        Map<Long, String> titulos = ofertaRepository.findAll().stream()
                 .collect(Collectors.toMap(Oferta::getId, Oferta::getTitulo, (a, b) -> a));
 
         return conteoPorOferta.entrySet().stream()
-                .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
+                .sorted(Map.Entry.<Long, Long>comparingByValue().reversed())
                 .limit(Math.max(1, limite))
                 .map(entrada -> {
                     Map<String, Object> fila = new LinkedHashMap<>();
@@ -107,17 +107,5 @@ public class MetricasServiceImpl implements IMetricasService {
                     return fila;
                 })
                 .collect(Collectors.toList());
-    }
-
-    /* ============ Helpers privados ============ */
-
-    /** Cache local del map estadoId -> codigo, evita N+1 lookups. */
-    private Map<String, String> construirMapaCodigosEstado() {
-        return estadoRepository.listarTodos().stream()
-                .collect(Collectors.toMap(Estado::getId, Estado::getCodigo, (a, b) -> a));
-    }
-
-    private String obtenerIdEstadoPorCodigo(String codigo) {
-        return estadoRepository.buscarPorCodigo(codigo).map(Estado::getId).orElse(null);
     }
 }

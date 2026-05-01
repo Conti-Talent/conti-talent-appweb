@@ -1,12 +1,9 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.dto.request;
 
-/**
- * Cuerpo del POST /api/postulantes — datos que envía el formulario de postulación.
- */
 public class PostularRequest {
 
-    private String usuarioId;
-    private String ofertaId;
+    private Long usuarioId;
+    private Long ofertaId;
     private String nombre;
     private String email;
     private String telefono;
@@ -17,11 +14,11 @@ public class PostularRequest {
     public PostularRequest() {
     }
 
-    public String getUsuarioId() { return usuarioId; }
-    public void setUsuarioId(String usuarioId) { this.usuarioId = usuarioId; }
+    public Long getUsuarioId() { return usuarioId; }
+    public void setUsuarioId(Long usuarioId) { this.usuarioId = usuarioId; }
 
-    public String getOfertaId() { return ofertaId; }
-    public void setOfertaId(String ofertaId) { this.ofertaId = ofertaId; }
+    public Long getOfertaId() { return ofertaId; }
+    public void setOfertaId(Long ofertaId) { this.ofertaId = ofertaId; }
 
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }

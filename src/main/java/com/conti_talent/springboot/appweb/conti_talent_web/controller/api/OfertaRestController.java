@@ -20,19 +20,19 @@ public class OfertaRestController {
 
     /**
      * GET /api/ofertas              -> todas las ofertas
-     * GET /api/ofertas?area=a1      -> filtra por área
+     * GET /api/ofertas?area=1       -> filtra por id de area
      * GET /api/ofertas?destacadas   -> solo destacadas
      */
     @GetMapping
-    public List<OfertaDTO> listar(@RequestParam(value = "area", required = false) String areaId,
+    public List<OfertaDTO> listar(@RequestParam(value = "area", required = false) Long areaId,
                                   @RequestParam(value = "destacadas", required = false) Boolean destacadas) {
         if (Boolean.TRUE.equals(destacadas)) return service.destacadas();
-        if (areaId != null && !areaId.isBlank()) return service.listarPorArea(areaId);
+        if (areaId != null) return service.listarPorArea(areaId);
         return service.listar();
     }
 
     @GetMapping("/{id}")
-    public OfertaDTO obtener(@PathVariable String id) {
+    public OfertaDTO obtener(@PathVariable Long id) {
         return service.obtener(id);
     }
 
@@ -42,12 +42,12 @@ public class OfertaRestController {
     }
 
     @PutMapping("/{id}")
-    public OfertaDTO actualizar(@PathVariable String id, @RequestBody OfertaDTO body) {
+    public OfertaDTO actualizar(@PathVariable Long id, @RequestBody OfertaDTO body) {
         return service.actualizar(id, body);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable String id) {
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         service.eliminar(id);
         return ResponseEntity.noContent().build();
     }

@@ -1,33 +1,46 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.model;
 
+import jakarta.persistence.*;
+
 /**
- * Entidad de dominio para Estado del flujo de seleccion. Representa una
- * etapa del proceso (POSTULADO, EN_EVALUACION, ENTREVISTA, etc.).
- *
- * Existe como tabla independiente para preparar la futura migracion a BD
- * relacional, donde Postulante tendra una FK -> Estado.
- *
- * El campo `codigo` es la llave logica (espejo de EstadoCodigo).
- * El campo `orden` permite renderizar los estados en secuencia en la UI.
- * El campo `terminal` indica si desde aqui no se puede avanzar.
+ * Entidad de dominio Estado del flujo de seleccion. Tabla TBL_ESTADO.
  */
+@Entity
+@Table(name = "tbl_estado", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_estado_codigo", columnNames = "codigo")
+})
 public class Estado {
 
-    private String id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "codigo", nullable = false, length = 40)
     private String codigo;
+
+    @Column(name = "nombre", nullable = false, length = 80)
     private String nombre;
+
+    @Column(name = "descripcion", length = 255)
     private String descripcion;
+
+    @Column(name = "orden", nullable = false)
     private int orden;
+
+    @Column(name = "terminal", nullable = false)
     private boolean terminal;
+
+    @Column(name = "activo", nullable = false)
     private boolean activo;
+
+    @Column(name = "creado_en", nullable = false)
     private long creadoEn;
 
     public Estado() {
     }
 
-    public Estado(String id, String codigo, String nombre, String descripcion,
+    public Estado(String codigo, String nombre, String descripcion,
                   int orden, boolean terminal, boolean activo, long creadoEn) {
-        this.id = id;
         this.codigo = codigo;
         this.nombre = nombre;
         this.descripcion = descripcion;
@@ -37,8 +50,8 @@ public class Estado {
         this.creadoEn = creadoEn;
     }
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
     public String getCodigo() { return codigo; }
     public void setCodigo(String codigo) { this.codigo = codigo; }

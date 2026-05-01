@@ -1,10 +1,8 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.dto.request;
 
 /**
- * Cuerpo de creacion / actualizacion de usuario desde el panel admin.
- * Acepta el rol como `rolId` (FK) o como `rolCodigo` (texto: "ADMIN" / "POSTULANTE")
- * para flexibilidad del cliente. El servicio resolvera la FK a partir del codigo
- * cuando solo se envie este ultimo.
+ * Cuerpo de creacion / actualizacion de usuario.
+ * Acepta el rol como `rolId` (FK directa) o como `rolCodigo` (texto).
  */
 public class UsuarioRequest {
 
@@ -12,7 +10,7 @@ public class UsuarioRequest {
     private String apellido;
     private String email;
     private String password;
-    private String rolId;
+    private Long rolId;
     private String rolCodigo;
     private Boolean activo;
 
@@ -31,8 +29,8 @@ public class UsuarioRequest {
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
 
-    public String getRolId() { return rolId; }
-    public void setRolId(String rolId) { this.rolId = rolId; }
+    public Long getRolId() { return rolId; }
+    public void setRolId(Long rolId) { this.rolId = rolId; }
 
     public String getRolCodigo() { return rolCodigo; }
     public void setRolCodigo(String rolCodigo) { this.rolCodigo = rolCodigo; }

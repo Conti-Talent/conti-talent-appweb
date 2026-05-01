@@ -1,151 +1,196 @@
 /* =========================================================
-   storage-api.js — Capa de persistencia v2 (drop-in)
-
-   REEMPLAZO de storage.js que migra de localStorage a la API REST
-   sin cambiar el contrato: sigue exponiendo `window.Storage` con los
-   métodos read / write / clear / generateId. Cuando estés listo para
-   migrar, en cada plantilla cambia:
-
-       <script src="js/storage.js"></script>
-   por:
-       <script src="js/storage-api.js"></script>
-
-   Estrategia (cache-then-network):
-     - Para minimizar riesgo y mantener la UI síncrona del front actual,
-       Storage.read sigue retornando lo que hay en localStorage en ese
-       momento, pero al mismo tiempo dispara una recarga asíncrona
-       contra la API y refresca el localStorage. La próxima lectura
-       traerá ya datos frescos.
-     - Storage.write hace optimistic write a localStorage y empuja
-       la novedad al backend.
+   storage-api.js — Capa de datos REST sin localStorage
    ========================================================= */
 
-const NAMESPACE = 'conti-talent';
-const API = ''; // mismo origen — Spring Boot sirve también el front
+const API = '';
 
 const Storage = (() => {
-  const buildKey = (entity) => `${NAMESPACE}:${entity}`;
+  const cache = {
+    usuarios: [],
+    areas: [],
+    ofertas: [],
+    preguntas: [],
+    postulantes: [],
+    metricas: { series: {}, estadoActual: {} },
+    session: null
+  };
 
-  /* ---------- mapeos entidad ↔ endpoint ---------- */
-  const endpointFor = {
-    usuarios:    '/api/usuarios',
-    areas:       '/api/areas',
-    ofertas:     '/api/ofertas',
-    preguntas:   '/api/preguntas',
+  const endpoints = {
+    usuarios: '/api/usuarios',
+    areas: '/api/areas',
+    ofertas: '/api/ofertas',
+    preguntas: '/api/preguntas',
     postulantes: '/api/postulantes',
-    metricas:    '/api/metricas'
+    metricas: '/api/metricas'
   };
 
-  const fetchJSON = (url, opts = {}) =>
-    fetch(API + url, { credentials: 'include', headers: { 'Content-Type': 'application/json' }, ...opts })
-      .then((r) => (r.ok ? r.json() : Promise.reject(r)));
+  const normalizeId = (value) => value === null || value === undefined ? null : String(value);
+  const toNumber = (value) => value === null || value === undefined || value === '' ? null : Number(value);
+  const rolCode = (u) => String(u.rol?.codigo || u.rolCodigo || u.rol || '').toLowerCase();
 
-  const refreshFromServer = (entity) => {
-    const ep = endpointFor[entity];
-    if (!ep) return;
-    fetchJSON(ep)
-      .then((data) => localStorage.setItem(buildKey(entity), JSON.stringify(data)))
-      .catch(() => { /* offline: dejamos lo que ya hay en localStorage */ });
+  const iconMap = {
+    engineering: '💻',
+    chart: '📊',
+    scale: '⚖️',
+    books: '📚',
+    stethoscope: '🏥',
+    microscope: '🔬',
+    computer: '🖥️',
+    handshake: '🤝',
+    building: '🏢'
   };
+
+  const displayIcon = (icono) => iconMap[icono] || icono || iconMap.building;
+
+  const normalize = {
+    usuarios: (items) => (items || []).map((u) => ({
+      ...u,
+      id: normalizeId(u.id),
+      rolId: normalizeId(u.rolId || u.rol?.id),
+      rol: rolCode(u),
+      activo: u.activo !== false
+    })),
+    areas: (items) => (items || []).map((a) => ({ ...a, id: normalizeId(a.id), icono: displayIcon(a.icono) })),
+    ofertas: (items) => (items || []).map((o) => ({
+      ...o,
+      id: normalizeId(o.id),
+      areaId: normalizeId(o.areaId),
+      requisitos: o.requisitos || [],
+      beneficios: o.beneficios || []
+    })),
+    preguntas: (items) => (items || []).map((q) => ({
+      ...q,
+      id: normalizeId(q.id),
+      ofertaId: normalizeId(q.ofertaId),
+      opciones: q.opciones || []
+    })),
+    postulantes: (items) => (items || []).map((p) => ({
+      ...p,
+      id: normalizeId(p.id),
+      usuarioId: normalizeId(p.usuarioId),
+      ofertaId: normalizeId(p.ofertaId),
+      estadoId: normalizeId(p.estadoId),
+      respuestas: p.respuestas || {}
+    })),
+    metricas: (data) => data || { series: {}, estadoActual: {} }
+  };
+
+  const normalizeSession = (s) => !s ? null : ({
+    ...s,
+    id: normalizeId(s.id),
+    rol: String(s.rol || s.rolCodigo || '').toLowerCase()
+  });
+
+  const request = (url, opts = {}) =>
+    fetch(API + url, {
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json', ...(opts.headers || {}) },
+      ...opts
+    }).then(async (response) => {
+      if (response.status === 204) return null;
+      const contentType = response.headers.get('content-type') || '';
+      const body = contentType.includes('application/json') ? await response.json() : await response.text();
+      if (!response.ok) {
+        const message = body?.message || body?.error || body || `Error HTTP ${response.status}`;
+        throw new Error(message);
+      }
+      return body;
+    });
+
+  const refresh = async (entity) => {
+    const endpoint = endpoints[entity];
+    if (!endpoint) return read(entity, entity === 'metricas' ? { series: {}, estadoActual: {} } : []);
+    const data = await request(endpoint);
+    cache[entity] = normalize[entity] ? normalize[entity](data) : data;
+    return cache[entity];
+  };
+
+  const refreshSession = async () => {
+    try {
+      cache.session = normalizeSession(await request('/api/auth/me'));
+    } catch (_err) {
+      cache.session = null;
+    }
+    return cache.session;
+  };
+
+  const ready = Promise.all([
+    refresh('usuarios'),
+    refresh('areas'),
+    refresh('ofertas'),
+    refresh('preguntas'),
+    refresh('postulantes'),
+    refresh('metricas').catch(() => cache.metricas),
+    refreshSession()
+  ]).then(() => cache);
 
   const read = (entity, fallback = []) => {
-    // 1) refrescamos en segundo plano (no bloquea la UI)
-    refreshFromServer(entity);
-    // 2) devolvemos lo último conocido
-    try {
-      const raw = localStorage.getItem(buildKey(entity));
-      return raw ? JSON.parse(raw) : fallback;
-    } catch (_err) {
-      return fallback;
-    }
+    if (Object.prototype.hasOwnProperty.call(cache, entity)) return cache[entity] ?? fallback;
+    return fallback;
   };
 
   const write = (entity, value) => {
-    // optimistic local write — el front sigue funcionando aunque la red falle
-    localStorage.setItem(buildKey(entity), JSON.stringify(value));
-    // intento de sync best-effort (CRUD granular vive en cada módulo cuando esté listo)
-    // Aquí mantenemos compatibilidad con el código actual que escribe la lista
-    // entera; el backend la ignora salvo que la página implemente sus propios
-    // POST/PUT/DELETE granulares contra /api/<entity>.
+    cache[entity] = normalize[entity] ? normalize[entity](value) : value;
   };
 
-  const clear = (entity) => localStorage.removeItem(buildKey(entity));
+  const clear = (entity) => {
+    if (entity === 'session') cache.session = null;
+    else if (Array.isArray(cache[entity])) cache[entity] = [];
+    else cache[entity] = null;
+  };
 
-  const generateId = () =>
-    'id_' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+  const upsert = (entity, item) => {
+    const normalized = normalize[entity] ? normalize[entity]([item])[0] : item;
+    const items = Array.isArray(cache[entity]) ? cache[entity] : [];
+    const index = items.findIndex((x) => String(x.id) === String(normalized.id));
+    if (index >= 0) items[index] = normalized;
+    else items.push(normalized);
+    cache[entity] = items;
+    return normalized;
+  };
 
-  return { read, write, clear, generateId };
+  const removeCached = (entity, id) => {
+    cache[entity] = (cache[entity] || []).filter((item) => String(item.id) !== String(id));
+  };
+
+  const generateId = () => 'tmp_' + Math.random().toString(36).slice(2, 10);
+
+  return { ready, request, refresh, read, write, clear, upsert, removeCached, generateId, normalizeSession, toNumber };
 })();
+
+const ContiAPI = (() => ({
+  login: (email, password) =>
+    Storage.request('/api/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) }),
+  registro: (data) =>
+    Storage.request('/api/auth/registro', { method: 'POST', body: JSON.stringify(data) }),
+  me: () => Storage.request('/api/auth/me'),
+  logout: () => Storage.request('/api/auth/logout', { method: 'POST' }),
+
+  crearUsuario: (data) => Storage.request('/api/usuarios', { method: 'POST', body: JSON.stringify(data) }),
+  actualizarUsuario: (id, data) => Storage.request(`/api/usuarios/${Storage.toNumber(id)}`, { method: 'PUT', body: JSON.stringify(data) }),
+  eliminarUsuario: (id) => Storage.request(`/api/usuarios/${Storage.toNumber(id)}`, { method: 'DELETE' }),
+
+  crearArea: (data) => Storage.request('/api/areas', { method: 'POST', body: JSON.stringify(data) }),
+  actualizarArea: (id, data) => Storage.request(`/api/areas/${Storage.toNumber(id)}`, { method: 'PUT', body: JSON.stringify(data) }),
+  eliminarArea: (id) => Storage.request(`/api/areas/${Storage.toNumber(id)}`, { method: 'DELETE' }),
+
+  crearOferta: (data) => Storage.request('/api/ofertas', { method: 'POST', body: JSON.stringify(data) }),
+  actualizarOferta: (id, data) => Storage.request(`/api/ofertas/${Storage.toNumber(id)}`, { method: 'PUT', body: JSON.stringify(data) }),
+  eliminarOferta: (id) => Storage.request(`/api/ofertas/${Storage.toNumber(id)}`, { method: 'DELETE' }),
+
+  crearPregunta: (data) => Storage.request('/api/preguntas', { method: 'POST', body: JSON.stringify(data) }),
+  actualizarPregunta: (id, data) => Storage.request(`/api/preguntas/${Storage.toNumber(id)}`, { method: 'PUT', body: JSON.stringify(data) }),
+  eliminarPregunta: (id) => Storage.request(`/api/preguntas/${Storage.toNumber(id)}`, { method: 'DELETE' }),
+
+  postular: (data) => Storage.request('/api/postulantes', { method: 'POST', body: JSON.stringify(data) }),
+  cambiarEstado: (id, estado) =>
+    Storage.request(`/api/postulantes/${Storage.toNumber(id)}/estado`, { method: 'PATCH', body: JSON.stringify({ estado }) }),
+  rechazar: (id) => Storage.request(`/api/postulantes/${Storage.toNumber(id)}/rechazar`, { method: 'POST' }),
+  eliminarPostulante: (id) => Storage.request(`/api/postulantes/${Storage.toNumber(id)}`, { method: 'DELETE' }),
+
+  calificar: (postulanteId, respuestas) =>
+    Storage.request('/api/evaluaciones', { method: 'POST', body: JSON.stringify({ postulanteId: Storage.toNumber(postulanteId), respuestas }) })
+}))();
 
 window.Storage = Storage;
-
-/* =========================================================
-   Helpers REST opcionales — el front puede ir migrando módulo por módulo.
-
-   Ejemplo de cómo migrar page-postular.js (Fase 2):
-
-     // Antes (localStorage):
-     // const postulante = Postulantes.create({ ... });
-
-     // Después (REST):
-     ContiAPI.postular({
-       usuarioId: session?.id,
-       ofertaId: oferta.id,
-       nombre, email, telefono, experiencia, habilidades, cv
-     }).then((postulante) => {
-       window.location.href = `evaluacion.html?postulante=${postulante.id}`;
-     });
-
-   Y para enviar la evaluación (page-evaluacion.js):
-
-     ContiAPI.calificar(postulanteId, respuestas)
-       .then((evalDto) => UI.showToast(`Puntaje: ${evalDto.puntaje}`, 'success'));
-   ========================================================= */
-
-const ContiAPI = (() => {
-  const j = (url, opts = {}) =>
-    fetch(API + url, {
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      ...opts
-    }).then((r) => {
-      if (!r.ok) return r.json().then((b) => Promise.reject(b));
-      return r.status === 204 ? null : r.json();
-    });
-
-  return {
-    /* ---------- Auth ---------- */
-    login:    (email, password) => j('/api/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) }),
-    registro: (data)            => j('/api/auth/registro', { method: 'POST', body: JSON.stringify(data) }),
-    me:       ()                => j('/api/auth/me'),
-    logout:   ()                => j('/api/auth/logout', { method: 'POST' }),
-
-    /* ---------- Catálogo ---------- */
-    listarOfertas:     ()      => j('/api/ofertas'),
-    ofertasDestacadas: ()      => j('/api/ofertas?destacadas=true'),
-    obtenerOferta:     (id)    => j(`/api/ofertas/${id}`),
-    listarAreas:       ()      => j('/api/areas'),
-    obtenerArea:       (id)    => j(`/api/areas/${id}`),
-
-    /* ---------- Postulación ---------- */
-    postular:    (data)        => j('/api/postulantes',          { method: 'POST', body: JSON.stringify(data) }),
-    misPostulaciones: (uid)    => j(`/api/postulantes?usuario=${encodeURIComponent(uid)}`),
-    obtenerPostulante: (id)    => j(`/api/postulantes/${id}`),
-    cambiarEstado: (id, est)   => j(`/api/postulantes/${id}/estado`, { method: 'PATCH', body: JSON.stringify({ estado: est }) }),
-    rechazar:    (id)          => j(`/api/postulantes/${id}/rechazar`, { method: 'POST' }),
-
-    /* ---------- Evaluación ---------- */
-    preguntasOferta: (ofertaId) => j(`/api/preguntas?oferta=${encodeURIComponent(ofertaId)}&publico=true`),
-    calificar: (postulanteId, respuestas) =>
-        j('/api/evaluaciones', { method: 'POST', body: JSON.stringify({ postulanteId, respuestas }) }),
-    evaluacionPorPostulante: (id) => j(`/api/evaluaciones/postulante/${id}`),
-
-    /* ---------- Métricas ---------- */
-    metricas:      ()                    => j('/api/metricas'),
-    ranking:       (ofertaId, limit = 10) => j(`/api/metricas/ranking?limit=${limit}${ofertaId ? `&oferta=${ofertaId}` : ''}`),
-    porEstado:     ()                    => j('/api/metricas/por-estado'),
-    ofertasTop:    (limit = 5)           => j(`/api/metricas/ofertas-top?limit=${limit}`)
-  };
-})();
-
 window.ContiAPI = ContiAPI;

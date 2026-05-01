@@ -25,7 +25,7 @@ public class UsuarioRestController {
     }
 
     @GetMapping("/{id}")
-    public UsuarioDTO obtener(@PathVariable String id) {
+    public UsuarioDTO obtener(@PathVariable Long id) {
         return service.obtener(id);
     }
 
@@ -35,12 +35,12 @@ public class UsuarioRestController {
     }
 
     @PutMapping("/{id}")
-    public UsuarioDTO actualizar(@PathVariable String id, @RequestBody UsuarioRequest body) {
+    public UsuarioDTO actualizar(@PathVariable Long id, @RequestBody UsuarioRequest body) {
         return service.actualizar(id, body);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable String id) {
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         service.eliminar(id);
         return ResponseEntity.noContent().build();
     }

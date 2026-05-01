@@ -1,47 +1,45 @@
 /* =========================================================
-   auth.js — Sesión, login, registro, control de roles
+   auth.js — Sesion, login, registro y control de roles
    ========================================================= */
 
 const Auth = (() => {
   const SESSION_KEY = 'session';
 
-  const getSession  = () => Storage.read(SESSION_KEY, null);
-  const setSession  = (s) => Storage.write(SESSION_KEY, s);
-  const clear       = () => Storage.clear(SESSION_KEY);
+  const getSession = () => Storage.read(SESSION_KEY, null);
+  const setSession = (session) => Storage.write(SESSION_KEY, Storage.normalizeSession(session));
+  const clear = () => Storage.clear(SESSION_KEY);
 
   const isAuthenticated = () => !!getSession();
-  const isAdmin         = () => getSession()?.rol === 'admin';
+  const isAdmin = () => getSession()?.rol === 'admin';
 
-  const login = (email, password) => {
-    const usuarios = Storage.read('usuarios', []);
-    const user = usuarios.find((u) => u.email.toLowerCase() === String(email).toLowerCase().trim() && u.password === password && u.activo);
-    if (!user) return { ok: false, error: 'Credenciales inválidas o cuenta desactivada' };
-    setSession({ id: user.id, nombre: user.nombre, apellido: user.apellido, email: user.email, rol: user.rol });
-    return { ok: true, user };
-  };
-
-  const register = ({ nombre, apellido, email, password }) => {
-    const usuarios = Storage.read('usuarios', []);
-    if (usuarios.some((u) => u.email.toLowerCase() === String(email).toLowerCase().trim())) {
-      return { ok: false, error: 'Ya existe una cuenta con este correo' };
+  const login = async (email, password) => {
+    try {
+      const response = await ContiAPI.login(email, password);
+      const user = Storage.normalizeSession(response.data || response);
+      setSession(user);
+      await Storage.refresh('usuarios').catch(() => {});
+      return { ok: true, user };
+    } catch (err) {
+      return { ok: false, error: err.message || 'Credenciales invalidas o cuenta desactivada' };
     }
-    const newUser = {
-      id: Storage.generateId(),
-      nombre: nombre.trim(),
-      apellido: apellido.trim(),
-      email: email.trim(),
-      password,
-      rol: 'postulante',
-      activo: true,
-      creadoEn: Date.now()
-    };
-    usuarios.push(newUser);
-    Storage.write('usuarios', usuarios);
-    setSession({ id: newUser.id, nombre: newUser.nombre, apellido: newUser.apellido, email: newUser.email, rol: newUser.rol });
-    return { ok: true, user: newUser };
   };
 
-  const logout = () => clear();
+  const register = async ({ nombre, apellido, email, password }) => {
+    try {
+      const response = await ContiAPI.registro({ nombre, apellido, email, password });
+      const user = Storage.normalizeSession(response.data || response);
+      setSession(user);
+      await Storage.refresh('usuarios').catch(() => {});
+      return { ok: true, user };
+    } catch (err) {
+      return { ok: false, error: err.message || 'No se pudo crear la cuenta' };
+    }
+  };
+
+  const logout = async () => {
+    clear();
+    try { await ContiAPI.logout(); } catch (_err) {}
+  };
 
   const requireAuth = (redirect = 'login.html') => {
     if (!isAuthenticated()) {

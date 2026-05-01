@@ -1,11 +1,8 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.dto;
 
-/**
- * DTO de Estado para exposicion via API REST.
- */
 public class EstadoDTO {
 
-    private String id;
+    private Long id;
     private String codigo;
     private String nombre;
     private String descripcion;
@@ -17,7 +14,7 @@ public class EstadoDTO {
     public EstadoDTO() {
     }
 
-    public EstadoDTO(String id, String codigo, String nombre, String descripcion,
+    public EstadoDTO(Long id, String codigo, String nombre, String descripcion,
                      int orden, boolean terminal, boolean activo, long creadoEn) {
         this.id = id;
         this.codigo = codigo;
@@ -29,8 +26,8 @@ public class EstadoDTO {
         this.creadoEn = creadoEn;
     }
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
     public String getCodigo() { return codigo; }
     public void setCodigo(String codigo) { this.codigo = codigo; }

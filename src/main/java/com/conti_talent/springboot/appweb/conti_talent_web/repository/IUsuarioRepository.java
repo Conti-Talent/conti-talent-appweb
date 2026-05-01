@@ -1,27 +1,28 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.repository;
 
 import com.conti_talent.springboot.appweb.conti_talent_web.model.Usuario;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
 /**
- * Contrato del repositorio de Usuario. Implementacion intercambiable
- * (memoria hoy, JPA mañana) sin afectar la capa de servicios.
+ * Repositorio JPA de Usuario.
+ * Spring Data deriva las queries automaticamente del nombre del metodo.
  */
-public interface IUsuarioRepository {
+@Repository
+public interface IUsuarioRepository extends JpaRepository<Usuario, Long> {
 
-    List<Usuario> findAll();
+    Optional<Usuario> findByEmailIgnoreCase(String email);
 
-    Optional<Usuario> findById(String id);
+    boolean existsByEmailIgnoreCase(String email);
 
-    Optional<Usuario> findByEmail(String email);
+    List<Usuario> findByRolId(Long rolId);
 
-    List<Usuario> findByRolId(String rolId);
+    /* ===== Atajos retro-compatibles con la API antigua ===== */
 
-    Usuario save(Usuario usuario);
+    default Optional<Usuario> findByEmail(String email) { return findByEmailIgnoreCase(email); }
 
-    void deleteById(String id);
-
-    boolean existsByEmail(String email);
+    default boolean existsByEmail(String email) { return existsByEmailIgnoreCase(email); }
 }

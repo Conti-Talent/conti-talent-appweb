@@ -1,18 +1,15 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.dto;
 
 /**
- * DTO de Usuario para exposicion externa.
- * IMPORTANTE: nunca incluye password.
- * Incluye el rol como objeto embebido (RolDTO) para evitar que el frontend
- * tenga que hacer un segundo request para obtener el nombre del rol.
+ * DTO de Usuario. Nunca incluye password. Embebe RolDTO resuelto.
  */
 public class UsuarioDTO {
 
-    private String id;
+    private Long id;
     private String nombre;
     private String apellido;
     private String email;
-    private String rolId;
+    private Long rolId;
     private RolDTO rol;
     private boolean activo;
     private long creadoEn;
@@ -20,8 +17,8 @@ public class UsuarioDTO {
     public UsuarioDTO() {
     }
 
-    public UsuarioDTO(String id, String nombre, String apellido, String email,
-                      String rolId, RolDTO rol, boolean activo, long creadoEn) {
+    public UsuarioDTO(Long id, String nombre, String apellido, String email,
+                      Long rolId, RolDTO rol, boolean activo, long creadoEn) {
         this.id = id;
         this.nombre = nombre;
         this.apellido = apellido;
@@ -32,8 +29,8 @@ public class UsuarioDTO {
         this.creadoEn = creadoEn;
     }
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
@@ -44,8 +41,8 @@ public class UsuarioDTO {
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
 
-    public String getRolId() { return rolId; }
-    public void setRolId(String rolId) { this.rolId = rolId; }
+    public Long getRolId() { return rolId; }
+    public void setRolId(Long rolId) { this.rolId = rolId; }
 
     public RolDTO getRol() { return rol; }
     public void setRol(RolDTO rol) { this.rol = rol; }
