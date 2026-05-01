@@ -117,7 +117,7 @@
 
     UI.clear(tbody);
     if (items.length === 0) {
-      tbody.appendChild(UI.el('tr', {}, [UI.el('td', { colspan: 6, class: 'soft', style: 'text-align:center;padding:32px', text: 'Sin postulantes que coincidan.' })]));
+      tbody.appendChild(UI.el('tr', {}, [UI.el('td', { colspan: 7, class: 'soft', style: 'text-align:center;padding:32px', text: 'Sin postulantes que coincidan.' })]));
       return;
     }
 
@@ -141,6 +141,7 @@
             UI.el('div', { class: 'progress' }, [UI.el('div', { class: 'progress__bar', style: `width:${Math.min(100, p.puntaje)}%` })])
           ])
         ]),
+        UI.el('td', {}, [renderCvAction(p)]),
         UI.el('td', { text: UI.formatDate(p.creadoEn) }),
         UI.el('td', {}, [
           UI.el('div', { class: 'row-actions' }, [
@@ -170,7 +171,7 @@
           UI.el('div', { class: 'kpi__label', text: 'Puntaje' }),
           UI.el('div', { class: 'kpi__value', text: p.puntaje })
         ]),
-        UI.el('a', { href: '#', class: 'btn btn--ghost btn--sm', style: 'margin-top:16px', text: `📎 ${p.cv}` })
+        renderCvAction(p, 'margin-top:16px')
       ]),
       UI.el('section', {}, [
         UI.el('div', { class: 'card', style: 'margin-bottom:12px' }, [
@@ -191,6 +192,20 @@
     ]);
 
     UI.openModal({ title: 'Detalle del postulante', content });
+  };
+
+  const renderCvAction = (p, style = '') => {
+    if (!p.cv) {
+      return UI.el('span', { class: 'soft text-xs', text: 'Sin CV' });
+    }
+    return UI.el('a', {
+      href: ContiAPI.cvUrl(p.id),
+      target: '_blank',
+      rel: 'noopener',
+      class: 'btn btn--sm btn--ghost',
+      style,
+      text: 'Ver CV'
+    });
   };
 
   const openEdit = (p) => {

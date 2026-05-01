@@ -184,8 +184,28 @@ const ContiAPI = (() => ({
   crearPregunta: (data) => Storage.request('/api/preguntas', { method: 'POST', body: JSON.stringify(data) }),
   actualizarPregunta: (id, data) => Storage.request(`/api/preguntas/${Storage.toNumber(id)}`, { method: 'PUT', body: JSON.stringify(data) }),
   eliminarPregunta: (id) => Storage.request(`/api/preguntas/${Storage.toNumber(id)}`, { method: 'DELETE' }),
+  preguntasPublicas: (ofertaId) => Storage.request(`/api/preguntas/publicas?oferta=${Storage.toNumber(ofertaId)}`),
+  preguntasResueltas: (postulanteId) => Storage.request(`/api/preguntas/resueltas?postulante=${Storage.toNumber(postulanteId)}`),
 
   postular: (data) => Storage.request('/api/postulantes', { method: 'POST', body: JSON.stringify(data) }),
+  subirCv: (postulanteId, file) => {
+    const formData = new FormData();
+    formData.append('cv', file);
+    return fetch(API + `/api/postulantes/${Storage.toNumber(postulanteId)}/cv`, {
+      method: 'POST',
+      credentials: 'include',
+      body: formData
+    }).then(async (response) => {
+      const contentType = response.headers.get('content-type') || '';
+      const body = contentType.includes('application/json') ? await response.json() : await response.text();
+      if (!response.ok) {
+        const message = body?.message || body?.error || body || `Error HTTP ${response.status}`;
+        throw new Error(message);
+      }
+      return body?.data || body;
+    });
+  },
+  cvUrl: (postulanteId) => `/api/postulantes/${Storage.toNumber(postulanteId)}/cv`,
   cambiarEstado: (id, estado) =>
     Storage.request(`/api/postulantes/${Storage.toNumber(id)}/estado`, { method: 'PATCH', body: JSON.stringify({ estado }) }),
   rechazar: (id) => Storage.request(`/api/postulantes/${Storage.toNumber(id)}/rechazar`, { method: 'POST' }),

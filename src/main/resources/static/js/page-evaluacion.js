@@ -28,8 +28,20 @@
       return;
     }
 
-    oferta    = Ofertas.get(postulante.ofertaId);
-    preguntas = Evaluacion.byOferta(oferta.id);
+    oferta = Ofertas.get(postulante.ofertaId);
+    if (!oferta) {
+      UI.showToast('No se encontrÃ³ la oferta asociada', 'error');
+      setTimeout(() => window.location.href = '/mi-estado', 800);
+      return;
+    }
+
+    try {
+      preguntas = await ContiAPI.preguntasPublicas(oferta.id);
+      preguntas = (preguntas || []).map((q) => ({ ...q, id: String(q.id), ofertaId: String(q.ofertaId), opciones: q.opciones || [] }));
+    } catch (err) {
+      UI.showToast(err.message || 'No se pudo cargar la evaluaciÃ³n', 'error');
+      preguntas = [];
+    }
 
     UI.$('#quiz-title').textContent = `Evaluación técnica · ${oferta.titulo}`;
     UI.$('#quiz-area').textContent  = Areas.get(oferta.areaId)?.nombre || '—';
@@ -78,17 +90,27 @@
   const updateProgress = () => {
     const answered = Object.keys(respuestas).length;
     UI.$('#quiz-progress-text').textContent = `${answered} / ${preguntas.length} respondidas`;
-    UI.$('#quiz-progress-bar').style.width  = `${(answered / preguntas.length) * 100}%`;
+    UI.$('#quiz-progress-bar').style.width  = preguntas.length ? `${(answered / preguntas.length) * 100}%` : '0%';
   };
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
     if (Object.keys(respuestas).length < preguntas.length) {
       UI.showToast('Responde todas las preguntas', 'error');
       return;
     }
-    const result = Evaluacion.calificar(oferta.id, respuestas);
-    Postulantes.saveEvaluation(postulante.id, result.puntaje, { ...respuestas });
+    let result;
+    try {
+      result = await ContiAPI.calificar(postulante.id, { ...respuestas });
+      Postulantes.update(postulante.id, {
+        puntaje: result.puntaje,
+        respuestas: { ...respuestas },
+        estado: result.puntaje >= 70 ? 'APROBADO_TECNICO' : 'EN_EVALUACION'
+      });
+    } catch (err) {
+      UI.showToast(err.message || 'No se pudo registrar la evaluaciÃ³n', 'error');
+      return;
+    }
 
     UI.openModal({
       title: 'Resultado de tu evaluación',

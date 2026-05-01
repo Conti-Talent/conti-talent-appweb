@@ -12,6 +12,7 @@ import java.util.List;
 @Repository
 public interface IPreguntaRepository extends JpaRepository<Pregunta, Long> {
 
+    @Query("SELECT p FROM Pregunta p WHERE p.oferta.id = :ofertaId")
     List<Pregunta> findByOfertaId(Long ofertaId);
 
     @Modifying

@@ -27,9 +27,23 @@
       return;
     }
 
-    const oferta    = Ofertas.get(postulante.ofertaId);
-    const preguntas = Evaluacion.byOferta(postulante.ofertaId);
+    const oferta = Ofertas.get(postulante.ofertaId);
+    let preguntas = [];
     const respuestas = postulante.respuestas || {};
+
+    if (Object.keys(respuestas).length > 0) {
+      try {
+        preguntas = await ContiAPI.preguntasResueltas(postulante.id);
+        preguntas = (preguntas || []).map((q) => ({
+          ...q,
+          id: String(q.id),
+          ofertaId: String(q.ofertaId),
+          opciones: q.opciones || []
+        }));
+      } catch (err) {
+        UI.showToast(err.message || 'No se pudieron cargar tus respuestas', 'error');
+      }
+    }
 
     renderHeader(postulante, oferta);
     renderResumen(postulante, preguntas, respuestas);
@@ -45,7 +59,7 @@
   };
 
   const renderResumen = (p, preguntas, respuestas) => {
-    const correctas = preguntas.filter((q) => respuestas[q.id] === q.correcta).length;
+    const correctas = preguntas.filter((q) => Number(respuestas[q.id]) === Number(q.correcta)).length;
     const total     = preguntas.length;
     const wrap      = document.getElementById('respuestas-summary');
     UI.clear(wrap);
@@ -84,8 +98,9 @@
     }
 
     preguntas.forEach((q, idx) => {
-      const elegida   = respuestas[q.id];
-      const acerto    = elegida === q.correcta;
+      const elegida   = Number(respuestas[q.id]);
+      const correcta  = Number(q.correcta);
+      const acerto    = elegida === correcta;
       const card      = UI.el('article', { class: 'question-card anim-fade-up' }, [
         UI.el('div', { class: 'flex gap-2', style: 'align-items:center' }, [
           UI.el('span', { class: 'badge', text: `Pregunta ${idx + 1}` }),
@@ -95,7 +110,7 @@
         UI.el('div', { class: 'options' },
           q.opciones.map((opcion, i) => {
             const tuRespuesta = i === elegida;
-            const esCorrecta  = i === q.correcta;
+            const esCorrecta  = i === correcta;
             let cls = 'option';
             if (tuRespuesta && esCorrecta) cls += ' is-selected';
             const styleCorrecta = esCorrecta && !tuRespuesta

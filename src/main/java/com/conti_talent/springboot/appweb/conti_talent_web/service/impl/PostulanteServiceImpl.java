@@ -90,6 +90,17 @@ public class PostulanteServiceImpl implements IPostulanteService {
 
     @Override
     @Transactional
+    public PostulanteDTO actualizarCv(Long idPostulante, String cv) {
+        if (esTextoVacio(cv)) {
+            throw new BusinessException("Ruta de CV requerida");
+        }
+        Postulante postulante = buscarPostulanteOFallar(idPostulante);
+        postulante.setCv(cv.trim());
+        return postulanteMapper.convertirADTO(postulanteRepository.save(postulante));
+    }
+
+    @Override
+    @Transactional
     public PostulanteDTO cambiarEstado(Long idPostulante, String estadoDestino) {
         Postulante postulante = buscarPostulanteOFallar(idPostulante);
         if (esTextoVacio(estadoDestino)) {

@@ -1,21 +1,32 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.controller.api;
 
+import com.conti_talent.springboot.appweb.conti_talent_web.dto.PostulanteDTO;
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.PreguntaDTO;
+import com.conti_talent.springboot.appweb.conti_talent_web.dto.auth.SesionDTO;
+import com.conti_talent.springboot.appweb.conti_talent_web.exception.ResourceNotFoundException;
+import com.conti_talent.springboot.appweb.conti_talent_web.exception.UnauthorizedException;
+import com.conti_talent.springboot.appweb.conti_talent_web.service.IPostulanteService;
 import com.conti_talent.springboot.appweb.conti_talent_web.service.IPreguntaService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/preguntas")
 public class PreguntaRestController {
 
     private final IPreguntaService service;
+    private final IPostulanteService postulanteService;
 
-    public PreguntaRestController(IPreguntaService service) {
+    public PreguntaRestController(IPreguntaService service,
+                                  IPostulanteService postulanteService) {
         this.service = service;
+        this.postulanteService = postulanteService;
     }
 
     /**
@@ -32,6 +43,32 @@ public class PreguntaRestController {
                     : service.listarPorOferta(ofertaId);
         }
         return service.listar();
+    }
+
+    @GetMapping("/publicas")
+    public List<PreguntaDTO> listarPublicas(@RequestParam("oferta") Long ofertaId) {
+        return service.listarPorOfertaPublico(ofertaId);
+    }
+
+    @GetMapping("/resueltas")
+    public List<PreguntaDTO> listarResueltas(@RequestParam("postulante") Long postulanteId,
+                                             HttpSession session) {
+        SesionDTO sesion = (SesionDTO) session.getAttribute(AuthRestController.SESSION_ATTR);
+        if (sesion == null) {
+            throw new UnauthorizedException("No autenticado");
+        }
+
+        PostulanteDTO postulante = postulanteService.obtenerPorId(postulanteId);
+        boolean esAdmin = "admin".equals(sesion.getRol());
+        boolean esDuenio = postulante.getUsuarioId() != null && Objects.equals(postulante.getUsuarioId(), sesion.getId());
+        if (!esAdmin && !esDuenio) {
+            throw new AccessDeniedException("No tienes acceso a estas respuestas");
+        }
+        if (postulante.getRespuestas() == null || postulante.getRespuestas().isEmpty()) {
+            throw new ResourceNotFoundException("El postulante no tiene respuestas registradas");
+        }
+
+        return service.listarPorOferta(postulante.getOfertaId());
     }
 
     @GetMapping("/{id}")

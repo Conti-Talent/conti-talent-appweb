@@ -8,6 +8,11 @@
 
   const init = async () => {
     await Storage.ready;
+    try {
+      await Promise.all([Storage.refresh('areas'), Storage.refresh('ofertas')]);
+    } catch (err) {
+      UI.showToast(err.message || 'No se pudieron cargar las ofertas', 'error');
+    }
     populateAreaFilter();
     populateTipoFilter();
 

@@ -3,6 +3,7 @@ package com.conti_talent.springboot.appweb.conti_talent_web.config;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
@@ -35,18 +36,25 @@ public class SecurityConfig {
                                 "/contacto", "/contacto.html",
                                 "/publicidad", "/publicidad.html",
                                 "/css/**", "/js/**", "/img/**", "/images/**", "/assets/**",
-                                "/uploads/**",
                                 "/error", "/error/**",
-                                "/api/auth/**",
-                                "/api/ofertas/**", "/api/areas/**"
+                                "/api/auth/**"
                         ).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/ofertas", "/api/ofertas/**", "/api/areas", "/api/areas/**")
+                        .permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/preguntas/publicas")
+                        .authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/preguntas/resueltas")
+                        .authenticated()
+                        .requestMatchers("/api/ofertas/**", "/api/areas/**")
+                        .hasRole("ADMIN")
                         .requestMatchers("/admin/**", "/api/usuarios/**", "/api/roles/**",
                                 "/api/preguntas/**", "/api/metricas/**")
                         .hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/postulantes/*/cv").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/postulantes/*/cv").authenticated()
                         .requestMatchers("/postular", "/postular.html", "/evaluacion", "/evaluacion.html",
                                 "/mi-estado", "/mi-estado.html", "/mis-respuestas", "/mis-respuestas.html",
-                                "/api/postulantes/**", "/api/evaluaciones/**", "/api/estados/**",
-                                "/api/uploads/**")
+                                "/api/postulantes/**", "/api/evaluaciones/**", "/api/estados/**")
                         .authenticated()
                         .anyRequest().permitAll()
                 )

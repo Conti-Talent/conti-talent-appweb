@@ -17,6 +17,8 @@ public interface IPostulanteService {
 
     PostulanteDTO registrarPostulacion(PostularRequest request);
 
+    PostulanteDTO actualizarCv(Long idPostulante, String cv);
+
     /** Cambia el estado por id o por codigo logico (POSTULADO, ENTREVISTA, ...). */
     PostulanteDTO cambiarEstado(Long idPostulante, String estadoDestino);
 

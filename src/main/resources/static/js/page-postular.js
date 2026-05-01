@@ -71,7 +71,7 @@
       return;
     }
 
-    const cvName = document.getElementById('cv-input').files[0]?.name || 'cv.pdf';
+    const cvFile = document.getElementById('cv-input').files[0] || null;
     const session = Auth.getSession();
 
     let postulante;
@@ -84,8 +84,13 @@
         telefono: result.values.telefono,
         experiencia: result.values.experiencia,
         habilidades: result.values.habilidades,
-        cv: cvName
+        cv: ''
       });
+
+      if (cvFile) {
+        postulante = await ContiAPI.subirCv(postulante.id, cvFile);
+      }
+
       postulante = Storage.upsert('postulantes', postulante);
     } catch (err) {
       UI.showToast(err.message || 'No se pudo registrar la postulacion', 'error');
