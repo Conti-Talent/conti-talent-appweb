@@ -1,5 +1,6 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.mapper;
 
+import com.conti_talent.springboot.appweb.conti_talent_web.dto.RolDTO;
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.UsuarioDTO;
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.auth.SesionDTO;
 import com.conti_talent.springboot.appweb.conti_talent_web.model.Usuario;
@@ -9,26 +10,40 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Mapper manual entre Usuario (entidad) y sus DTOs públicos.
- * Garantiza que la password nunca abandone la capa de dominio.
+ * Mapper de Usuario. La entidad ya trae el Rol por relacion JPA, asi que no
+ * se hace lookup adicional. La password nunca se expone.
  */
 @Component
 public class UsuarioMapper {
 
-    public UsuarioDTO toDTO(Usuario u) {
-        if (u == null) return null;
+    private final RolMapper rolMapper;
+
+    public UsuarioMapper(RolMapper rolMapper) {
+        this.rolMapper = rolMapper;
+    }
+
+    public UsuarioDTO convertirADTO(Usuario usuario) {
+        if (usuario == null) return null;
+        RolDTO rolEmbebido = rolMapper.convertirADTO(usuario.getRol());
         return new UsuarioDTO(
-                u.getId(), u.getNombre(), u.getApellido(),
-                u.getEmail(), u.getRol(), u.isActivo(), u.getCreadoEn());
+                usuario.getId(), usuario.getNombre(), usuario.getApellido(),
+                usuario.getEmail(),
+                usuario.getRolId(), rolEmbebido,
+                usuario.isActivo(), usuario.getCreadoEn());
     }
 
-    public List<UsuarioDTO> toDTOList(List<Usuario> usuarios) {
+    public List<UsuarioDTO> convertirALista(List<Usuario> usuarios) {
         if (usuarios == null) return List.of();
-        return usuarios.stream().map(this::toDTO).collect(Collectors.toList());
+        return usuarios.stream().map(this::convertirADTO).collect(Collectors.toList());
     }
 
-    public SesionDTO toSesionDTO(Usuario u) {
-        if (u == null) return null;
-        return new SesionDTO(u.getId(), u.getNombre(), u.getApellido(), u.getEmail(), u.getRol());
+    /** Construye SesionDTO. El codigo del rol se expone en minuscula. */
+    public SesionDTO convertirASesion(Usuario usuario) {
+        if (usuario == null) return null;
+        String codigoRolMinuscula = usuario.getRol() != null && usuario.getRol().getCodigo() != null
+                ? usuario.getRol().getCodigo().toLowerCase()
+                : "";
+        return new SesionDTO(usuario.getId(), usuario.getNombre(), usuario.getApellido(),
+                usuario.getEmail(), codigoRolMinuscula);
     }
 }

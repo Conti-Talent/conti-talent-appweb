@@ -5,7 +5,8 @@
    ========================================================= */
 
 (() => {
-  const init = () => {
+  const init = async () => {
+    await Storage.ready;
     if (!Auth.requireAdmin('../login.html')) return;
     populateFilters();
     document.getElementById('search-postulante').addEventListener('input', renderTable);

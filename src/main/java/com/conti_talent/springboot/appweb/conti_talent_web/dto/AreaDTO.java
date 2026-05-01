@@ -2,7 +2,7 @@ package com.conti_talent.springboot.appweb.conti_talent_web.dto;
 
 public class AreaDTO {
 
-    private String id;
+    private Long id;
     private String nombre;
     private String descripcion;
     private String icono;
@@ -11,7 +11,7 @@ public class AreaDTO {
     public AreaDTO() {
     }
 
-    public AreaDTO(String id, String nombre, String descripcion, String icono, String color) {
+    public AreaDTO(Long id, String nombre, String descripcion, String icono, String color) {
         this.id = id;
         this.nombre = nombre;
         this.descripcion = descripcion;
@@ -19,8 +19,8 @@ public class AreaDTO {
         this.color = color;
     }
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }

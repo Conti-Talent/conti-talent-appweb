@@ -5,7 +5,8 @@
 (() => {
   const ICONOS = ['💻','🎨','📣','🤝','👥','📊','⚙️','🏥','📚','🌐','🔧','🚀'];
 
-  const init = () => {
+  const init = async () => {
+    await Storage.ready;
     if (!Auth.requireAdmin('../login.html')) return;
     document.getElementById('btn-nueva-area').addEventListener('click', () => openForm());
     document.getElementById('search-area').addEventListener('input', renderTable);

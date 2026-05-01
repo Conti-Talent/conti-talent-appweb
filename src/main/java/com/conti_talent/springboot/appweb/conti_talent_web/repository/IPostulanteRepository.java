@@ -1,21 +1,17 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.repository;
 
 import com.conti_talent.springboot.appweb.conti_talent_web.model.Postulante;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
-public interface IPostulanteRepository {
+@Repository
+public interface IPostulanteRepository extends JpaRepository<Postulante, Long> {
 
-    List<Postulante> findAll();
+    List<Postulante> findByOfertaId(Long ofertaId);
 
-    Optional<Postulante> findById(String id);
+    List<Postulante> findByUsuarioId(Long usuarioId);
 
-    List<Postulante> findByOfertaId(String ofertaId);
-
-    List<Postulante> findByUsuarioId(String usuarioId);
-
-    Postulante save(Postulante postulante);
-
-    void deleteById(String id);
+    List<Postulante> findByEstadoId(Long estadoId);
 }

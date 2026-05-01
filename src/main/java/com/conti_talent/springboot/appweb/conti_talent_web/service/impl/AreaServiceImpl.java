@@ -9,6 +9,7 @@ import com.conti_talent.springboot.appweb.conti_talent_web.repository.IAreaRepos
 import com.conti_talent.springboot.appweb.conti_talent_web.repository.IOfertaRepository;
 import com.conti_talent.springboot.appweb.conti_talent_web.service.IAreaService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -28,58 +29,64 @@ public class AreaServiceImpl implements IAreaService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<AreaDTO> listar() {
         return mapper.toDTOList(areaRepository.findAll());
     }
 
     @Override
-    public AreaDTO obtener(String id) {
-        Area a = areaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Área no encontrada: " + id));
-        return mapper.toDTO(a);
+    @Transactional(readOnly = true)
+    public AreaDTO obtener(Long id) {
+        Area area = areaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Area no encontrada: " + id));
+        return mapper.toDTO(area);
     }
 
     @Override
+    @Transactional
     public AreaDTO crear(AreaDTO dto) {
-        if (dto == null || isBlank(dto.getNombre())) {
-            throw new BusinessException("El nombre del área es obligatorio");
+        if (dto == null || esTextoVacio(dto.getNombre())) {
+            throw new BusinessException("El nombre del area es obligatorio");
         }
-        Area a = new Area();
-        a.setNombre(dto.getNombre().trim());
-        a.setDescripcion(dto.getDescripcion() != null ? dto.getDescripcion().trim() : "");
-        a.setIcono(dto.getIcono() != null ? dto.getIcono() : "🏢");
-        a.setColor(dto.getColor() != null ? dto.getColor() : "#6366f1");
-        return mapper.toDTO(areaRepository.save(a));
+        Area nueva = new Area();
+        nueva.setNombre(dto.getNombre().trim());
+        nueva.setDescripcion(dto.getDescripcion() != null ? dto.getDescripcion().trim() : "");
+        nueva.setIcono(dto.getIcono() != null ? dto.getIcono() : "default");
+        nueva.setColor(dto.getColor() != null ? dto.getColor() : "#6366f1");
+        return mapper.toDTO(areaRepository.save(nueva));
     }
 
     @Override
-    public AreaDTO actualizar(String id, AreaDTO dto) {
-        Area a = areaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Área no encontrada: " + id));
-        if (dto.getNombre()      != null) a.setNombre(dto.getNombre().trim());
-        if (dto.getDescripcion() != null) a.setDescripcion(dto.getDescripcion().trim());
-        if (dto.getIcono()       != null) a.setIcono(dto.getIcono());
-        if (dto.getColor()       != null) a.setColor(dto.getColor());
-        return mapper.toDTO(areaRepository.save(a));
+    @Transactional
+    public AreaDTO actualizar(Long id, AreaDTO dto) {
+        Area existente = areaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Area no encontrada: " + id));
+        if (dto.getNombre()      != null) existente.setNombre(dto.getNombre().trim());
+        if (dto.getDescripcion() != null) existente.setDescripcion(dto.getDescripcion().trim());
+        if (dto.getIcono()       != null) existente.setIcono(dto.getIcono());
+        if (dto.getColor()       != null) existente.setColor(dto.getColor());
+        return mapper.toDTO(areaRepository.save(existente));
     }
 
     @Override
-    public void eliminar(String id) {
-        if (areaRepository.findById(id).isEmpty()) {
-            throw new ResourceNotFoundException("Área no encontrada: " + id);
+    @Transactional
+    public void eliminar(Long id) {
+        if (!areaRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Area no encontrada: " + id);
         }
         if (!ofertaRepository.findByAreaId(id).isEmpty()) {
-            throw new BusinessException("No se puede eliminar el área: tiene ofertas asociadas");
+            throw new BusinessException("No se puede eliminar el area: tiene ofertas asociadas");
         }
         areaRepository.deleteById(id);
     }
 
     @Override
-    public int contarOfertas(String areaId) {
+    @Transactional(readOnly = true)
+    public int contarOfertas(Long areaId) {
         return ofertaRepository.findByAreaId(areaId).size();
     }
 
-    private static boolean isBlank(String s) {
-        return s == null || s.trim().isEmpty();
+    private static boolean esTextoVacio(String texto) {
+        return texto == null || texto.trim().isEmpty();
     }
 }

@@ -9,7 +9,8 @@
   const params       = new URLSearchParams(window.location.search);
   const postulanteId = params.get('postulante');
 
-  const init = () => {
+  const init = async () => {
+    await Storage.ready;
     if (!Auth.requireAuth('login.html')) return;
 
     const postulante = Postulantes.get(postulanteId);

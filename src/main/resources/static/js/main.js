@@ -14,8 +14,8 @@
     close:  '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6l-12 12"/></svg>'
   };
 
-  const init = () => {
-    if (window.Seed) Seed.run();
+  const init = async () => {
+    await Storage.ready;
     renderHeaderSession();
     highlightActiveNav();
     bindLogoutLinks();
@@ -51,7 +51,7 @@
       title: 'Cerrar sesión',
       'aria-label': 'Cerrar sesión',
       html: '⎋',
-      onClick: () => { Auth.logout(); window.location.href = resolveHomeUrl(); }
+      onClick: async () => { await Auth.logout(); window.location.href = resolveHomeUrl(); }
     }));
   };
 
@@ -64,9 +64,9 @@
 
   const bindLogoutLinks = () => {
     UI.$$('[data-action="logout"]').forEach((node) => {
-      node.addEventListener('click', (e) => {
+      node.addEventListener('click', async (e) => {
         e.preventDefault();
-        Auth.logout();
+        await Auth.logout();
         window.location.href = resolveHomeUrl();
       });
     });
@@ -194,7 +194,7 @@
     }
 
     const logoutBtn = UI.el('button', { class: 'btn btn--danger', 'data-mobile-action': 'logout', text: 'Cerrar sesión' });
-    logoutBtn.addEventListener('click', () => { Auth.logout(); window.location.href = resolveHomeUrl(); });
+    logoutBtn.addEventListener('click', async () => { await Auth.logout(); window.location.href = resolveHomeUrl(); });
     wrap.appendChild(logoutBtn);
   };
 

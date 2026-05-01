@@ -19,14 +19,14 @@ public class PreguntaRestController {
     }
 
     /**
-     * GET /api/preguntas                     -> admin (incluye `correcta`)
-     * GET /api/preguntas?oferta=o1           -> admin filtrado por oferta
-     * GET /api/preguntas?oferta=o1&publico=1 -> publico (sin `correcta`)
+     * GET /api/preguntas                 -> admin (incluye `correcta`)
+     * GET /api/preguntas?oferta=1        -> admin filtrado por oferta
+     * GET /api/preguntas?oferta=1&publico=1 -> publico (sin `correcta`)
      */
     @GetMapping
-    public List<PreguntaDTO> listar(@RequestParam(value = "oferta", required = false) String ofertaId,
+    public List<PreguntaDTO> listar(@RequestParam(value = "oferta", required = false) Long ofertaId,
                                     @RequestParam(value = "publico", required = false) Boolean publico) {
-        if (ofertaId != null && !ofertaId.isBlank()) {
+        if (ofertaId != null) {
             return Boolean.TRUE.equals(publico)
                     ? service.listarPorOfertaPublico(ofertaId)
                     : service.listarPorOferta(ofertaId);
@@ -35,7 +35,7 @@ public class PreguntaRestController {
     }
 
     @GetMapping("/{id}")
-    public PreguntaDTO obtener(@PathVariable String id) {
+    public PreguntaDTO obtener(@PathVariable Long id) {
         return service.obtener(id);
     }
 
@@ -45,12 +45,12 @@ public class PreguntaRestController {
     }
 
     @PutMapping("/{id}")
-    public PreguntaDTO actualizar(@PathVariable String id, @RequestBody PreguntaDTO body) {
+    public PreguntaDTO actualizar(@PathVariable Long id, @RequestBody PreguntaDTO body) {
         return service.actualizar(id, body);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable String id) {
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         service.eliminar(id);
         return ResponseEntity.noContent().build();
     }

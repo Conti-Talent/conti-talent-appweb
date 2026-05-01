@@ -9,11 +9,11 @@ public interface IUsuarioService {
 
     List<UsuarioDTO> listar();
 
-    UsuarioDTO obtener(String id);
+    UsuarioDTO obtener(Long id);
 
     UsuarioDTO crear(UsuarioRequest request);
 
-    UsuarioDTO actualizar(String id, UsuarioRequest request);
+    UsuarioDTO actualizar(Long id, UsuarioRequest request);
 
-    void eliminar(String id);
+    void eliminar(Long id);
 }

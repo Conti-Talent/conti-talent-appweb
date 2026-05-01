@@ -23,7 +23,7 @@ public class EvaluacionRestController {
     }
 
     @GetMapping("/postulante/{postulanteId}")
-    public EvaluacionDTO obtenerPorPostulante(@PathVariable String postulanteId) {
+    public EvaluacionDTO obtenerPorPostulante(@PathVariable Long postulanteId) {
         return service.obtenerPorPostulante(postulanteId);
     }
 }

@@ -10,14 +10,17 @@ import java.util.stream.Collectors;
 @Component
 public class AreaMapper {
 
-    public AreaDTO toDTO(Area a) {
-        if (a == null) return null;
-        return new AreaDTO(a.getId(), a.getNombre(), a.getDescripcion(), a.getIcono(), a.getColor());
+    public AreaDTO toDTO(Area area) {
+        if (area == null) return null;
+        return new AreaDTO(area.getId(), area.getNombre(),
+                area.getDescripcion(), area.getIcono(), area.getColor());
     }
 
     public Area toEntity(AreaDTO dto) {
         if (dto == null) return null;
-        return new Area(dto.getId(), dto.getNombre(), dto.getDescripcion(), dto.getIcono(), dto.getColor());
+        Area area = new Area(dto.getNombre(), dto.getDescripcion(), dto.getIcono(), dto.getColor());
+        area.setId(dto.getId());
+        return area;
     }
 
     public List<AreaDTO> toDTOList(List<Area> areas) {

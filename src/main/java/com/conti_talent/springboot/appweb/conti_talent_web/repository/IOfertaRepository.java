@@ -1,21 +1,19 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.repository;
 
 import com.conti_talent.springboot.appweb.conti_talent_web.model.Oferta;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
-public interface IOfertaRepository {
+@Repository
+public interface IOfertaRepository extends JpaRepository<Oferta, Long> {
 
-    List<Oferta> findAll();
+    List<Oferta> findByAreaId(Long areaId);
 
-    Optional<Oferta> findById(String id);
+    List<Oferta> findByDestacadaTrue();
 
-    List<Oferta> findByAreaId(String areaId);
+    /* ===== Atajos retro-compatibles ===== */
 
-    List<Oferta> findFeatured();
-
-    Oferta save(Oferta oferta);
-
-    void deleteById(String id);
+    default List<Oferta> findFeatured() { return findByDestacadaTrue(); }
 }

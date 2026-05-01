@@ -6,19 +6,17 @@ import java.util.List;
 
 public interface IPreguntaService {
 
-    /** Vista admin: incluye `correcta`. */
     List<PreguntaDTO> listar();
 
-    List<PreguntaDTO> listarPorOferta(String ofertaId);
+    List<PreguntaDTO> listarPorOferta(Long ofertaId);
 
-    /** Vista pública: omite `correcta`. */
-    List<PreguntaDTO> listarPorOfertaPublico(String ofertaId);
+    List<PreguntaDTO> listarPorOfertaPublico(Long ofertaId);
 
-    PreguntaDTO obtener(String id);
+    PreguntaDTO obtener(Long id);
 
     PreguntaDTO crear(PreguntaDTO dto);
 
-    PreguntaDTO actualizar(String id, PreguntaDTO dto);
+    PreguntaDTO actualizar(Long id, PreguntaDTO dto);
 
-    void eliminar(String id);
+    void eliminar(Long id);
 }
