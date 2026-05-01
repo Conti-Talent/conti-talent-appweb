@@ -14,7 +14,7 @@
     if (!grid) return;
     UI.clear(grid);
     Areas.list().slice(0, 6).forEach((a) => {
-      const card = UI.el('a', { href: `ofertas.html?area=${a.id}`, class: 'area-card' }, [
+      const card = UI.el('a', { href: `/ofertas?area=${a.id}`, class: 'area-card' }, [
         UI.el('div', { class: 'area-card__icon', text: a.icono, style: `background: linear-gradient(135deg, ${a.color}, #8b5cf6);` }),
         UI.el('h3',  { text: a.nombre }),
         UI.el('p',   { class: 'muted', text: a.descripcion }),
@@ -32,7 +32,7 @@
     UI.clear(wrap);
     Ofertas.featured().slice(0, 3).forEach((o) => {
       const area = Areas.get(o.areaId);
-      const card = UI.el('a', { href: `detalle-oferta.html?id=${o.id}`, class: 'featured-card' }, [
+      const card = UI.el('a', { href: `/oferta?id=${o.id}`, class: 'featured-card' }, [
         UI.el('div', { class: 'featured-card__tag', text: 'Destacada' }),
         UI.el('span', { class: 'badge', text: area?.nombre || '—' }),
         UI.el('h3',  { class: 'card__title', style: 'margin-top: 12px;', text: o.titulo }),

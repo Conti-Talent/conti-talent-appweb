@@ -6,7 +6,7 @@
   const ICONOS = ['💻','🎨','📣','🤝','👥','📊','⚙️','🏥','📚','🌐','🔧','🚀'];
 
   const init = () => {
-    if (!Auth.requireAdmin('../login.html')) return;
+    if (!Auth.requireAdmin('/login')) return;
     document.getElementById('btn-nueva-area').addEventListener('click', () => openForm());
     document.getElementById('search-area').addEventListener('input', renderTable);
     renderTable();

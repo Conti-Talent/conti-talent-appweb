@@ -30,8 +30,8 @@
     UI.clear(slot);
 
     if (!session) {
-      slot.appendChild(UI.el('a', { href: 'login.html',    class: 'btn btn--ghost btn--sm', text: 'Iniciar sesión' }));
-      slot.appendChild(UI.el('a', { href: 'registro.html', class: 'btn btn--primary btn--sm', text: 'Crear cuenta' }));
+      slot.appendChild(UI.el('a', { href: '/login',    class: 'btn btn--ghost btn--sm', text: 'Iniciar sesión' }));
+      slot.appendChild(UI.el('a', { href: '/registro', class: 'btn btn--primary btn--sm', text: 'Crear cuenta' }));
       return;
     }
 
@@ -40,9 +40,9 @@
     const name   = UI.el('span', { class: 'muted', text: `${session.nombre} ${session.apellido}` });
 
     if (session.rol === 'admin') {
-      slot.appendChild(UI.el('a', { href: 'admin/dashboard.html', class: 'btn btn--ghost btn--sm', text: 'Panel admin' }));
+      slot.appendChild(UI.el('a', { href: '/admin', class: 'btn btn--ghost btn--sm', text: 'Panel admin' }));
     } else {
-      slot.appendChild(UI.el('a', { href: 'mi-estado.html', class: 'btn btn--ghost btn--sm', text: 'Mi estado' }));
+      slot.appendChild(UI.el('a', { href: '/mi-estado', class: 'btn btn--ghost btn--sm', text: 'Mi estado' }));
     }
     slot.appendChild(avatar);
     slot.appendChild(name);
@@ -56,7 +56,7 @@
   };
 
   const highlightActiveNav = () => {
-    const path = window.location.pathname.split('/').pop() || 'index.html';
+    const path = window.location.pathname || '/';
     UI.$$('[data-nav]').forEach((node) => {
       if (node.dataset.nav === path) node.classList.add('is-active');
     });
@@ -155,7 +155,7 @@
       });
       // Volver al sitio público
       navWrap.appendChild(UI.el('div', { class: 'mobile-drawer__group-label', text: 'Sitio' }));
-      navWrap.appendChild(UI.el('a', { href: '../index.html', text: '↗ Ir al sitio público' }));
+      navWrap.appendChild(UI.el('a', { href: '/', text: '↗ Ir al sitio público' }));
       return;
     }
 
@@ -173,8 +173,8 @@
     const isAdmin = !!document.querySelector('.app-sidebar');
 
     if (!session) {
-      wrap.appendChild(UI.el('a', { href: prefixed('login.html'),    class: 'btn btn--ghost',   text: 'Iniciar sesión' }));
-      wrap.appendChild(UI.el('a', { href: prefixed('registro.html'), class: 'btn btn--primary', text: 'Crear cuenta' }));
+      wrap.appendChild(UI.el('a', { href: '/login',    class: 'btn btn--ghost',   text: 'Iniciar sesión' }));
+      wrap.appendChild(UI.el('a', { href: '/registro', class: 'btn btn--primary', text: 'Crear cuenta' }));
       return;
     }
 
@@ -188,9 +188,9 @@
     ]));
 
     if (session.rol === 'admin' && !isAdmin) {
-      wrap.appendChild(UI.el('a', { href: 'admin/dashboard.html', class: 'btn btn--ghost', text: 'Panel admin' }));
+      wrap.appendChild(UI.el('a', { href: '/admin', class: 'btn btn--ghost', text: 'Panel admin' }));
     } else if (session.rol !== 'admin') {
-      wrap.appendChild(UI.el('a', { href: prefixed('mi-estado.html'), class: 'btn btn--ghost', text: 'Mi estado' }));
+      wrap.appendChild(UI.el('a', { href: '/mi-estado', class: 'btn btn--ghost', text: 'Mi estado' }));
     }
 
     const logoutBtn = UI.el('button', { class: 'btn btn--danger', 'data-mobile-action': 'logout', text: 'Cerrar sesión' });
@@ -218,16 +218,7 @@
     });
   };
 
-  /* Ruta home según contexto admin / público */
-  const resolveHomeUrl = () => {
-    const isAdminPath = window.location.pathname.includes('/admin/');
-    return isAdminPath ? '../index.html' : 'index.html';
-  };
-
-  const prefixed = (path) => {
-    const isAdminPath = window.location.pathname.includes('/admin/');
-    return isAdminPath ? `../${path}` : path;
-  };
+  const resolveHomeUrl = () => '/';
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);

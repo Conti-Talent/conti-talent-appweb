@@ -6,7 +6,7 @@
 
 (() => {
   const init = () => {
-    if (!Auth.requireAdmin('../login.html')) return;
+    if (!Auth.requireAdmin('/login')) return;
     populateFilters();
     document.getElementById('search-postulante').addEventListener('input', renderTable);
     document.getElementById('filter-oferta-postulante').addEventListener('change', renderTable);

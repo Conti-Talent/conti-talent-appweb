@@ -17,7 +17,7 @@
         UI.el('div', { class: 'empty-state__icon', text: '📭' }),
         UI.el('h3',  { text: 'Aún no tienes postulaciones' }),
         UI.el('p',   { class: 'muted', text: 'Explora ofertas que se ajusten a tu perfil y postula en un click.' }),
-        UI.el('a',   { href: 'ofertas.html', class: 'btn btn--primary', style: 'margin-top:12px', text: 'Ver ofertas' })
+        UI.el('a',   { href: '/ofertas', class: 'btn btn--primary', style: 'margin-top:12px', text: 'Ver ofertas' })
       ]));
       return;
     }
@@ -26,8 +26,8 @@
       const oferta    = Ofertas.get(p.ofertaId);
       const yaRindio  = Postulantes.hasRespuestas(p);
       const ctaButton = yaRindio
-        ? UI.el('a', { href: `mis-respuestas.html?postulante=${p.id}`, class: 'btn btn--ghost', text: 'Ver mis respuestas' })
-        : UI.el('a', { href: `evaluacion.html?postulante=${p.id}`,    class: 'btn btn--primary', text: 'Realizar evaluación' });
+        ? UI.el('a', { href: `/mis-respuestas?postulante=${p.id}`, class: 'btn btn--ghost', text: 'Ver mis respuestas' })
+        : UI.el('a', { href: `/evaluacion?postulante=${p.id}`,    class: 'btn btn--primary', text: 'Realizar evaluación' });
 
       const card = UI.el('article', { class: 'card' }, [
         UI.el('header', { class: 'flex between gap-3' }, [

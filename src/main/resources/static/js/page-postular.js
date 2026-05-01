@@ -7,11 +7,11 @@
   const ofertaId = params.get('oferta');
 
   const init = () => {
-    if (!Auth.requireAuth('login.html?next=' + encodeURIComponent(window.location.href))) return;
+    if (!Auth.requireAuth('/login?next=' + encodeURIComponent(window.location.href))) return;
 
     const oferta = Ofertas.get(ofertaId);
     if (!oferta) {
-      window.location.href = 'ofertas.html';
+      window.location.href = '/ofertas';
       return;
     }
 
@@ -86,7 +86,7 @@
 
     UI.showToast('Postulación registrada con éxito', 'success');
     setTimeout(() => {
-      window.location.href = `evaluacion.html?postulante=${postulante.id}`;
+      window.location.href = `/evaluacion?postulante=${postulante.id}`;
     }, 700);
   };
 

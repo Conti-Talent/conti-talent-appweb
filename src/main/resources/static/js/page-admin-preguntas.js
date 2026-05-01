@@ -7,7 +7,7 @@
   let ofertaId   = params.get('oferta') || '';
 
   const init = () => {
-    if (!Auth.requireAdmin('../login.html')) return;
+    if (!Auth.requireAdmin('/login')) return;
     populateOfertaSelect();
     document.getElementById('preguntas-oferta-select').addEventListener('change', (e) => {
       ofertaId = e.target.value;

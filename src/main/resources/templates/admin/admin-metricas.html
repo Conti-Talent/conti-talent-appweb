@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,21 +7,21 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/base.css" />
-  <link rel="stylesheet" href="../css/layout.css" />
-  <link rel="stylesheet" href="../css/components.css" />
-  <link rel="stylesheet" href="../css/pages.css" />
-  <link rel="stylesheet" href="../css/animations.css" />
+  <link rel="stylesheet" th:href="@{/css/base.css}" />
+  <link rel="stylesheet" th:href="@{/css/layout.css}" />
+  <link rel="stylesheet" th:href="@{/css/components.css}" />
+  <link rel="stylesheet" th:href="@{/css/pages.css}" />
+  <link rel="stylesheet" th:href="@{/css/animations.css}" />
 </head>
 <body>
   <header class="site-header">
     <div class="site-header__inner">
-      <a class="brand" href="../index.html">
+      <a class="brand" th:href="@{/}">
         <span class="brand__mark">C</span>
         <span class="brand__name">Conti<span>Talent</span> · Admin</span>
       </a>
       <nav class="primary-nav">
-        <a href="../index.html">Ir al sitio</a>
+        <a th:href="@{/}">Ir al sitio</a>
         <span class="session-area" id="session-area"></span>
       </nav>
     </div>
@@ -31,22 +31,22 @@
     <aside class="app-sidebar">
       <div class="sidebar-section">
         <div class="sidebar-section__label">General</div>
-        <a class="sidebar-link" href="dashboard.html"><span>📊</span> Dashboard</a>
+        <a class="sidebar-link" th:href="@{/admin}"><span>📊</span> Dashboard</a>
       </div>
       <div class="sidebar-section">
         <div class="sidebar-section__label">Reclutamiento</div>
-        <a class="sidebar-link" href="admin-areas.html"><span>🗂️</span> Áreas</a>
-        <a class="sidebar-link" href="admin-ofertas.html"><span>💼</span> Ofertas</a>
-        <a class="sidebar-link" href="admin-preguntas.html"><span>❓</span> Preguntas</a>
+        <a class="sidebar-link" th:href="@{/admin/areas}"><span>🗂️</span> Áreas</a>
+        <a class="sidebar-link" th:href="@{/admin/ofertas}"><span>💼</span> Ofertas</a>
+        <a class="sidebar-link" th:href="@{/admin/preguntas}"><span>❓</span> Preguntas</a>
       </div>
       <div class="sidebar-section">
         <div class="sidebar-section__label">Evaluación</div>
-        <a class="sidebar-link" href="admin-postulantes.html"><span>👥</span> Postulantes</a>
-        <a class="sidebar-link is-active" href="admin-metricas.html"><span>📈</span> Métricas / Ranking</a>
+        <a class="sidebar-link" th:href="@{/admin/postulantes}"><span>👥</span> Postulantes</a>
+        <a class="sidebar-link is-active" th:href="@{/admin/metricas}"><span>📈</span> Métricas / Ranking</a>
       </div>
       <div class="sidebar-section">
         <div class="sidebar-section__label">Sistema</div>
-        <a class="sidebar-link" href="admin-usuarios.html"><span>🔐</span> Usuarios</a>
+        <a class="sidebar-link" th:href="@{/admin/usuarios}"><span>🔐</span> Usuarios</a>
       </div>
     </aside>
 
@@ -80,16 +80,16 @@
     </main>
   </div>
 
-  <script src="../js/storage.js"></script>
-  <script src="../js/seed.js"></script>
-  <script src="../js/ui.js"></script>
-  <script src="../js/validators.js"></script>
-  <script src="../js/auth.js"></script>
-  <script src="../js/areas.js"></script>
-  <script src="../js/ofertas.js"></script>
-  <script src="../js/postulantes.js"></script>
-  <script src="../js/chart.js"></script>
-  <script src="../js/main.js"></script>
-  <script src="../js/page-admin-metricas.js"></script>
+  <script th:src="@{/js/storage.js}"></script>
+  <script th:src="@{/js/seed.js}"></script>
+  <script th:src="@{/js/ui.js}"></script>
+  <script th:src="@{/js/validators.js}"></script>
+  <script th:src="@{/js/auth.js}"></script>
+  <script th:src="@{/js/areas.js}"></script>
+  <script th:src="@{/js/ofertas.js}"></script>
+  <script th:src="@{/js/postulantes.js}"></script>
+  <script th:src="@{/js/chart.js}"></script>
+  <script th:src="@{/js/main.js}"></script>
+  <script th:src="@{/js/page-admin-metricas.js}"></script>
 </body>
 </html>

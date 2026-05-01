@@ -4,7 +4,7 @@
 
 (() => {
   const init = () => {
-    if (!Auth.requireAdmin('../login.html')) return;
+    if (!Auth.requireAdmin('/login')) return;
     document.getElementById('btn-nueva-oferta').addEventListener('click', () => openForm());
     document.getElementById('search-oferta').addEventListener('input', renderTable);
     document.getElementById('filter-area-admin').addEventListener('change', renderTable);
@@ -44,7 +44,7 @@
         UI.el('td', { text: o.destacada ? '⭐ Sí' : '—' }),
         UI.el('td', {}, [
           UI.el('div', { class: 'row-actions' }, [
-            UI.el('a', { href: `admin-preguntas.html?oferta=${o.id}`, class: 'btn btn--sm btn--ghost', text: 'Preguntas' }),
+            UI.el('a', { href: `/admin/preguntas?oferta=${o.id}`, class: 'btn btn--sm btn--ghost', text: 'Preguntas' }),
             UI.el('button', { class: 'btn btn--sm btn--ghost',  text: 'Editar', onClick: () => openForm(o) }),
             UI.el('button', { class: 'btn btn--sm btn--danger', text: 'Eliminar', onClick: () => onDelete(o) })
           ])

@@ -4,7 +4,7 @@
 
 (() => {
   const init = () => {
-    if (!Auth.requireAdmin('../login.html')) return;
+    if (!Auth.requireAdmin('/login')) return;
     renderKPIs();
     renderEstadosBreakdown();
     renderRecientes();
