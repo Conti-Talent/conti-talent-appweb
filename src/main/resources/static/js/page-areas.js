@@ -9,7 +9,7 @@
     if (!grid) return;
     UI.clear(grid);
     Areas.list().forEach((a, i) => {
-      const card = UI.el('a', { href: `ofertas.html?area=${a.id}`, class: `area-card anim-fade-up delay-${(i % 5) + 1}` }, [
+      const card = UI.el('a', { href: `/ofertas?area=${a.id}`, class: `area-card anim-fade-up delay-${(i % 5) + 1}` }, [
         UI.el('div', { class: 'area-card__icon', text: a.icono, style: `background: linear-gradient(135deg, ${a.color}, #8b5cf6);` }),
         UI.el('h3',  { text: a.nombre }),
         UI.el('p',   { class: 'muted', text: a.descripcion }),

@@ -63,7 +63,7 @@
     items.forEach((o) => {
       const a = Areas.get(o.areaId);
       const tipoBadgeMod = o.tipo === 'Práctica' ? 'badge--evaluacion' : 'badge--aprobado-tecnico';
-      const card = UI.el('a', { href: `detalle-oferta.html?id=${o.id}`, class: 'oferta-card' }, [
+      const card = UI.el('a', { href: `/detalle-oferta?id=${o.id}`, class: 'oferta-card' }, [
         UI.el('div', {}, [
           UI.el('div', { class: 'flex gap-2 flex-wrap' }, [
             UI.el('span', { class: `badge ${tipoBadgeMod}`, text: o.tipo }),

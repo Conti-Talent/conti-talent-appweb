@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pagina no encontrada | Conti Talent</title>
+  <link rel="stylesheet" th:href="@{/css/base.css}" href="/css/base.css" />
+  <link rel="stylesheet" th:href="@{/css/layout.css}" href="/css/layout.css" />
+  <link rel="stylesheet" th:href="@{/css/components.css}" href="/css/components.css" />
+  <link rel="stylesheet" th:href="@{/css/pages.css}" href="/css/pages.css" />
+</head>
+<body>
+  <main class="container section">
+    <section class="empty-state">
+      <span class="badge">404</span>
+      <h1>Pagina no encontrada</h1>
+      <p class="muted">La URL solicitada no existe o fue movida.</p>
+      <a class="btn btn--primary" th:href="@{/}" href="/">Volver al inicio</a>
+    </section>
+  </main>
+</body>
+</html>

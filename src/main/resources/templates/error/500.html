@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Error interno | Conti Talent</title>
+  <link rel="stylesheet" th:href="@{/css/base.css}" href="/css/base.css" />
+  <link rel="stylesheet" th:href="@{/css/layout.css}" href="/css/layout.css" />
+  <link rel="stylesheet" th:href="@{/css/components.css}" href="/css/components.css" />
+  <link rel="stylesheet" th:href="@{/css/pages.css}" href="/css/pages.css" />
+</head>
+<body>
+  <main class="container section">
+    <section class="empty-state">
+      <span class="badge">500</span>
+      <h1>Error interno</h1>
+      <p class="muted">No pudimos completar la solicitud. Intenta nuevamente mas tarde.</p>
+      <a class="btn btn--primary" th:href="@{/}" href="/">Volver al inicio</a>
+    </section>
+  </main>
+</body>
+</html>

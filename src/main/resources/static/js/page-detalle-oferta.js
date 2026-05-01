@@ -40,7 +40,7 @@
     (oferta.beneficios || []).forEach((b) => benList.appendChild(UI.el('li', { text: b })));
 
     const cta = UI.$('#detalle-cta');
-    cta.href = `postular.html?oferta=${oferta.id}`;
+    cta.href = `/postular?oferta=${oferta.id}`;
   };
 
   document.addEventListener('DOMContentLoaded', init);

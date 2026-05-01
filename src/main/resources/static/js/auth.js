@@ -41,7 +41,7 @@ const Auth = (() => {
     try { await ContiAPI.logout(); } catch (_err) {}
   };
 
-  const requireAuth = (redirect = 'login.html') => {
+  const requireAuth = (redirect = '/login') => {
     if (!isAuthenticated()) {
       window.location.href = redirect;
       return false;
@@ -49,7 +49,7 @@ const Auth = (() => {
     return true;
   };
 
-  const requireAdmin = (redirect = 'login.html') => {
+  const requireAdmin = (redirect = '/login') => {
     if (!isAdmin()) {
       window.location.href = redirect;
       return false;

@@ -18,13 +18,13 @@
     postulante = Postulantes.get(postulanteId);
     if (!postulante) {
       UI.showToast('No se encontró tu postulación', 'error');
-      setTimeout(() => window.location.href = 'index.html', 800);
+      setTimeout(() => window.location.href = '/', 800);
       return;
     }
 
     // Si ya rindió, no se permite volver a hacerlo: vamos a la vista de respuestas.
     if (Postulantes.hasRespuestas(postulante)) {
-      window.location.replace(`mis-respuestas.html?postulante=${postulante.id}`);
+      window.location.replace(`/mis-respuestas?postulante=${postulante.id}`);
       return;
     }
 
@@ -107,8 +107,8 @@
         UI.el('p', { style: 'margin-top: 16px;', text: result.puntaje >= 70 ? '¡Has aprobado la evaluación técnica! Tu estado se actualizó.' : 'Has terminado la evaluación. Tu puntaje será revisado.' })
       ]),
       footer: UI.el('footer', { style: 'display:flex;justify-content:flex-end;gap:8px;margin-top:16px;' }, [
-        UI.el('a', { href: `mis-respuestas.html?postulante=${postulante.id}`, class: 'btn btn--ghost', text: 'Ver mis respuestas' }),
-        UI.el('a', { href: 'mi-estado.html', class: 'btn btn--primary', text: 'Ir a mi estado' })
+        UI.el('a', { href: `/mis-respuestas?postulante=${postulante.id}`, class: 'btn btn--ghost', text: 'Ver mis respuestas' }),
+        UI.el('a', { href: '/mi-estado', class: 'btn btn--primary', text: 'Ir a mi estado' })
       ])
     });
   };

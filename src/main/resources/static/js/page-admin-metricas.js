@@ -8,7 +8,7 @@
 
   const init = async () => {
     await Storage.ready;
-    if (!Auth.requireAdmin('../login.html')) return;
+    if (!Auth.requireAdmin('/login')) return;
     renderTimeSeriesCharts();
     renderPunctualKPIs();
     renderRanking();

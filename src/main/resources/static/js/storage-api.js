@@ -114,13 +114,16 @@ const Storage = (() => {
     return cache.session;
   };
 
+  const optionalRefresh = (entity) =>
+    refresh(entity).catch(() => read(entity, entity === 'metricas' ? { series: {}, estadoActual: {} } : []));
+
   const ready = Promise.all([
-    refresh('usuarios'),
-    refresh('areas'),
-    refresh('ofertas'),
-    refresh('preguntas'),
-    refresh('postulantes'),
-    refresh('metricas').catch(() => cache.metricas),
+    optionalRefresh('usuarios'),
+    optionalRefresh('areas'),
+    optionalRefresh('ofertas'),
+    optionalRefresh('preguntas'),
+    optionalRefresh('postulantes'),
+    optionalRefresh('metricas'),
     refreshSession()
   ]).then(() => cache);
 

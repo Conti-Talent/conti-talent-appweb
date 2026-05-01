@@ -10,7 +10,7 @@
     UI.clear(grid);
     Ofertas.featured().forEach((o, i) => {
       const a = Areas.get(o.areaId);
-      const card = UI.el('a', { href: `detalle-oferta.html?id=${o.id}`, class: `featured-card anim-fade-up delay-${(i % 5) + 1}` }, [
+      const card = UI.el('a', { href: `/detalle-oferta?id=${o.id}`, class: `featured-card anim-fade-up delay-${(i % 5) + 1}` }, [
         UI.el('div', { class: 'featured-card__tag', text: 'Top oferta' }),
         UI.el('span', { class: 'badge', text: a?.nombre || '—' }),
         UI.el('h3',   { class: 'card__title', style: 'margin-top: 12px;', text: o.titulo }),

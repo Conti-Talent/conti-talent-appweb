@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,21 +7,21 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/base.css" />
-  <link rel="stylesheet" href="css/layout.css" />
-  <link rel="stylesheet" href="css/components.css" />
-  <link rel="stylesheet" href="css/pages.css" />
-  <link rel="stylesheet" href="css/animations.css" />
+  <link rel="stylesheet" th:href="@{/css/base.css}" href="/css/base.css" />
+  <link rel="stylesheet" th:href="@{/css/layout.css}" href="/css/layout.css" />
+  <link rel="stylesheet" th:href="@{/css/components.css}" href="/css/components.css" />
+  <link rel="stylesheet" th:href="@{/css/pages.css}" href="/css/pages.css" />
+  <link rel="stylesheet" th:href="@{/css/animations.css}" href="/css/animations.css" />
 </head>
 <body>
   <header class="site-header">
     <div class="site-header__inner">
-      <a class="brand" href="index.html">
+      <a class="brand" th:href="@{/}" href="/">
         <span class="brand__mark">C</span>
         <span class="brand__name">Conti<span>Talent</span></span>
       </a>
       <nav class="primary-nav">
-        <a href="login.html" class="btn btn--ghost btn--sm">Iniciar sesión</a>
+        <a th:href="@{/login}" href="/login" class="btn btn--ghost btn--sm">Iniciar sesión</a>
       </nav>
     </div>
   </header>
@@ -82,16 +82,16 @@
           <button class="btn btn--primary btn--block btn--lg" type="submit">Crear cuenta</button>
         </form>
 
-        <p class="soft text-center mt-5">¿Ya tienes cuenta? <a href="login.html">Inicia sesión</a></p>
+        <p class="soft text-center mt-5">¿Ya tienes cuenta? <a th:href="@{/login}" href="/login">Inicia sesión</a></p>
       </div>
     </section>
   </main>
 
-  <script src="js/storage-api.js?v=rest3"></script>
-  <script src="js/ui.js?v=rest3"></script>
-  <script src="js/validators.js?v=rest3"></script>
-  <script src="js/auth.js?v=rest3"></script>
-  <script src="js/main.js?v=rest3"></script>
-  <script src="js/page-registro.js?v=rest3"></script>
+  <script th:src="@{/js/storage-api.js?v=rest3}" src="/js/storage-api.js?v=rest3"></script>
+  <script th:src="@{/js/ui.js?v=rest3}" src="/js/ui.js?v=rest3"></script>
+  <script th:src="@{/js/validators.js?v=rest3}" src="/js/validators.js?v=rest3"></script>
+  <script th:src="@{/js/auth.js?v=rest3}" src="/js/auth.js?v=rest3"></script>
+  <script th:src="@{/js/main.js?v=rest3}" src="/js/main.js?v=rest3"></script>
+  <script th:src="@{/js/page-registro.js?v=rest3}" src="/js/page-registro.js?v=rest3"></script>
 </body>
 </html>

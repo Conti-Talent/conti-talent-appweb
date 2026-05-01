@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,25 +7,25 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/base.css" />
-  <link rel="stylesheet" href="css/layout.css" />
-  <link rel="stylesheet" href="css/components.css" />
-  <link rel="stylesheet" href="css/pages.css" />
-  <link rel="stylesheet" href="css/animations.css" />
+  <link rel="stylesheet" th:href="@{/css/base.css}" href="/css/base.css" />
+  <link rel="stylesheet" th:href="@{/css/layout.css}" href="/css/layout.css" />
+  <link rel="stylesheet" th:href="@{/css/components.css}" href="/css/components.css" />
+  <link rel="stylesheet" th:href="@{/css/pages.css}" href="/css/pages.css" />
+  <link rel="stylesheet" th:href="@{/css/animations.css}" href="/css/animations.css" />
 </head>
 <body>
   <header class="site-header">
     <div class="site-header__inner">
-      <a class="brand" href="index.html">
+      <a class="brand" th:href="@{/}" href="/">
         <span class="brand__mark">C</span>
         <span class="brand__name">Conti<span>Talent</span></span>
       </a>
       <nav class="primary-nav">
-        <a href="index.html"      data-nav="index.html">Inicio</a>
-        <a href="areas.html"      data-nav="areas.html">Áreas</a>
-        <a href="ofertas.html"    data-nav="ofertas.html" class="is-active">Ofertas</a>
-        <a href="publicidad.html" data-nav="publicidad.html">Publicidad</a>
-        <a href="contacto.html"   data-nav="contacto.html">Contacto</a>
+        <a th:href="@{/}" href="/"      data-nav="/">Inicio</a>
+        <a th:href="@{/areas}" href="/areas"      data-nav="/areas">Áreas</a>
+        <a th:href="@{/ofertas}" href="/ofertas"    data-nav="/ofertas" class="is-active">Ofertas</a>
+        <a th:href="@{/publicidad}" href="/publicidad" data-nav="/publicidad">Publicidad</a>
+        <a th:href="@{/contacto}" href="/contacto"   data-nav="/contacto">Contacto</a>
         <span class="session-area" id="session-area"></span>
       </nav>
     </div>
@@ -67,13 +67,13 @@
     </div>
   </footer>
 
-  <script src="js/storage-api.js?v=rest3"></script>
-  <script src="js/ui.js?v=rest3"></script>
-  <script src="js/validators.js?v=rest3"></script>
-  <script src="js/auth.js?v=rest3"></script>
-  <script src="js/areas.js?v=rest3"></script>
-  <script src="js/ofertas.js?v=rest3"></script>
-  <script src="js/main.js?v=rest3"></script>
-  <script src="js/page-ofertas.js?v=rest3"></script>
+  <script th:src="@{/js/storage-api.js?v=rest3}" src="/js/storage-api.js?v=rest3"></script>
+  <script th:src="@{/js/ui.js?v=rest3}" src="/js/ui.js?v=rest3"></script>
+  <script th:src="@{/js/validators.js?v=rest3}" src="/js/validators.js?v=rest3"></script>
+  <script th:src="@{/js/auth.js?v=rest3}" src="/js/auth.js?v=rest3"></script>
+  <script th:src="@{/js/areas.js?v=rest3}" src="/js/areas.js?v=rest3"></script>
+  <script th:src="@{/js/ofertas.js?v=rest3}" src="/js/ofertas.js?v=rest3"></script>
+  <script th:src="@{/js/main.js?v=rest3}" src="/js/main.js?v=rest3"></script>
+  <script th:src="@{/js/page-ofertas.js?v=rest3}" src="/js/page-ofertas.js?v=rest3"></script>
 </body>
 </html>

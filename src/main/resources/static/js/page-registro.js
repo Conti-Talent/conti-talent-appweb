@@ -30,7 +30,7 @@
       }
 
       UI.showToast('Cuenta creada con éxito', 'success');
-      setTimeout(() => { window.location.href = 'index.html'; }, 700);
+      setTimeout(() => { window.location.href = '/'; }, 700);
     });
   };
 

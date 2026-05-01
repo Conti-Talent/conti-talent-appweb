@@ -5,7 +5,7 @@
 (() => {
   const init = async () => {
     await Storage.ready;
-    if (!Auth.requireAdmin('../login.html')) return;
+    if (!Auth.requireAdmin('/login')) return;
     document.getElementById('btn-nuevo-usuario').addEventListener('click', () => openForm());
     document.getElementById('search-usuario').addEventListener('input', renderTable);
     document.getElementById('filter-rol').addEventListener('change', renderTable);

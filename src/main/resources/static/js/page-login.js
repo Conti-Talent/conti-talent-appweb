@@ -25,7 +25,7 @@
 
       UI.showToast(`Bienvenido, ${out.user.nombre} 👋`, 'success');
       setTimeout(() => {
-        window.location.href = out.user.rol === 'admin' ? 'admin/dashboard.html' : 'index.html';
+        window.location.href = out.user.rol === 'admin' ? '/admin/dashboard' : '/';
       }, 600);
     });
   };
