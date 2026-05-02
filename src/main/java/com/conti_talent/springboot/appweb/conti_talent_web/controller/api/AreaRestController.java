@@ -25,12 +25,12 @@ public class AreaRestController {
     }
 
     @GetMapping("/{id}")
-    public AreaDTO obtener(@PathVariable String id) {
+    public AreaDTO obtener(@PathVariable Long id) {
         return service.obtener(id);
     }
 
     @GetMapping("/{id}/ofertas-count")
-    public Map<String, Integer> contarOfertas(@PathVariable String id) {
+    public Map<String, Integer> contarOfertas(@PathVariable Long id) {
         return Map.of("count", service.contarOfertas(id));
     }
 
@@ -40,12 +40,12 @@ public class AreaRestController {
     }
 
     @PutMapping("/{id}")
-    public AreaDTO actualizar(@PathVariable String id, @RequestBody AreaDTO body) {
+    public AreaDTO actualizar(@PathVariable Long id, @RequestBody AreaDTO body) {
         return service.actualizar(id, body);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable String id) {
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         service.eliminar(id);
         return ResponseEntity.noContent().build();
     }

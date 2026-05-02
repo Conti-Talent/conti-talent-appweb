@@ -8,13 +8,13 @@ public interface IAreaService {
 
     List<AreaDTO> listar();
 
-    AreaDTO obtener(String id);
+    AreaDTO obtener(Long id);
 
     AreaDTO crear(AreaDTO dto);
 
-    AreaDTO actualizar(String id, AreaDTO dto);
+    AreaDTO actualizar(Long id, AreaDTO dto);
 
-    void eliminar(String id);
+    void eliminar(Long id);
 
-    int contarOfertas(String areaId);
+    int contarOfertas(Long areaId);
 }

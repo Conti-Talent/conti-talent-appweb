@@ -4,12 +4,14 @@ import com.conti_talent.springboot.appweb.conti_talent_web.dto.OfertaDTO;
 import com.conti_talent.springboot.appweb.conti_talent_web.exception.BusinessException;
 import com.conti_talent.springboot.appweb.conti_talent_web.exception.ResourceNotFoundException;
 import com.conti_talent.springboot.appweb.conti_talent_web.mapper.OfertaMapper;
+import com.conti_talent.springboot.appweb.conti_talent_web.model.Area;
 import com.conti_talent.springboot.appweb.conti_talent_web.model.Oferta;
 import com.conti_talent.springboot.appweb.conti_talent_web.repository.IAreaRepository;
 import com.conti_talent.springboot.appweb.conti_talent_web.repository.IOfertaRepository;
 import com.conti_talent.springboot.appweb.conti_talent_web.repository.IPreguntaRepository;
 import com.conti_talent.springboot.appweb.conti_talent_web.service.IOfertaService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +19,7 @@ import java.util.List;
 @Service
 public class OfertaServiceImpl implements IOfertaService {
 
-    private static final List<String> TIPOS_VALIDOS = List.of("Práctica", "Trabajo");
+    private static final List<String> TIPOS_VALIDOS = List.of("Práctica", "Trabajo", "Practica");
 
     private final IOfertaRepository ofertaRepository;
     private final IAreaRepository areaRepository;
@@ -35,51 +37,57 @@ public class OfertaServiceImpl implements IOfertaService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<OfertaDTO> listar() {
         return mapper.toDTOList(ofertaRepository.findAll());
     }
 
     @Override
-    public List<OfertaDTO> listarPorArea(String areaId) {
+    @Transactional(readOnly = true)
+    public List<OfertaDTO> listarPorArea(Long areaId) {
         return mapper.toDTOList(ofertaRepository.findByAreaId(areaId));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<OfertaDTO> destacadas() {
-        return mapper.toDTOList(ofertaRepository.findFeatured());
+        return mapper.toDTOList(ofertaRepository.findByDestacadaTrue());
     }
 
     @Override
-    public OfertaDTO obtener(String id) {
-        Oferta o = ofertaRepository.findById(id)
+    @Transactional(readOnly = true)
+    public OfertaDTO obtener(Long id) {
+        Oferta oferta = ofertaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Oferta no encontrada: " + id));
-        return mapper.toDTO(o);
+        return mapper.toDTO(oferta);
     }
 
     @Override
+    @Transactional
     public OfertaDTO crear(OfertaDTO dto) {
-        validarDTO(dto, /*creando=*/ true);
-        Oferta o = new Oferta();
-        applyChanges(o, dto, /*nuevo=*/ true);
-        o.setCreadaEn(System.currentTimeMillis());
-        return mapper.toDTO(ofertaRepository.save(o));
+        validarDTO(dto, true);
+        Oferta oferta = new Oferta();
+        aplicarCambios(oferta, dto, true);
+        oferta.setCreadaEn(System.currentTimeMillis());
+        return mapper.toDTO(ofertaRepository.save(oferta));
     }
 
     @Override
-    public OfertaDTO actualizar(String id, OfertaDTO dto) {
-        Oferta o = ofertaRepository.findById(id)
+    @Transactional
+    public OfertaDTO actualizar(Long id, OfertaDTO dto) {
+        Oferta oferta = ofertaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Oferta no encontrada: " + id));
-        validarDTO(dto, /*creando=*/ false);
-        applyChanges(o, dto, /*nuevo=*/ false);
-        return mapper.toDTO(ofertaRepository.save(o));
+        validarDTO(dto, false);
+        aplicarCambios(oferta, dto, false);
+        return mapper.toDTO(ofertaRepository.save(oferta));
     }
 
     @Override
-    public void eliminar(String id) {
-        if (ofertaRepository.findById(id).isEmpty()) {
+    @Transactional
+    public void eliminar(Long id) {
+        if (!ofertaRepository.existsById(id)) {
             throw new ResourceNotFoundException("Oferta no encontrada: " + id);
         }
-        // limpieza referencial: preguntas asociadas se borran junto con la oferta
         preguntaRepository.deleteByOfertaId(id);
         ofertaRepository.deleteById(id);
     }
@@ -88,33 +96,36 @@ public class OfertaServiceImpl implements IOfertaService {
 
     private void validarDTO(OfertaDTO dto, boolean creando) {
         if (dto == null) throw new BusinessException("Datos de oferta requeridos");
-        if (creando && isBlank(dto.getTitulo())) {
-            throw new BusinessException("El título es obligatorio");
+        if (creando && esTextoVacio(dto.getTitulo())) {
+            throw new BusinessException("El titulo es obligatorio");
         }
         if (dto.getTipo() != null && !TIPOS_VALIDOS.contains(dto.getTipo())) {
-            throw new BusinessException("Tipo inválido. Permitidos: " + TIPOS_VALIDOS);
+            throw new BusinessException("Tipo invalido. Permitidos: " + TIPOS_VALIDOS);
         }
-        if (dto.getAreaId() != null && !dto.getAreaId().isBlank()
-                && areaRepository.findById(dto.getAreaId()).isEmpty()) {
-            throw new BusinessException("Área inexistente: " + dto.getAreaId());
+        if (dto.getAreaId() != null && !areaRepository.existsById(dto.getAreaId())) {
+            throw new BusinessException("Area inexistente: " + dto.getAreaId());
         }
     }
 
-    private void applyChanges(Oferta o, OfertaDTO dto, boolean nuevo) {
-        if (dto.getTitulo()      != null) o.setTitulo(dto.getTitulo().trim());
-        if (dto.getTipo()        != null) o.setTipo(dto.getTipo());
-        else if (nuevo) o.setTipo("Trabajo");
-        if (dto.getAreaId()      != null) o.setAreaId(dto.getAreaId());
-        if (dto.getModalidad()   != null) o.setModalidad(dto.getModalidad());
-        if (dto.getUbicacion()   != null) o.setUbicacion(dto.getUbicacion());
-        o.setVacantes(Math.max(1, dto.getVacantes() == 0 && nuevo ? 1 : dto.getVacantes()));
-        o.setDestacada(dto.isDestacada());
-        if (dto.getDescripcion() != null) o.setDescripcion(dto.getDescripcion().trim());
-        if (dto.getRequisitos()  != null) o.setRequisitos(new ArrayList<>(dto.getRequisitos()));
-        if (dto.getBeneficios()  != null) o.setBeneficios(new ArrayList<>(dto.getBeneficios()));
+    private void aplicarCambios(Oferta oferta, OfertaDTO dto, boolean nuevo) {
+        if (dto.getTitulo()      != null) oferta.setTitulo(dto.getTitulo().trim());
+        if (dto.getTipo()        != null) oferta.setTipo(dto.getTipo());
+        else if (nuevo) oferta.setTipo("Trabajo");
+        if (dto.getAreaId()      != null) {
+            Area area = areaRepository.findById(dto.getAreaId())
+                    .orElseThrow(() -> new BusinessException("Area inexistente: " + dto.getAreaId()));
+            oferta.setArea(area);
+        }
+        if (dto.getModalidad()   != null) oferta.setModalidad(dto.getModalidad());
+        if (dto.getUbicacion()   != null) oferta.setUbicacion(dto.getUbicacion());
+        oferta.setVacantes(Math.max(1, dto.getVacantes() == 0 && nuevo ? 1 : dto.getVacantes()));
+        oferta.setDestacada(dto.isDestacada());
+        if (dto.getDescripcion() != null) oferta.setDescripcion(dto.getDescripcion().trim());
+        if (dto.getRequisitos()  != null) oferta.setRequisitos(new ArrayList<>(dto.getRequisitos()));
+        if (dto.getBeneficios()  != null) oferta.setBeneficios(new ArrayList<>(dto.getBeneficios()));
     }
 
-    private static boolean isBlank(String s) {
-        return s == null || s.trim().isEmpty();
+    private static boolean esTextoVacio(String texto) {
+        return texto == null || texto.trim().isEmpty();
     }
 }

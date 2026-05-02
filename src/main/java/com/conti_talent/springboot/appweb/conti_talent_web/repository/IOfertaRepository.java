@@ -6,16 +6,15 @@ import java.util.List;
 import java.util.Optional;
 
 public interface IOfertaRepository {
-
     List<Oferta> findAll();
-
-    Optional<Oferta> findById(String id);
-
-    List<Oferta> findByAreaId(String areaId);
-
-    List<Oferta> findFeatured();
-
+    Optional<Oferta> findById(Long id);
     Oferta save(Oferta oferta);
+    boolean existsById(Long id);
+    void deleteById(Long id);
+    long count();
 
-    void deleteById(String id);
+    List<Oferta> findByAreaId(Long areaId);
+    List<Oferta> findByDestacadaTrue();
+
+    default List<Oferta> findFeatured() { return findByDestacadaTrue(); }
 }

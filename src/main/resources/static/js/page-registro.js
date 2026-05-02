@@ -3,11 +3,12 @@
    ========================================================= */
 
 (() => {
-  const init = () => {
+  const init = async () => {
+    await Storage.ready;
     const form = document.getElementById('registro-form');
     if (!form) return;
 
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const result = Validators.validateForm(form, {
         nombre:          [{ test: Validators.required,           message: 'Ingresa tu nombre' }],
@@ -22,7 +23,7 @@
       });
       if (!result.valid) return;
 
-      const out = Auth.register(result.values);
+      const out = await Auth.register(result.values);
       if (!out.ok) {
         UI.showToast(out.error, 'error');
         return;

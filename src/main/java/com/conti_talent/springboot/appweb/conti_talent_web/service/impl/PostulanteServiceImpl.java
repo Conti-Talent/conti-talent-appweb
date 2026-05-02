@@ -6,12 +6,18 @@ import com.conti_talent.springboot.appweb.conti_talent_web.exception.BusinessExc
 import com.conti_talent.springboot.appweb.conti_talent_web.exception.EstadoInvalidoException;
 import com.conti_talent.springboot.appweb.conti_talent_web.exception.ResourceNotFoundException;
 import com.conti_talent.springboot.appweb.conti_talent_web.mapper.PostulanteMapper;
+import com.conti_talent.springboot.appweb.conti_talent_web.model.Estado;
+import com.conti_talent.springboot.appweb.conti_talent_web.model.Oferta;
 import com.conti_talent.springboot.appweb.conti_talent_web.model.Postulante;
-import com.conti_talent.springboot.appweb.conti_talent_web.model.enums.EstadoPostulante;
+import com.conti_talent.springboot.appweb.conti_talent_web.model.Usuario;
+import com.conti_talent.springboot.appweb.conti_talent_web.model.enums.EstadoCodigo;
+import com.conti_talent.springboot.appweb.conti_talent_web.repository.IEstadoRepository;
 import com.conti_talent.springboot.appweb.conti_talent_web.repository.IOfertaRepository;
 import com.conti_talent.springboot.appweb.conti_talent_web.repository.IPostulanteRepository;
+import com.conti_talent.springboot.appweb.conti_talent_web.repository.IUsuarioRepository;
 import com.conti_talent.springboot.appweb.conti_talent_web.service.IPostulanteService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
@@ -22,95 +28,146 @@ public class PostulanteServiceImpl implements IPostulanteService {
 
     private final IPostulanteRepository postulanteRepository;
     private final IOfertaRepository ofertaRepository;
-    private final PostulanteMapper mapper;
+    private final IUsuarioRepository usuarioRepository;
+    private final IEstadoRepository estadoRepository;
+    private final PostulanteMapper postulanteMapper;
 
     public PostulanteServiceImpl(IPostulanteRepository postulanteRepository,
                                  IOfertaRepository ofertaRepository,
-                                 PostulanteMapper mapper) {
+                                 IUsuarioRepository usuarioRepository,
+                                 IEstadoRepository estadoRepository,
+                                 PostulanteMapper postulanteMapper) {
         this.postulanteRepository = postulanteRepository;
         this.ofertaRepository = ofertaRepository;
-        this.mapper = mapper;
+        this.usuarioRepository = usuarioRepository;
+        this.estadoRepository = estadoRepository;
+        this.postulanteMapper = postulanteMapper;
     }
 
     @Override
-    public List<PostulanteDTO> listar() {
-        return mapper.toDTOList(postulanteRepository.findAll());
+    @Transactional(readOnly = true)
+    public List<PostulanteDTO> listarTodos() {
+        return postulanteMapper.convertirALista(postulanteRepository.findAll());
     }
 
     @Override
-    public PostulanteDTO obtener(String id) {
-        return mapper.toDTO(getOrThrow(id));
+    @Transactional(readOnly = true)
+    public PostulanteDTO obtenerPorId(Long id) {
+        return postulanteMapper.convertirADTO(buscarPostulanteOFallar(id));
     }
 
     @Override
-    public List<PostulanteDTO> listarPorOferta(String ofertaId) {
-        return mapper.toDTOList(postulanteRepository.findByOfertaId(ofertaId));
+    @Transactional(readOnly = true)
+    public List<PostulanteDTO> listarPorOferta(Long ofertaId) {
+        return postulanteMapper.convertirALista(postulanteRepository.findByOfertaId(ofertaId));
     }
 
     @Override
-    public List<PostulanteDTO> listarPorUsuario(String usuarioId) {
-        return mapper.toDTOList(postulanteRepository.findByUsuarioId(usuarioId));
+    @Transactional(readOnly = true)
+    public List<PostulanteDTO> listarPorUsuario(Long usuarioId) {
+        return postulanteMapper.convertirALista(postulanteRepository.findByUsuarioId(usuarioId));
     }
 
     @Override
-    public PostulanteDTO postular(PostularRequest req) {
-        if (req == null) throw new BusinessException("Datos de postulación requeridos");
-        if (isBlank(req.getOfertaId())) throw new BusinessException("ofertaId requerido");
-        if (isBlank(req.getNombre()))   throw new BusinessException("Nombre requerido");
-        if (isBlank(req.getEmail()))    throw new BusinessException("Email requerido");
+    @Transactional
+    public PostulanteDTO registrarPostulacion(PostularRequest request) {
+        validarDatosPostulacion(request);
+        Oferta oferta = ofertaRepository.findById(request.getOfertaId())
+                .orElseThrow(() -> new BusinessException("Oferta inexistente: " + request.getOfertaId()));
+        Estado estadoInicial = obtenerEstadoPorCodigoOFallar(EstadoCodigo.POSTULADO.name());
 
-        if (ofertaRepository.findById(req.getOfertaId()).isEmpty()) {
-            throw new BusinessException("Oferta inexistente: " + req.getOfertaId());
+        Postulante nuevoPostulante = postulanteMapper.crearDesdeRequest(request);
+        nuevoPostulante.setOferta(oferta);
+        nuevoPostulante.setEstado(estadoInicial);
+        if (request.getUsuarioId() != null) {
+            Usuario usuario = usuarioRepository.findById(request.getUsuarioId())
+                    .orElseThrow(() -> new BusinessException("Usuario inexistente: " + request.getUsuarioId()));
+            nuevoPostulante.setUsuario(usuario);
         }
-        Postulante p = mapper.fromRequest(req);
-        p.setCreadoEn(System.currentTimeMillis());
-        return mapper.toDTO(postulanteRepository.save(p));
+        nuevoPostulante.setCreadoEn(System.currentTimeMillis());
+        return postulanteMapper.convertirADTO(postulanteRepository.save(nuevoPostulante));
     }
 
     @Override
-    public PostulanteDTO cambiarEstado(String id, EstadoPostulante destino) {
-        Postulante p = getOrThrow(id);
-        if (destino == null) throw new BusinessException("Estado destino requerido");
-        if (!p.getEstado().puedeTransicionarA(destino)) {
+    @Transactional
+    public PostulanteDTO cambiarEstado(Long idPostulante, String estadoDestino) {
+        Postulante postulante = buscarPostulanteOFallar(idPostulante);
+        if (esTextoVacio(estadoDestino)) {
+            throw new BusinessException("Estado destino requerido");
+        }
+        Estado estadoActual = postulante.getEstado();
+        Estado estadoNuevo  = resolverEstadoDestino(estadoDestino);
+
+        EstadoCodigo codigoActual = EstadoCodigo.valueOf(estadoActual.getCodigo());
+        EstadoCodigo codigoNuevo  = EstadoCodigo.valueOf(estadoNuevo.getCodigo());
+
+        if (!codigoActual.puedeTransicionarA(codigoNuevo)) {
             throw new EstadoInvalidoException(
-                    "Transición no permitida: " + p.getEstado() + " → " + destino);
+                    "Transicion no permitida: " + codigoActual + " -> " + codigoNuevo);
         }
-        p.setEstado(destino);
-        return mapper.toDTO(postulanteRepository.save(p));
+        postulante.setEstado(estadoNuevo);
+        return postulanteMapper.convertirADTO(postulanteRepository.save(postulante));
     }
 
     @Override
-    public void eliminar(String id) {
-        if (postulanteRepository.findById(id).isEmpty()) {
+    @Transactional
+    public void eliminar(Long id) {
+        if (!postulanteRepository.existsById(id)) {
             throw new ResourceNotFoundException("Postulante no encontrado: " + id);
         }
         postulanteRepository.deleteById(id);
     }
 
     @Override
-    public PostulanteDTO softDelete(String id) {
-        return cambiarEstado(id, EstadoPostulante.RECHAZADO);
+    @Transactional
+    public PostulanteDTO marcarComoRechazado(Long id) {
+        return cambiarEstado(id, EstadoCodigo.RECHAZADO.name());
     }
 
     @Override
-    public List<PostulanteDTO> ranking(String ofertaId) {
-        List<Postulante> data = isBlank(ofertaId)
+    @Transactional(readOnly = true)
+    public List<PostulanteDTO> obtenerRankingPorPuntaje(Long ofertaId) {
+        List<Postulante> base = ofertaId == null
                 ? postulanteRepository.findAll()
                 : postulanteRepository.findByOfertaId(ofertaId);
-        return data.stream()
+        return base.stream()
                 .sorted(Comparator.comparingInt(Postulante::getPuntaje).reversed())
-                .map(mapper::toDTO)
+                .map(postulanteMapper::convertirADTO)
                 .collect(Collectors.toList());
     }
 
-    /* ============ helpers ============ */
+    /* ============ Helpers privados ============ */
 
-    private Postulante getOrThrow(String id) {
+    private Postulante buscarPostulanteOFallar(Long id) {
         return postulanteRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Postulante no encontrado: " + id));
     }
 
-    private static boolean isBlank(String s) {
-        return s == null || s.trim().isEmpty();
+    private Estado obtenerEstadoPorCodigoOFallar(String codigo) {
+        return estadoRepository.findByCodigo(codigo)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Estado con codigo '" + codigo + "' no encontrado"));
+    }
+
+    /** Acepta tanto un id numerico como un codigo logico (POSTULADO, ENTREVISTA...). */
+    private Estado resolverEstadoDestino(String referencia) {
+        try {
+            Long idEstado = Long.parseLong(referencia);
+            return estadoRepository.findById(idEstado)
+                    .orElseThrow(() -> new ResourceNotFoundException("Estado no encontrado: " + idEstado));
+        } catch (NumberFormatException e) {
+            return obtenerEstadoPorCodigoOFallar(referencia);
+        }
+    }
+
+    private static void validarDatosPostulacion(PostularRequest request) {
+        if (request == null)                          throw new BusinessException("Datos de postulacion requeridos");
+        if (request.getOfertaId() == null)            throw new BusinessException("ofertaId requerido");
+        if (esTextoVacio(request.getNombre()))        throw new BusinessException("Nombre requerido");
+        if (esTextoVacio(request.getEmail()))         throw new BusinessException("Email requerido");
+    }
+
+    private static boolean esTextoVacio(String texto) {
+        return texto == null || texto.trim().isEmpty();
     }
 }

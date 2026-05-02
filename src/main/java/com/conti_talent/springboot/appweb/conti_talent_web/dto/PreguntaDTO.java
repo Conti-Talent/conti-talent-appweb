@@ -3,28 +3,23 @@ package com.conti_talent.springboot.appweb.conti_talent_web.dto;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * DTO de pregunta para exposición. En endpoints públicos (al postular)
- * se debería filtrar el campo `correcta` antes de retornarlo. Para uso
- * administrativo se devuelve completo.
- */
 public class PreguntaDTO {
 
-    private String id;
-    private String ofertaId;
+    private Long id;
+    private Long ofertaId;
     private String pregunta;
     private List<String> opciones;
-    private Integer correcta; // Integer para poder anularlo en respuestas públicas
+    private Integer correcta;
 
     public PreguntaDTO() {
         this.opciones = new ArrayList<>();
     }
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public String getOfertaId() { return ofertaId; }
-    public void setOfertaId(String ofertaId) { this.ofertaId = ofertaId; }
+    public Long getOfertaId() { return ofertaId; }
+    public void setOfertaId(Long ofertaId) { this.ofertaId = ofertaId; }
 
     public String getPregunta() { return pregunta; }
     public void setPregunta(String pregunta) { this.pregunta = pregunta; }

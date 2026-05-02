@@ -3,7 +3,8 @@
    ========================================================= */
 
 (() => {
-  const init = () => {
+  const init = async () => {
+    await Storage.ready;
     if (!Auth.requireAdmin('../login.html')) return;
     document.getElementById('btn-nueva-oferta').addEventListener('click', () => openForm());
     document.getElementById('search-oferta').addEventListener('input', renderTable);

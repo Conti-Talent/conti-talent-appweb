@@ -1,76 +1,96 @@
 /* =========================================================
-   postulantes.js — Gestión de postulantes
+   postulantes.js — Gestion de postulantes contra API REST
    ========================================================= */
 
 const Postulantes = (() => {
   const ENTITY = 'postulantes';
 
-  const list   = ()      => Storage.read(ENTITY, []);
-  const get    = (id)    => list().find((p) => p.id === id) || null;
-  const byOferta = (ofertaId) => list().filter((p) => p.ofertaId === ofertaId);
-  const byUsuario = (usuarioId) => list().filter((p) => p.usuarioId === usuarioId);
+  const list = () => Storage.read(ENTITY, []);
+  const get = (id) => list().find((p) => String(p.id) === String(id)) || null;
+  const byOferta = (ofertaId) => list().filter((p) => String(p.ofertaId) === String(ofertaId));
+  const byUsuario = (usuarioId) => list().filter((p) => String(p.usuarioId) === String(usuarioId));
+
+  const payload = (data) => ({
+    usuarioId: Storage.toNumber(data.usuarioId),
+    ofertaId: Storage.toNumber(data.ofertaId),
+    nombre: data.nombre?.trim(),
+    email: data.email?.trim(),
+    telefono: data.telefono || '',
+    experiencia: data.experiencia || '',
+    habilidades: data.habilidades || '',
+    cv: data.cv || ''
+  });
 
   const create = (data) => {
-    const items = list();
-    const newItem = {
+    const temp = {
       id: Storage.generateId(),
-      usuarioId: data.usuarioId || null,
-      ofertaId: data.ofertaId,
-      nombre: data.nombre.trim(),
-      email: data.email.trim(),
-      telefono: data.telefono || '',
-      experiencia: data.experiencia || '',
-      habilidades: data.habilidades || '',
-      cv: data.cv || '',
+      ...data,
+      usuarioId: data.usuarioId ? String(data.usuarioId) : null,
+      ofertaId: String(data.ofertaId),
       estado: 'POSTULADO',
       puntaje: 0,
+      respuestas: {},
       creadoEn: Date.now()
     };
-    items.push(newItem);
-    Storage.write(ENTITY, items);
-    return newItem;
+    Storage.upsert(ENTITY, temp);
+    ContiAPI.postular(payload(data))
+      .then((created) => Storage.upsert(ENTITY, created))
+      .catch((err) => { Storage.removeCached(ENTITY, temp.id); UI.showToast(err.message, 'error'); });
+    return temp;
   };
 
   const update = (id, data) => {
-    const items = list().map((p) => p.id === id ? { ...p, ...data } : p);
-    Storage.write(ENTITY, items);
+    const current = get(id);
+    return Storage.upsert(ENTITY, { ...current, ...data, id });
   };
 
   const setEstado = (id, estado) => {
-    update(id, { estado });
+    const current = get(id);
+    const updated = update(id, { estado });
+    ContiAPI.cambiarEstado(id, estado)
+      .then((saved) => Storage.upsert(ENTITY, saved))
+      .catch((err) => { if (current) Storage.upsert(ENTITY, current); UI.showToast(err.message, 'error'); });
+    return updated;
   };
 
   const setPuntaje = (id, puntaje, autoEstado = true) => {
     const updates = { puntaje };
-    if (autoEstado) {
-      updates.estado = puntaje >= 70 ? 'APROBADO_TECNICO' : 'EN_EVALUACION';
-    }
-    update(id, updates);
+    if (autoEstado) updates.estado = puntaje >= 70 ? 'APROBADO_TECNICO' : 'EN_EVALUACION';
+    return update(id, updates);
   };
 
-  /**
-   * Guarda el resultado completo de una evaluación: puntaje + respuestas marcadas.
-   * Esto permite revisar después qué respondió el postulante (vista solo lectura).
-   */
   const saveEvaluation = (id, puntaje, respuestas) => {
-    update(id, {
+    const current = get(id);
+    const updated = update(id, {
       puntaje,
       respuestas,
       estado: puntaje >= 70 ? 'APROBADO_TECNICO' : 'EN_EVALUACION'
     });
+    ContiAPI.calificar(id, respuestas)
+      .then(() => Storage.refresh(ENTITY))
+      .catch((err) => { if (current) Storage.upsert(ENTITY, current); UI.showToast(err.message, 'error'); });
+    return updated;
   };
 
   const hasRespuestas = (postulante) =>
     postulante && postulante.respuestas && Object.keys(postulante.respuestas).length > 0;
 
   const remove = (id) => {
-    Storage.write(ENTITY, list().filter((p) => p.id !== id));
+    const current = get(id);
+    Storage.removeCached(ENTITY, id);
+    ContiAPI.eliminarPostulante(id)
+      .catch((err) => { if (current) Storage.upsert(ENTITY, current); UI.showToast(err.message, 'error'); });
   };
 
-  // Eliminación lógica → marca como rechazado
-  const softDelete = (id) => setEstado(id, 'RECHAZADO');
+  const softDelete = (id) => {
+    const current = get(id);
+    const updated = update(id, { estado: 'RECHAZADO' });
+    ContiAPI.rechazar(id)
+      .then((saved) => Storage.upsert(ENTITY, saved))
+      .catch((err) => { if (current) Storage.upsert(ENTITY, current); UI.showToast(err.message, 'error'); });
+    return updated;
+  };
 
-  /** Ranking ordenado por puntaje desc */
   const ranking = (ofertaId = null) => {
     const data = ofertaId ? byOferta(ofertaId) : list();
     return [...data].sort((a, b) => b.puntaje - a.puntaje);

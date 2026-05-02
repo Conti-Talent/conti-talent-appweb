@@ -5,22 +5,18 @@ import com.conti_talent.springboot.appweb.conti_talent_web.model.Usuario;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Contrato del repositorio de Usuario. Definido como interfaz para que la
- * implementación pueda cambiar (in-memory hoy, JPA mañana) sin afectar la
- * capa de servicios.
- */
 public interface IUsuarioRepository {
-
     List<Usuario> findAll();
-
-    Optional<Usuario> findById(String id);
-
-    Optional<Usuario> findByEmail(String email);
-
+    Optional<Usuario> findById(Long id);
     Usuario save(Usuario usuario);
+    boolean existsById(Long id);
+    void deleteById(Long id);
+    long count();
 
-    void deleteById(String id);
+    Optional<Usuario> findByEmailIgnoreCase(String email);
+    boolean existsByEmailIgnoreCase(String email);
+    List<Usuario> findByRolId(Long rolId);
 
-    boolean existsByEmail(String email);
+    default Optional<Usuario> findByEmail(String email) { return findByEmailIgnoreCase(email); }
+    default boolean existsByEmail(String email) { return existsByEmailIgnoreCase(email); }
 }

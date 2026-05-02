@@ -8,15 +8,15 @@ public interface IOfertaService {
 
     List<OfertaDTO> listar();
 
-    List<OfertaDTO> listarPorArea(String areaId);
+    List<OfertaDTO> listarPorArea(Long areaId);
 
     List<OfertaDTO> destacadas();
 
-    OfertaDTO obtener(String id);
+    OfertaDTO obtener(Long id);
 
     OfertaDTO crear(OfertaDTO dto);
 
-    OfertaDTO actualizar(String id, OfertaDTO dto);
+    OfertaDTO actualizar(Long id, OfertaDTO dto);
 
-    void eliminar(String id);
+    void eliminar(Long id);
 }

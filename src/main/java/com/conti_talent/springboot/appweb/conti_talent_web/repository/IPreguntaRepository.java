@@ -6,16 +6,13 @@ import java.util.List;
 import java.util.Optional;
 
 public interface IPreguntaRepository {
-
     List<Pregunta> findAll();
-
-    Optional<Pregunta> findById(String id);
-
-    List<Pregunta> findByOfertaId(String ofertaId);
-
+    Optional<Pregunta> findById(Long id);
     Pregunta save(Pregunta pregunta);
+    boolean existsById(Long id);
+    void deleteById(Long id);
+    long count();
 
-    void deleteById(String id);
-
-    void deleteByOfertaId(String ofertaId);
+    List<Pregunta> findByOfertaId(Long ofertaId);
+    void deleteByOfertaId(Long ofertaId);
 }

@@ -6,12 +6,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface IAreaRepository {
-
     List<Area> findAll();
-
-    Optional<Area> findById(String id);
-
+    Optional<Area> findById(Long id);
     Area save(Area area);
-
-    void deleteById(String id);
+    boolean existsById(Long id);
+    void deleteById(Long id);
+    long count();
 }

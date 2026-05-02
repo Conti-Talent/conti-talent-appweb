@@ -6,16 +6,14 @@ import java.util.List;
 import java.util.Optional;
 
 public interface IPostulanteRepository {
-
     List<Postulante> findAll();
-
-    Optional<Postulante> findById(String id);
-
-    List<Postulante> findByOfertaId(String ofertaId);
-
-    List<Postulante> findByUsuarioId(String usuarioId);
-
+    Optional<Postulante> findById(Long id);
     Postulante save(Postulante postulante);
+    boolean existsById(Long id);
+    void deleteById(Long id);
+    long count();
 
-    void deleteById(String id);
+    List<Postulante> findByOfertaId(Long ofertaId);
+    List<Postulante> findByUsuarioId(Long usuarioId);
+    List<Postulante> findByEstadoId(Long estadoId);
 }

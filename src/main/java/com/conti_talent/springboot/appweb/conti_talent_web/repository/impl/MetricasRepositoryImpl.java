@@ -2,16 +2,15 @@ package com.conti_talent.springboot.appweb.conti_talent_web.repository.impl;
 
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.MetricasDTO;
 import com.conti_talent.springboot.appweb.conti_talent_web.repository.IMetricasRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Component;
 
-@Repository
+/**
+ * Impl in-memory del MetricasRepository (no JPA). Las metricas precomputadas
+ * son un snapshot estatico cargado por el DataLoader.
+ */
+@Component
 public class MetricasRepositoryImpl implements IMetricasRepository {
 
-    /**
-     * Volátil: el snapshot lo escribe el DataLoader una vez al arrancar y se
-     * lee desde cualquier hilo HTTP. La escritura desde otros lugares es
-     * excepcional (admin futuro) por lo que no necesitamos sincronización extra.
-     */
     private volatile MetricasDTO snapshot = new MetricasDTO();
 
     @Override
