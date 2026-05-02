@@ -465,8 +465,11 @@
   /* Contact info card */
   .contact-info-list .ico { width: 36px; height: 36px; font-size: 1rem; }
 
-  /* Hero visual smaller */
-  .hero__visual { aspect-ratio: 5 / 3; }
+  /* Hero visual */
+  .hero__visual {
+    aspect-ratio: 320 / 363;
+    width: min(100%, 380px);
+  }
 
   /* Botón CTA detalle/postular full-width */
   #detalle-cta { width: 100%; justify-content: center; }
