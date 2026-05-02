@@ -15,8 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 
 /**
- * Carga inicial de datos en la base MySQL. Solo se ejecuta si la tabla de
- * usuarios esta vacia (seed idempotente).
+ * Carga inicial de datos en memoria. Solo se ejecuta si el repositorio de
+ * usuarios esta vacio (seed idempotente).
  *
  * Orden de carga:
  *   1. Roles      (catalogo)
@@ -72,10 +72,10 @@ public class DataLoader implements CommandLineRunner {
         cargarMetricas();
 
         if (usuarioRepository.count() > 0) {
-            log.info("[DataLoader] Datos ya cargados en MySQL; omito seed de entidades.");
+            log.info("[DataLoader] Datos ya cargados en memoria; omito seed de entidades.");
             return;
         }
-        log.info("[DataLoader] Cargando seed inicial de Conti Talent en MySQL...");
+        log.info("[DataLoader] Cargando seed inicial de Conti Talent en memoria...");
 
         long ahora = System.currentTimeMillis();
 
