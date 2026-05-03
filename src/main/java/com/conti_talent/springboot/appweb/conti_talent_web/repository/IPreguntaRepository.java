@@ -1,18 +1,13 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.repository;
 
 import com.conti_talent.springboot.appweb.conti_talent_web.model.Pregunta;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
-public interface IPreguntaRepository {
-    List<Pregunta> findAll();
-    Optional<Pregunta> findById(Long id);
-    Pregunta save(Pregunta pregunta);
-    boolean existsById(Long id);
-    void deleteById(Long id);
-    long count();
-
+public interface IPreguntaRepository extends JpaRepository<Pregunta, Long> {
     List<Pregunta> findByOfertaId(Long ofertaId);
+    @Transactional
     void deleteByOfertaId(Long ofertaId);
 }

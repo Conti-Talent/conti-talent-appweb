@@ -7,14 +7,17 @@ import com.conti_talent.springboot.appweb.conti_talent_web.exception.EstadoInval
 import com.conti_talent.springboot.appweb.conti_talent_web.exception.ResourceNotFoundException;
 import com.conti_talent.springboot.appweb.conti_talent_web.mapper.PostulanteMapper;
 import com.conti_talent.springboot.appweb.conti_talent_web.model.Estado;
+import com.conti_talent.springboot.appweb.conti_talent_web.model.HistorialEstadoPostulante;
 import com.conti_talent.springboot.appweb.conti_talent_web.model.Oferta;
 import com.conti_talent.springboot.appweb.conti_talent_web.model.Postulante;
 import com.conti_talent.springboot.appweb.conti_talent_web.model.Usuario;
 import com.conti_talent.springboot.appweb.conti_talent_web.model.enums.EstadoCodigo;
 import com.conti_talent.springboot.appweb.conti_talent_web.repository.IEstadoRepository;
+import com.conti_talent.springboot.appweb.conti_talent_web.repository.IHistorialEstadoPostulanteRepository;
 import com.conti_talent.springboot.appweb.conti_talent_web.repository.IOfertaRepository;
 import com.conti_talent.springboot.appweb.conti_talent_web.repository.IPostulanteRepository;
 import com.conti_talent.springboot.appweb.conti_talent_web.repository.IUsuarioRepository;
+import com.conti_talent.springboot.appweb.conti_talent_web.service.EvaluacionCompuestaService;
 import com.conti_talent.springboot.appweb.conti_talent_web.service.IPostulanteService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,17 +33,23 @@ public class PostulanteServiceImpl implements IPostulanteService {
     private final IOfertaRepository ofertaRepository;
     private final IUsuarioRepository usuarioRepository;
     private final IEstadoRepository estadoRepository;
+    private final IHistorialEstadoPostulanteRepository historialRepository;
+    private final EvaluacionCompuestaService evaluacionCompuestaService;
     private final PostulanteMapper postulanteMapper;
 
     public PostulanteServiceImpl(IPostulanteRepository postulanteRepository,
                                  IOfertaRepository ofertaRepository,
                                  IUsuarioRepository usuarioRepository,
                                  IEstadoRepository estadoRepository,
+                                 IHistorialEstadoPostulanteRepository historialRepository,
+                                 EvaluacionCompuestaService evaluacionCompuestaService,
                                  PostulanteMapper postulanteMapper) {
         this.postulanteRepository = postulanteRepository;
         this.ofertaRepository = ofertaRepository;
         this.usuarioRepository = usuarioRepository;
         this.estadoRepository = estadoRepository;
+        this.historialRepository = historialRepository;
+        this.evaluacionCompuestaService = evaluacionCompuestaService;
         this.postulanteMapper = postulanteMapper;
     }
 
@@ -84,13 +93,26 @@ public class PostulanteServiceImpl implements IPostulanteService {
                     .orElseThrow(() -> new BusinessException("Usuario inexistente: " + request.getUsuarioId()));
             nuevoPostulante.setUsuario(usuario);
         }
-        nuevoPostulante.setCreadoEn(System.currentTimeMillis());
-        return postulanteMapper.convertirADTO(postulanteRepository.save(nuevoPostulante));
+        long ahora = System.currentTimeMillis();
+        nuevoPostulante.setFechaPostulacion(ahora);
+        nuevoPostulante.setCreadoEn(ahora);
+        evaluacionCompuestaService.recalcular(nuevoPostulante);
+        Postulante guardado = postulanteRepository.save(nuevoPostulante);
+        registrarHistorial(guardado, null, estadoInicial.getCodigo(), "Sistema",
+                "Postulacion registrada", "Tu postulacion fue recibida correctamente.");
+        return postulanteMapper.convertirADTO(guardado);
     }
 
     @Override
     @Transactional
     public PostulanteDTO cambiarEstado(Long idPostulante, String estadoDestino) {
+        return cambiarEstado(idPostulante, estadoDestino, "Admin", null, null);
+    }
+
+    @Override
+    @Transactional
+    public PostulanteDTO cambiarEstado(Long idPostulante, String estadoDestino, String usuarioAdmin,
+                                       String observacionInterna, String observacionPostulante) {
         Postulante postulante = buscarPostulanteOFallar(idPostulante);
         if (esTextoVacio(estadoDestino)) {
             throw new BusinessException("Estado destino requerido");
@@ -106,6 +128,17 @@ public class PostulanteServiceImpl implements IPostulanteService {
                     "Transicion no permitida: " + codigoActual + " -> " + codigoNuevo);
         }
         postulante.setEstado(estadoNuevo);
+        Postulante guardado = postulanteRepository.save(postulante);
+        registrarHistorial(guardado, codigoActual.name(), codigoNuevo.name(), usuarioAdmin,
+                observacionInterna, observacionPostulante);
+        return postulanteMapper.convertirADTO(guardado);
+    }
+
+    @Override
+    @Transactional
+    public PostulanteDTO actualizarObservacionAdmin(Long idPostulante, String observacionAdmin) {
+        Postulante postulante = buscarPostulanteOFallar(idPostulante);
+        postulante.setObservacionAdmin(observacionAdmin != null ? observacionAdmin.trim() : null);
         return postulanteMapper.convertirADTO(postulanteRepository.save(postulante));
     }
 
@@ -127,11 +160,22 @@ public class PostulanteServiceImpl implements IPostulanteService {
     @Override
     @Transactional(readOnly = true)
     public List<PostulanteDTO> obtenerRankingPorPuntaje(Long ofertaId) {
+        return obtenerRanking(ofertaId, null, null);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<PostulanteDTO> obtenerRanking(Long ofertaId, String estado, Long areaId) {
         List<Postulante> base = ofertaId == null
                 ? postulanteRepository.findAll()
                 : postulanteRepository.findByOfertaId(ofertaId);
         return base.stream()
-                .sorted(Comparator.comparingInt(Postulante::getPuntaje).reversed())
+                .filter(postulante -> esTextoVacio(estado)
+                        || (postulante.getEstado() != null && estado.equalsIgnoreCase(postulante.getEstado().getCodigo())))
+                .filter(postulante -> areaId == null
+                        || (postulante.getOferta() != null && postulante.getOferta().getAreaId() != null
+                        && postulante.getOferta().getAreaId().equals(areaId)))
+                .sorted(Comparator.comparingInt(Postulante::getPuntajeFinal).reversed())
                 .map(postulanteMapper::convertirADTO)
                 .collect(Collectors.toList());
     }
@@ -165,6 +209,21 @@ public class PostulanteServiceImpl implements IPostulanteService {
         if (request.getOfertaId() == null)            throw new BusinessException("ofertaId requerido");
         if (esTextoVacio(request.getNombre()))        throw new BusinessException("Nombre requerido");
         if (esTextoVacio(request.getEmail()))         throw new BusinessException("Email requerido");
+        if (request.getAniosExperiencia() < 0)        throw new BusinessException("aniosExperiencia no puede ser negativo");
+    }
+
+    private void registrarHistorial(Postulante postulante, String anterior, String nuevo, String usuarioAdmin,
+                                    String observacionInterna, String observacionPostulante) {
+        HistorialEstadoPostulante historial = new HistorialEstadoPostulante();
+        historial.setPostulante(postulante);
+        historial.setEstadoAnterior(anterior);
+        historial.setEstadoNuevo(nuevo);
+        historial.setUsuarioAdmin(esTextoVacio(usuarioAdmin) ? "Sistema" : usuarioAdmin.trim());
+        historial.setObservacionInterna(observacionInterna);
+        historial.setObservacionPostulante(observacionPostulante);
+        historial.setFechaCambio(System.currentTimeMillis());
+        historialRepository.save(historial);
+        postulante.getHistorialEstados().add(historial);
     }
 
     private static boolean esTextoVacio(String texto) {

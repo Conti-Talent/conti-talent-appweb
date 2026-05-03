@@ -6,10 +6,15 @@ USE conti_talent;
 
 SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS tbl_postulante_respuesta;
+DROP TABLE IF EXISTS tbl_documento_postulante;
+DROP TABLE IF EXISTS tbl_historial_estado_postulante;
+DROP TABLE IF EXISTS tbl_entrevista_postulante;
+DROP TABLE IF EXISTS tbl_evaluacion_psicologica_postulante;
 DROP TABLE IF EXISTS tbl_postulante;
 DROP TABLE IF EXISTS tbl_pregunta_opcion;
 DROP TABLE IF EXISTS tbl_pregunta;
 DROP TABLE IF EXISTS tbl_oferta_beneficio;
+DROP TABLE IF EXISTS tbl_oferta_habilidad;
 DROP TABLE IF EXISTS tbl_oferta_requisito;
 DROP TABLE IF EXISTS tbl_oferta;
 DROP TABLE IF EXISTS tbl_usuario;
@@ -96,6 +101,14 @@ CREATE TABLE tbl_oferta_beneficio (
   CONSTRAINT fk_beneficio_oferta FOREIGN KEY (oferta_id) REFERENCES tbl_oferta (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE tbl_oferta_habilidad (
+  oferta_id BIGINT NOT NULL,
+  orden INT NOT NULL,
+  habilidad VARCHAR(120) NOT NULL,
+  PRIMARY KEY (oferta_id, orden),
+  CONSTRAINT fk_habilidad_oferta FOREIGN KEY (oferta_id) REFERENCES tbl_oferta (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE tbl_pregunta (
   id BIGINT NOT NULL AUTO_INCREMENT,
   oferta_id BIGINT NOT NULL,
@@ -124,12 +137,77 @@ CREATE TABLE tbl_postulante (
   experiencia TEXT,
   habilidades TEXT,
   cv VARCHAR(255),
-  puntaje INT NOT NULL,
+  fecha_postulacion BIGINT NOT NULL,
+  fecha_evaluacion BIGINT,
+  anios_experiencia INT NOT NULL DEFAULT 0,
+  nivel_estudios VARCHAR(80),
+  carrera VARCHAR(120),
+  disponibilidad VARCHAR(80),
+  modalidad_preferida VARCHAR(40),
+  pretension_salarial DOUBLE,
+  linkedin VARCHAR(255),
+  portafolio VARCHAR(255),
+  observacion_admin TEXT,
+  puntaje_cuestionario INT NOT NULL DEFAULT 0,
+  puntaje_experiencia INT NOT NULL DEFAULT 0,
+  puntaje_habilidades INT NOT NULL DEFAULT 0,
+  puntaje_final INT NOT NULL DEFAULT 0,
   creado_en BIGINT NOT NULL,
   PRIMARY KEY (id),
   CONSTRAINT fk_postulante_usuario FOREIGN KEY (usuario_id) REFERENCES tbl_usuario (id),
   CONSTRAINT fk_postulante_oferta FOREIGN KEY (oferta_id) REFERENCES tbl_oferta (id),
   CONSTRAINT fk_postulante_estado FOREIGN KEY (estado_id) REFERENCES tbl_estado (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE tbl_documento_postulante (
+  id BIGINT NOT NULL AUTO_INCREMENT,
+  postulante_id BIGINT NOT NULL,
+  tipo_documento VARCHAR(40) NOT NULL,
+  nombre_original VARCHAR(255) NOT NULL,
+  nombre_archivo VARCHAR(255) NOT NULL,
+  ruta_archivo VARCHAR(500) NOT NULL,
+  extension VARCHAR(10) NOT NULL,
+  tamanio BIGINT NOT NULL,
+  fecha_subida BIGINT NOT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT fk_documento_postulante FOREIGN KEY (postulante_id) REFERENCES tbl_postulante (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE tbl_historial_estado_postulante (
+  id BIGINT NOT NULL AUTO_INCREMENT,
+  postulante_id BIGINT NOT NULL,
+  estado_anterior VARCHAR(40),
+  estado_nuevo VARCHAR(40) NOT NULL,
+  fecha_cambio BIGINT NOT NULL,
+  usuario_admin VARCHAR(120),
+  observacion_interna TEXT,
+  observacion_postulante TEXT,
+  PRIMARY KEY (id),
+  CONSTRAINT fk_historial_postulante FOREIGN KEY (postulante_id) REFERENCES tbl_postulante (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE tbl_entrevista_postulante (
+  id BIGINT NOT NULL AUTO_INCREMENT,
+  postulante_id BIGINT NOT NULL,
+  fecha_entrevista BIGINT NOT NULL,
+  resultado VARCHAR(40),
+  observacion TEXT,
+  usuario_admin VARCHAR(120),
+  creado_en BIGINT NOT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT fk_entrevista_postulante FOREIGN KEY (postulante_id) REFERENCES tbl_postulante (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE tbl_evaluacion_psicologica_postulante (
+  id BIGINT NOT NULL AUTO_INCREMENT,
+  postulante_id BIGINT NOT NULL,
+  fecha_evaluacion BIGINT NOT NULL,
+  resultado VARCHAR(40),
+  observacion TEXT,
+  usuario_admin VARCHAR(120),
+  creado_en BIGINT NOT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT fk_eval_psico_postulante FOREIGN KEY (postulante_id) REFERENCES tbl_postulante (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE tbl_postulante_respuesta (
@@ -215,6 +293,19 @@ INSERT INTO tbl_oferta_beneficio (oferta_id, orden, texto) VALUES
 (10, 0, 'Subvencion economica'), (10, 1, 'Certificacion de practicas'), (10, 2, 'Plan de mentoria'),
 (11, 0, 'Plan de carrera'), (11, 1, 'Capacitacion continua'), (11, 2, 'Contrato estable');
 
+INSERT INTO tbl_oferta_habilidad (oferta_id, orden, habilidad) VALUES
+(1, 0, 'Java'), (1, 1, 'bases de datos'), (1, 2, 'metodologias agiles'), (1, 3, 'didactica'),
+(2, 0, 'HTML'), (2, 1, 'CSS'), (2, 2, 'JavaScript'), (2, 3, 'soporte tecnico'),
+(3, 0, 'SEO'), (3, 1, 'Ads'), (3, 2, 'analitica'), (3, 3, 'didactica'),
+(4, 0, 'redes sociales'), (4, 1, 'contenido'), (4, 2, 'Figma'),
+(5, 0, 'Derecho'), (5, 1, 'publicaciones academicas'), (5, 2, 'docencia'),
+(6, 0, 'redaccion'), (6, 1, 'Derecho civil'),
+(7, 0, 'comunicacion'), (7, 1, 'educacion'), (7, 2, 'docencia'),
+(8, 0, 'estadistica'), (8, 1, 'investigacion'),
+(9, 0, 'publicaciones indexadas'), (9, 1, 'liderazgo'), (9, 2, 'investigacion'),
+(10, 0, 'redes'), (10, 1, 'hardware'), (10, 2, 'atencion al usuario'),
+(11, 0, 'liderazgo'), (11, 1, 'gestion estudiantil'), (11, 2, 'psicologia');
+
 INSERT INTO tbl_pregunta (id, oferta_id, enunciado, correcta) VALUES
 (1, 1, 'Que patron de diseno desacopla logica de presentacion?', 1),
 (2, 1, 'Cual es la principal ventaja de la inyeccion de dependencias?', 1),
@@ -245,14 +336,40 @@ INSERT INTO tbl_pregunta_opcion (pregunta_id, indice, texto) VALUES
 (12, 0, 'Figma'), (12, 1, 'Photoshop'), (12, 2, 'Excel'), (12, 3, 'Notepad'),
 (13, 0, 'Pinterest'), (13, 1, 'LinkedIn'), (13, 2, 'TikTok'), (13, 3, 'Snapchat');
 
-INSERT INTO tbl_postulante (id, usuario_id, oferta_id, estado_id, nombre, email, telefono, experiencia, habilidades, cv, puntaje, creado_en) VALUES
-(1, 2, 2, 2, 'Lucia Ramos', 'lucia@example.com', '+51 987 654 321', '3 anios apoyando areas de TI en universidades', 'JavaScript, soporte tecnico, atencion al usuario', 'lucia_cv.pdf', 67, @ahora - (@dia * 4)),
-(2, 3, 1, 3, 'Carlos Mendoza', 'carlos@example.com', '+51 911 222 333', '5 anios en arquitectura de software y docencia', 'Java, Spring, Docker, didactica universitaria', 'carlos_cv.pdf', 100, @ahora - (@dia * 3)),
-(3, 4, 4, 1, 'Maria Torres', 'maria@example.com', '+51 933 555 777', 'Estudiante de Marketing en ultimo ciclo', 'Community management, creacion de contenido', 'maria_cv.pdf', 0, @ahora - @dia),
-(4, 5, 2, 4, 'Pedro Salinas', 'pedro@example.com', '+51 922 444 666', 'Estudiante de Sistemas con practicas previas', 'JavaScript, HTML, CSS, soporte', 'pedro_cv.pdf', 100, @ahora - (@dia * 6)),
-(5, 6, 3, 5, 'Andrea Leon', 'andrea@example.com', '+51 944 888 111', '6 anios en marketing B2B y docencia universitaria', 'Estrategia digital, didactica, public speaking', 'andrea_cv.pdf', 100, @ahora - (@dia * 9)),
-(6, 7, 3, 6, 'Diego Alvarez', 'diego@example.com', '+51 955 777 222', '8 anios liderando agencias de marketing digital', 'Ads, SEO, analitica, formacion de equipos', 'diego_cv.pdf', 100, @ahora - (@dia * 14)),
-(7, 8, 4, 7, 'Fiorella Rojas', 'fiorella@example.com', '+51 966 333 444', '1 anio en diseno grafico', 'Figma, Illustrator', 'fiorella_cv.pdf', 50, @ahora - (@dia * 7));
+INSERT INTO tbl_postulante (id, usuario_id, oferta_id, estado_id, nombre, email, telefono, experiencia, habilidades, cv,
+  fecha_postulacion, fecha_evaluacion, anios_experiencia, nivel_estudios, carrera, disponibilidad, modalidad_preferida,
+  puntaje_cuestionario, puntaje_experiencia, puntaje_habilidades, puntaje_final, creado_en) VALUES
+(1, 2, 2, 2, 'Lucia Ramos', 'lucia@example.com', '+51 987 654 321', '3 anios apoyando areas de TI en universidades', 'JavaScript, soporte tecnico, atencion al usuario', 'lucia_cv.pdf', @ahora - (@dia * 4), @ahora - (@dia * 4) + 3600000, 3, 'Universitario', 'Ingenieria de Sistemas', 'Inmediata', 'Hibrido', 67, 100, 60, 76, @ahora - (@dia * 4)),
+(2, 3, 1, 3, 'Carlos Mendoza', 'carlos@example.com', '+51 911 222 333', '5 anios en arquitectura de software y docencia', 'Java, Spring, Docker, didactica universitaria', 'carlos_cv.pdf', @ahora - (@dia * 3), @ahora - (@dia * 3) + 3600000, 5, 'Titulado', 'Ingenieria de Sistemas', 'Inmediata', 'Presencial', 100, 100, 60, 92, @ahora - (@dia * 3)),
+(3, 4, 4, 1, 'Maria Torres', 'maria@example.com', '+51 933 555 777', 'Estudiante de Marketing en ultimo ciclo', 'Community management, creacion de contenido', 'maria_cv.pdf', @ahora - @dia, NULL, 0, 'Universitario', 'Marketing', '15 dias', 'Presencial', 0, 0, 60, 12, @ahora - @dia),
+(4, 5, 2, 4, 'Pedro Salinas', 'pedro@example.com', '+51 922 444 666', 'Estudiante de Sistemas con practicas previas', 'JavaScript, HTML, CSS, soporte', 'pedro_cv.pdf', @ahora - (@dia * 6), @ahora - (@dia * 6) + 3600000, 1, 'Universitario', 'Ingenieria de Sistemas', 'Inmediata', 'Hibrido', 100, 30, 60, 71, @ahora - (@dia * 6)),
+(5, 6, 3, 5, 'Andrea Leon', 'andrea@example.com', '+51 944 888 111', '6 anios en marketing B2B y docencia universitaria', 'Estrategia digital, didactica, public speaking', 'andrea_cv.pdf', @ahora - (@dia * 9), @ahora - (@dia * 9) + 3600000, 6, 'Maestria', 'Marketing', 'Inmediata', 'Presencial', 100, 100, 60, 92, @ahora - (@dia * 9)),
+(6, 7, 3, 6, 'Diego Alvarez', 'diego@example.com', '+51 955 777 222', '8 anios liderando agencias de marketing digital', 'Ads, SEO, analitica, formacion de equipos', 'diego_cv.pdf', @ahora - (@dia * 14), @ahora - (@dia * 14) + 3600000, 8, 'Titulado', 'Marketing', 'Inmediata', 'Presencial', 100, 100, 60, 92, @ahora - (@dia * 14)),
+(7, 8, 4, 7, 'Fiorella Rojas', 'fiorella@example.com', '+51 966 333 444', '1 anio en diseno grafico', 'Figma, Illustrator', 'fiorella_cv.pdf', @ahora - (@dia * 7), @ahora - (@dia * 7) + 3600000, 1, 'Universitario', 'Diseno', 'Inmediata', 'Presencial', 50, 30, 60, 46, @ahora - (@dia * 7));
+
+INSERT INTO tbl_documento_postulante (id, postulante_id, tipo_documento, nombre_original, nombre_archivo, ruta_archivo, extension, tamanio, fecha_subida) VALUES
+(1, 1, 'CV', 'lucia_cv.pdf', '1_seed_lucia_cv.pdf', 'uploads/postulantes/1_seed_lucia_cv.pdf', 'pdf', 245760, @ahora - (@dia * 4)),
+(2, 2, 'CV', 'carlos_cv.pdf', '2_seed_carlos_cv.pdf', 'uploads/postulantes/2_seed_carlos_cv.pdf', 'pdf', 286720, @ahora - (@dia * 3)),
+(3, 2, 'CERTIFICADO', 'certificado_spring.pdf', '2_seed_certificado_spring.pdf', 'uploads/postulantes/2_seed_certificado_spring.pdf', 'pdf', 196608, @ahora - (@dia * 3)),
+(4, 5, 'CV', 'andrea_cv.pdf', '5_seed_andrea_cv.pdf', 'uploads/postulantes/5_seed_andrea_cv.pdf', 'pdf', 253952, @ahora - (@dia * 9));
+
+INSERT INTO tbl_historial_estado_postulante (postulante_id, estado_anterior, estado_nuevo, fecha_cambio, usuario_admin, observacion_interna, observacion_postulante) VALUES
+(1, NULL, 'POSTULADO', @ahora - (@dia * 4), 'Sistema', 'Postulacion registrada', 'Tu postulacion fue recibida correctamente.'),
+(1, 'POSTULADO', 'EN_EVALUACION', @ahora - (@dia * 4) + 3600000, 'Sistema', 'Evaluacion tecnica registrada', 'Tu evaluacion tecnica fue registrada.'),
+(2, NULL, 'POSTULADO', @ahora - (@dia * 3), 'Sistema', 'Postulacion registrada', 'Tu postulacion fue recibida correctamente.'),
+(2, 'POSTULADO', 'APROBADO_TECNICO', @ahora - (@dia * 3) + 3600000, 'Sistema', 'Evaluacion tecnica aprobada', 'Aprobaste la evaluacion tecnica.'),
+(4, 'APROBADO_TECNICO', 'ENTREVISTA', @ahora - (@dia * 5), 'admin@contitalent.com', 'Entrevista agendada', 'Tu entrevista fue programada.'),
+(5, 'ENTREVISTA', 'EVALUACION_PSICOLOGICA', @ahora - (@dia * 8), 'admin@contitalent.com', 'Pasa a evaluacion psicologica', 'Continuas a evaluacion psicologica.'),
+(6, 'EVALUACION_PSICOLOGICA', 'ACEPTADO', @ahora - (@dia * 12), 'admin@contitalent.com', 'Candidato aceptado', 'Fuiste aceptado para la posicion.'),
+(7, 'EN_EVALUACION', 'RECHAZADO', @ahora - (@dia * 6), 'admin@contitalent.com', 'No cumple perfil requerido', 'El proceso finalizo para esta oferta.');
+
+INSERT INTO tbl_entrevista_postulante (id, postulante_id, fecha_entrevista, resultado, observacion, usuario_admin, creado_en) VALUES
+(1, 4, @ahora - (@dia * 5), 'PROGRAMADA', 'Entrevista tecnica con lider de area', 'admin@contitalent.com', @ahora - (@dia * 5)),
+(2, 5, @ahora - (@dia * 8), 'APTO', 'Buen dominio del rol docente', 'admin@contitalent.com', @ahora - (@dia * 8)),
+(3, 6, @ahora - (@dia * 13), 'APTO', 'Perfil senior validado', 'admin@contitalent.com', @ahora - (@dia * 13));
+
+INSERT INTO tbl_evaluacion_psicologica_postulante (id, postulante_id, fecha_evaluacion, resultado, observacion, usuario_admin, creado_en) VALUES
+(1, 6, @ahora - (@dia * 12), 'APTO', 'Sin observaciones restrictivas', 'admin@contitalent.com', @ahora - (@dia * 12));
 
 INSERT INTO tbl_postulante_respuesta (postulante_id, pregunta_id, opcion_elegida) VALUES
 (1, 6, 1), (1, 7, 1), (1, 8, 0),
@@ -269,3 +386,7 @@ ALTER TABLE tbl_usuario AUTO_INCREMENT = 9;
 ALTER TABLE tbl_oferta AUTO_INCREMENT = 12;
 ALTER TABLE tbl_pregunta AUTO_INCREMENT = 14;
 ALTER TABLE tbl_postulante AUTO_INCREMENT = 8;
+ALTER TABLE tbl_documento_postulante AUTO_INCREMENT = 5;
+ALTER TABLE tbl_historial_estado_postulante AUTO_INCREMENT = 9;
+ALTER TABLE tbl_entrevista_postulante AUTO_INCREMENT = 4;
+ALTER TABLE tbl_evaluacion_psicologica_postulante AUTO_INCREMENT = 2;

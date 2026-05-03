@@ -68,18 +68,26 @@
       </section>
 
       <section class="section--top-loose">
-        <header class="page-header">
-          <h2>Ranking de postulantes</h2>
-          <select class="select" id="ranking-oferta-filter">
-            <option value="">Todas las ofertas</option>
-          </select>
-        </header>
+          <header class="page-header">
+            <h2>Ranking de postulantes</h2>
+            <div class="filters-bar" style="margin:0">
+              <select class="select" id="ranking-oferta-filter">
+                <option value="">Todas las ofertas</option>
+              </select>
+              <select class="select" id="ranking-estado-filter">
+                <option value="">Todos los estados</option>
+              </select>
+              <select class="select" id="ranking-area-filter">
+                <option value="">Todas las areas</option>
+              </select>
+            </div>
+          </header>
         <div class="ranking-list" id="ranking-list"></div>
       </section>
     </main>
   </div>
 
-  <script src="../js/storage-api.js?v=rest3"></script>
+  <script src="../js/storage-api.js?v=rest6"></script>
   <script src="../js/ui.js?v=rest3"></script>
   <script src="../js/validators.js?v=rest3"></script>
   <script src="../js/auth.js?v=rest3"></script>
@@ -88,6 +96,6 @@
   <script src="../js/postulantes.js?v=rest3"></script>
   <script src="../js/chart.js?v=rest3"></script>
   <script src="../js/main.js?v=rest3"></script>
-  <script src="../js/page-admin-metricas.js?v=rest3"></script>
+  <script src="../js/page-admin-metricas.js?v=rest6"></script>
 </body>
 </html>

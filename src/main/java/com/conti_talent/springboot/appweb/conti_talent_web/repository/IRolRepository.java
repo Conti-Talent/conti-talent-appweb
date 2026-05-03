@@ -1,18 +1,12 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.repository;
 
 import com.conti_talent.springboot.appweb.conti_talent_web.model.Rol;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface IRolRepository {
-    List<Rol> findAll();
-    Optional<Rol> findById(Long id);
-    Rol save(Rol rol);
-    boolean existsById(Long id);
-    void deleteById(Long id);
-    long count();
-
+public interface IRolRepository extends JpaRepository<Rol, Long> {
     Optional<Rol> findByCodigo(String codigo);
     boolean existsByCodigo(String codigo);
 

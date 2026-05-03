@@ -269,6 +269,19 @@ public class DataLoader implements CommandLineRunner {
                 List.of("Plan de carrera", "Capacitacion continua", "Contrato estable"),
                 ahora - MILISEGUNDOS_POR_DIA * 4)));
 
+        mapa.get("Profesor de Programacion I").setHabilidadesRequeridas(List.of("Java", "bases de datos", "metodologias agiles", "didactica"));
+        mapa.get("Practica Sistemas").setHabilidadesRequeridas(List.of("HTML", "CSS", "JavaScript", "soporte tecnico"));
+        mapa.get("Profesor Marketing Digital").setHabilidadesRequeridas(List.of("SEO", "Ads", "analitica", "didactica"));
+        mapa.get("Practica Marketing").setHabilidadesRequeridas(List.of("redes sociales", "contenido", "Figma"));
+        mapa.get("Profesor Derecho Constitucional").setHabilidadesRequeridas(List.of("Derecho", "publicaciones academicas", "docencia"));
+        mapa.get("Practica Derecho Civil").setHabilidadesRequeridas(List.of("redaccion", "Derecho civil"));
+        mapa.get("Profesor Comunicacion").setHabilidadesRequeridas(List.of("comunicacion", "educacion", "docencia"));
+        mapa.get("Asistente Salud Publica").setHabilidadesRequeridas(List.of("estadistica", "investigacion"));
+        mapa.get("Coordinador Investigacion").setHabilidadesRequeridas(List.of("publicaciones indexadas", "liderazgo", "investigacion"));
+        mapa.get("Practica Soporte TI").setHabilidadesRequeridas(List.of("redes", "hardware", "atencion al usuario"));
+        mapa.get("Coordinador Bienestar").setHabilidadesRequeridas(List.of("liderazgo", "gestion estudiantil", "psicologia"));
+        mapa.values().forEach(ofertaRepository::save);
+
         return mapa;
     }
 
@@ -405,9 +418,32 @@ public class DataLoader implements CommandLineRunner {
         postulante.setHabilidades(habilidades);
         postulante.setCv(cv);
         postulante.setPuntaje(puntaje);
+        postulante.setFechaPostulacion(creadoEn);
+        postulante.setFechaEvaluacion(respuestas != null && !respuestas.isEmpty() ? creadoEn + 3_600_000L : null);
+        postulante.setAniosExperiencia(extraerAniosExperiencia(experiencia));
+        postulante.setNivelEstudios("Universitario");
+        postulante.setCarrera("No especificada");
+        postulante.setDisponibilidad("Inmediata");
+        postulante.setModalidadPreferida(oferta.getModalidad());
+        postulante.setPuntajeExperiencia(calcularPuntajeExperiencia(postulante.getAniosExperiencia()));
+        postulante.setPuntajeHabilidades(60);
+        postulante.setPuntajeFinal((int) Math.round((puntaje * 0.50) + (postulante.getPuntajeExperiencia() * 0.30) + (postulante.getPuntajeHabilidades() * 0.20)));
         postulante.setRespuestas(new HashMap<>(respuestas));
         postulante.setCreadoEn(creadoEn);
         return postulante;
+    }
+
+    private int extraerAniosExperiencia(String experiencia) {
+        if (experiencia == null) return 0;
+        java.util.regex.Matcher matcher = java.util.regex.Pattern.compile("(\\d+)").matcher(experiencia);
+        return matcher.find() ? Integer.parseInt(matcher.group(1)) : 0;
+    }
+
+    private int calcularPuntajeExperiencia(int anios) {
+        if (anios <= 0) return 0;
+        if (anios == 1) return 30;
+        if (anios == 2) return 60;
+        return 100;
     }
 
     /* =================== METRICAS (snapshot en memoria) =================== */

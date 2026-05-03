@@ -84,9 +84,24 @@
         telefono: result.values.telefono,
         experiencia: result.values.experiencia,
         habilidades: result.values.habilidades,
-        cv: cvName
+        cv: cvName,
+        aniosExperiencia: parseInt(result.values.aniosExperiencia, 10) || 0,
+        nivelEstudios: result.values.nivelEstudios,
+        carrera: result.values.carrera,
+        disponibilidad: result.values.disponibilidad,
+        modalidadPreferida: result.values.modalidadPreferida,
+        pretensionSalarial: result.values.pretensionSalarial ? Number(result.values.pretensionSalarial) : null,
+        linkedin: result.values.linkedin,
+        portafolio: result.values.portafolio
       });
       postulante = Storage.upsert('postulantes', postulante);
+      const cvFile = document.getElementById('cv-input').files[0];
+      if (cvFile) await ContiAPI.subirDocumentoPostulante(postulante.id, 'CV', cvFile);
+      const extras = Array.from(document.getElementById('documentos-input')?.files || []);
+      for (const archivo of extras) {
+        await ContiAPI.subirDocumentoPostulante(postulante.id, 'ADICIONAL', archivo);
+      }
+      await Storage.refresh('postulantes');
     } catch (err) {
       UI.showToast(err.message || 'No se pudo registrar la postulacion', 'error');
       return;

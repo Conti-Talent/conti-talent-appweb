@@ -16,14 +16,14 @@
     const postulante = Postulantes.get(postulanteId);
     if (!postulante) {
       UI.showToast('No se encontró la postulación', 'error');
-      setTimeout(() => window.location.href = 'mi-estado.html', 800);
+      setTimeout(() => window.location.href = 'mis-postulaciones.html', 800);
       return;
     }
 
     const session = Auth.getSession();
     if (postulante.usuarioId && postulante.usuarioId !== session.id && session.rol !== 'admin') {
       UI.showToast('No tienes acceso a estas respuestas', 'error');
-      setTimeout(() => window.location.href = 'mi-estado.html', 800);
+      setTimeout(() => window.location.href = 'mis-postulaciones.html', 800);
       return;
     }
 

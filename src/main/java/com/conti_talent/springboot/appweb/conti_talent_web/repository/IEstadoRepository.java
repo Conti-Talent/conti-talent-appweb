@@ -1,18 +1,12 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.repository;
 
 import com.conti_talent.springboot.appweb.conti_talent_web.model.Estado;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface IEstadoRepository {
-    List<Estado> findAll();
-    Optional<Estado> findById(Long id);
-    Estado save(Estado estado);
-    boolean existsById(Long id);
-    void deleteById(Long id);
-    long count();
-
+public interface IEstadoRepository extends JpaRepository<Estado, Long> {
     Optional<Estado> findByCodigo(String codigo);
     boolean existsByCodigo(String codigo);
 

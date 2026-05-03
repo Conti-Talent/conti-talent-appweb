@@ -183,10 +183,36 @@ const ContiAPI = (() => ({
   eliminarPregunta: (id) => Storage.request(`/api/preguntas/${Storage.toNumber(id)}`, { method: 'DELETE' }),
 
   postular: (data) => Storage.request('/api/postulantes', { method: 'POST', body: JSON.stringify(data) }),
-  cambiarEstado: (id, estado) =>
-    Storage.request(`/api/postulantes/${Storage.toNumber(id)}/estado`, { method: 'PATCH', body: JSON.stringify({ estado }) }),
+  cambiarEstado: (id, estado, extra = {}) =>
+    Storage.request(`/api/postulantes/${Storage.toNumber(id)}/estado`, {
+      method: 'PATCH',
+      body: JSON.stringify({ estado, ...extra })
+    }),
+  actualizarObservacionPostulante: (id, observacionAdmin) =>
+    Storage.request(`/api/postulantes/${Storage.toNumber(id)}/observaciones`, {
+      method: 'PATCH',
+      body: JSON.stringify({ observacionAdmin })
+    }),
+  registrarEntrevista: (id, data) =>
+    Storage.request(`/api/postulantes/${Storage.toNumber(id)}/entrevistas`, { method: 'POST', body: JSON.stringify(data) }),
+  registrarEvaluacionPsicologica: (id, data) =>
+    Storage.request(`/api/postulantes/${Storage.toNumber(id)}/evaluaciones-psicologicas`, { method: 'POST', body: JSON.stringify(data) }),
   rechazar: (id) => Storage.request(`/api/postulantes/${Storage.toNumber(id)}/rechazar`, { method: 'POST' }),
   eliminarPostulante: (id) => Storage.request(`/api/postulantes/${Storage.toNumber(id)}`, { method: 'DELETE' }),
+  subirDocumentoPostulante: (id, tipoDocumento, archivo) => {
+    const formData = new FormData();
+    formData.append('tipoDocumento', tipoDocumento);
+    formData.append('archivo', archivo);
+    return fetch(API + `/api/postulantes/${Storage.toNumber(id)}/documentos`, {
+      method: 'POST',
+      credentials: 'include',
+      body: formData
+    }).then(async (response) => {
+      const body = await response.json().catch(() => null);
+      if (!response.ok) throw new Error(body?.message || body?.error || `Error HTTP ${response.status}`);
+      return body;
+    });
+  },
 
   calificar: (postulanteId, respuestas) =>
     Storage.request('/api/evaluaciones', { method: 'POST', body: JSON.stringify({ postulanteId: Storage.toNumber(postulanteId), respuestas }) })

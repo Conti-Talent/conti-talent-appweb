@@ -66,7 +66,17 @@ public class PublicViewController {
 
     @GetMapping({"/mi-estado", "/mi-estado.html"})
     public String miEstado() {
-        return "mi-estado";
+        return "redirect:/mis-postulaciones.html";
+    }
+
+    @GetMapping({"/mi-proceso", "/mi-proceso.html"})
+    public String miProceso() {
+        return "mi-proceso";
+    }
+
+    @GetMapping({"/mis-postulaciones", "/mis-postulaciones.html"})
+    public String misPostulaciones() {
+        return "mis-postulaciones";
     }
 
     @GetMapping({"/mis-respuestas", "/mis-respuestas.html"})

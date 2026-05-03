@@ -123,6 +123,9 @@ public class OfertaServiceImpl implements IOfertaService {
         if (dto.getDescripcion() != null) oferta.setDescripcion(dto.getDescripcion().trim());
         if (dto.getRequisitos()  != null) oferta.setRequisitos(new ArrayList<>(dto.getRequisitos()));
         if (dto.getBeneficios()  != null) oferta.setBeneficios(new ArrayList<>(dto.getBeneficios()));
+        if (dto.getHabilidadesRequeridas() != null) {
+            oferta.setHabilidadesRequeridas(new ArrayList<>(dto.getHabilidadesRequeridas()));
+        }
     }
 
     private static boolean esTextoVacio(String texto) {

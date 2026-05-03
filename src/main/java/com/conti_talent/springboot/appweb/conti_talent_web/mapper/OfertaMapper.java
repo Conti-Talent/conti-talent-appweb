@@ -24,6 +24,7 @@ public class OfertaMapper {
         dto.setDescripcion(oferta.getDescripcion());
         dto.setRequisitos(oferta.getRequisitos());
         dto.setBeneficios(oferta.getBeneficios());
+        dto.setHabilidadesRequeridas(oferta.getHabilidadesRequeridas());
         dto.setCreadaEn(oferta.getCreadaEn());
         return dto;
     }

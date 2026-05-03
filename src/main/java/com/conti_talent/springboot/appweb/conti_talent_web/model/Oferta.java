@@ -65,12 +65,22 @@ public class Oferta {
     @Column(name = "texto", length = 255, nullable = false)
     private List<String> beneficios;
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "tbl_oferta_habilidad",
+            joinColumns = @JoinColumn(name = "oferta_id",
+                    foreignKey = @ForeignKey(name = "fk_habilidad_oferta")))
+    @OrderColumn(name = "orden")
+    @Column(name = "habilidad", length = 120, nullable = false)
+    private List<String> habilidadesRequeridas;
+
     @Column(name = "creada_en", nullable = false)
     private long creadaEn;
 
     public Oferta() {
         this.requisitos = new ArrayList<>();
         this.beneficios = new ArrayList<>();
+        this.habilidadesRequeridas = new ArrayList<>();
     }
 
     public Oferta(String titulo, String tipo, Area area, String modalidad,
@@ -86,6 +96,7 @@ public class Oferta {
         this.descripcion = descripcion;
         this.requisitos = requisitos != null ? new ArrayList<>(requisitos) : new ArrayList<>();
         this.beneficios = beneficios != null ? new ArrayList<>(beneficios) : new ArrayList<>();
+        this.habilidadesRequeridas = new ArrayList<>();
         this.creadaEn = creadaEn;
     }
 
@@ -127,6 +138,11 @@ public class Oferta {
     public List<String> getBeneficios() { return beneficios; }
     public void setBeneficios(List<String> beneficios) {
         this.beneficios = beneficios != null ? new ArrayList<>(beneficios) : new ArrayList<>();
+    }
+
+    public List<String> getHabilidadesRequeridas() { return habilidadesRequeridas; }
+    public void setHabilidadesRequeridas(List<String> habilidadesRequeridas) {
+        this.habilidadesRequeridas = habilidadesRequeridas != null ? new ArrayList<>(habilidadesRequeridas) : new ArrayList<>();
     }
 
     public long getCreadaEn() { return creadaEn; }

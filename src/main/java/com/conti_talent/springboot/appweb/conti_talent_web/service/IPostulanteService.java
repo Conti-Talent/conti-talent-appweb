@@ -17,12 +17,19 @@ public interface IPostulanteService {
 
     PostulanteDTO registrarPostulacion(PostularRequest request);
 
-    /** Cambia el estado por id o por codigo logico (POSTULADO, ENTREVISTA, ...). */
     PostulanteDTO cambiarEstado(Long idPostulante, String estadoDestino);
+
+    /** Cambia el estado por id o por codigo logico (POSTULADO, ENTREVISTA, ...). */
+    PostulanteDTO cambiarEstado(Long idPostulante, String estadoDestino, String usuarioAdmin,
+                                 String observacionInterna, String observacionPostulante);
+
+    PostulanteDTO actualizarObservacionAdmin(Long idPostulante, String observacionAdmin);
 
     void eliminar(Long id);
 
     PostulanteDTO marcarComoRechazado(Long id);
 
     List<PostulanteDTO> obtenerRankingPorPuntaje(Long ofertaId);
+
+    List<PostulanteDTO> obtenerRanking(Long ofertaId, String estado, Long areaId);
 }

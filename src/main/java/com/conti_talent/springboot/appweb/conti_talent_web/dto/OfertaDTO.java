@@ -16,11 +16,13 @@ public class OfertaDTO {
     private String descripcion;
     private List<String> requisitos;
     private List<String> beneficios;
+    private List<String> habilidadesRequeridas;
     private long creadaEn;
 
     public OfertaDTO() {
         this.requisitos = new ArrayList<>();
         this.beneficios = new ArrayList<>();
+        this.habilidadesRequeridas = new ArrayList<>();
     }
 
     public Long getId() { return id; }
@@ -58,6 +60,11 @@ public class OfertaDTO {
     public List<String> getBeneficios() { return beneficios; }
     public void setBeneficios(List<String> beneficios) {
         this.beneficios = beneficios != null ? new ArrayList<>(beneficios) : new ArrayList<>();
+    }
+
+    public List<String> getHabilidadesRequeridas() { return habilidadesRequeridas; }
+    public void setHabilidadesRequeridas(List<String> habilidadesRequeridas) {
+        this.habilidadesRequeridas = habilidadesRequeridas != null ? new ArrayList<>(habilidadesRequeridas) : new ArrayList<>();
     }
 
     public long getCreadaEn() { return creadaEn; }

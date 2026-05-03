@@ -48,7 +48,7 @@ public class MetricasServiceImpl implements IMetricasService {
         List<Postulante> ordenados = base.stream()
                 .filter(p -> p.getEstado() == null
                         || !EstadoCodigo.RECHAZADO.name().equals(p.getEstado().getCodigo()))
-                .sorted(Comparator.comparingInt(Postulante::getPuntaje).reversed())
+                .sorted(Comparator.comparingInt(Postulante::getPuntajeFinal).reversed())
                 .limit(Math.max(1, limite))
                 .collect(Collectors.toList());
 
@@ -58,14 +58,19 @@ public class MetricasServiceImpl implements IMetricasService {
             String codigoEstado = postulante.getEstado() != null
                     ? postulante.getEstado().getCodigo()
                     : "DESCONOCIDO";
-            filas.add(new RankingItemDTO(
+            RankingItemDTO fila = new RankingItemDTO(
                     i + 1,
                     postulante.getId(),
                     postulante.getNombre(),
                     postulante.getOfertaId(),
                     titulosOferta.getOrDefault(postulante.getOfertaId(), "—"),
                     codigoEstado,
-                    postulante.getPuntaje()));
+                    postulante.getPuntajeFinal());
+            fila.setPuntajeCuestionario(postulante.getPuntaje());
+            fila.setPuntajeExperiencia(postulante.getPuntajeExperiencia());
+            fila.setPuntajeHabilidades(postulante.getPuntajeHabilidades());
+            fila.setPuntajeFinal(postulante.getPuntajeFinal());
+            filas.add(fila);
         }
         return filas;
     }

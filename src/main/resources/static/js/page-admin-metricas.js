@@ -63,12 +63,26 @@
   const setupRankingFilter = () => {
     const sel = document.getElementById('ranking-oferta-filter');
     Ofertas.list().forEach((o) => sel.appendChild(UI.el('option', { value: o.id, text: o.titulo })));
-    sel.addEventListener('change', renderRanking);
+    const estadoSel = document.getElementById('ranking-estado-filter');
+    Object.entries(UI.ESTADOS).forEach(([k, v]) => estadoSel.appendChild(UI.el('option', { value: k, text: v.label })));
+    const areaSel = document.getElementById('ranking-area-filter');
+    Areas.list().forEach((a) => areaSel.appendChild(UI.el('option', { value: a.id, text: a.nombre })));
+    [sel, estadoSel, areaSel].forEach((control) => control.addEventListener('change', renderRanking));
   };
 
   const renderRanking = () => {
     const ofertaId = document.getElementById('ranking-oferta-filter').value || null;
-    const ranking  = Postulantes.ranking(ofertaId).filter((p) => p.estado !== 'RECHAZADO').slice(0, 10);
+    const estado = document.getElementById('ranking-estado-filter').value || null;
+    const area = document.getElementById('ranking-area-filter').value || null;
+    const ranking  = Postulantes.ranking(ofertaId)
+      .filter((p) => !estado || p.estado === estado)
+      .filter((p) => {
+        if (!area) return true;
+        const oferta = Ofertas.get(p.ofertaId);
+        return oferta && String(oferta.areaId) === String(area);
+      })
+      .filter((p) => p.estado !== 'RECHAZADO')
+      .slice(0, 10);
     const wrap     = document.getElementById('ranking-list');
     UI.clear(wrap);
     if (ranking.length === 0) {
@@ -84,7 +98,8 @@
           UI.el('div', { class: 'ranking-row__sub',  text: oferta?.titulo || '—' })
         ]),
         UI.renderEstadoBadge(p.estado),
-        UI.el('div', { class: 'ranking-row__score', text: `${p.puntaje}` })
+        UI.el('div', { class: 'ranking-row__score', text: `${p.puntajeFinal ?? p.puntaje}` }),
+        UI.el('div', { class: 'ranking-row__sub', text: `Tec ${p.puntajeCuestionario ?? p.puntaje} · Exp ${p.puntajeExperiencia ?? 0} · Hab ${p.puntajeHabilidades ?? 0}` })
       ]);
       wrap.appendChild(row);
     });
