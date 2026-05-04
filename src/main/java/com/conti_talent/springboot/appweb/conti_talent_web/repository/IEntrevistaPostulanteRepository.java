@@ -6,5 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface IEntrevistaPostulanteRepository extends JpaRepository<EntrevistaPostulante, Long> {
-    List<EntrevistaPostulante> findByPostulanteIdOrderByFechaEntrevistaDesc(Long postulanteId);
+    List<EntrevistaPostulante> findByPostulante_IdOrderByFechaProgramadaDesc(Long postulanteId);
+    boolean existsByPostulante_IdAndTipoEntrevistaAndEstadoEntrevistaIn(
+            Long postulanteId, String tipoEntrevista, List<String> estados);
+    boolean existsByPostulante_IdAndTipoEntrevistaAndResultado(Long postulanteId, String tipoEntrevista, String resultado);
 }

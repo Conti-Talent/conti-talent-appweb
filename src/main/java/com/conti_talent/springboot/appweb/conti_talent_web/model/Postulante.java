@@ -120,7 +120,7 @@ public class Postulante {
     private List<HistorialEstadoPostulante> historialEstados;
 
     @OneToMany(mappedBy = "postulante", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OrderBy("fechaEntrevista DESC")
+    @OrderBy("fechaProgramada DESC")
     private List<EntrevistaPostulante> entrevistas;
 
     @OneToMany(mappedBy = "postulante", cascade = CascadeType.ALL, orphanRemoval = true)

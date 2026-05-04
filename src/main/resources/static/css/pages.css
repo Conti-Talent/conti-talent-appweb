@@ -293,7 +293,8 @@
 .admin-applicant-detail {
   display: grid;
   gap: var(--space-4);
-  min-width: min(980px, 86vw);
+  width: min(1040px, 86vw);
+  max-width: 100%;
 }
 .admin-applicant-hero {
   display: grid;
@@ -411,6 +412,39 @@
   border-color: rgba(239,68,68,0.45);
   background: rgba(239,68,68,0.12);
 }
+.interview-actions,
+.badge-row {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  align-items: center;
+}
+.interview-actions {
+  margin-bottom: var(--space-3);
+}
+.interview-card {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  margin-bottom: var(--space-3);
+  border-radius: var(--radius-md);
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--color-border);
+}
+.interview-card__head {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  align-items: flex-start;
+}
+.interview-meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 var(--space-3);
+}
+.interview-card__actions {
+  justify-content: flex-start;
+}
 
 /* === Mi proceso === */
 .proceso-list { display: grid; gap: var(--space-4); }
@@ -484,6 +518,12 @@
   border-radius: var(--radius-md);
   background: rgba(255,255,255,0.03);
   border: 1px solid var(--color-border);
+}
+.proceso-panel--full {
+  margin-bottom: var(--space-4);
+}
+.proceso-interview-card {
+  background: rgba(99,102,241,0.08);
 }
 .document-row {
   display: flex;
@@ -655,6 +695,7 @@
   .admin-applicant-actions { justify-content: flex-start; }
   .admin-detail-grid { grid-template-columns: 1fr; }
   .admin-score-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .interview-meta { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 768px) {
@@ -753,4 +794,6 @@
   .admin-score-strip { grid-template-columns: 1fr; }
   .admin-info-row,
   .admin-document-row { grid-template-columns: 1fr; }
+  .interview-card__head { flex-direction: column; }
+  .btn { white-space: normal; }
 }

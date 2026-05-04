@@ -46,6 +46,7 @@
     const oferta = Ofertas.get(p.ofertaId);
     const area = oferta ? Areas.get(oferta.areaId) : null;
     const documentos = p.documentos || [];
+    const entrevistas = p.entrevistas || [];
     const historial = (p.historialEstados || []).slice().reverse();
     const fechaPostulacion = p.fechaPostulacion || p.creadoEn;
 
@@ -64,6 +65,13 @@
         scoreBox('Experiencia', p.puntajeExperiencia ?? 0),
         scoreBox('Habilidades', p.puntajeHabilidades ?? 0),
         scoreBox('Final', p.puntajeFinal ?? p.puntaje ?? 0)
+      ]),
+      UI.el('section', { class: 'proceso-panel proceso-panel--full' }, [
+        UI.el('h4', { text: 'Entrevistas' }),
+        ...(entrevistas.length ? entrevistas.map(renderEntrevistaProceso) : [
+          UI.el('p', { class: 'soft', text: 'Aun no se ha programado una entrevista.' }),
+          UI.el('p', { class: 'muted', text: NEXT_STEP[p.estado] || 'Esperar comunicacion del administrador.' })
+        ])
       ]),
       UI.el('div', { class: 'proceso-two-col' }, [
         UI.el('section', { class: 'proceso-panel' }, [
@@ -116,6 +124,51 @@
     UI.el('span', { text: `${doc.tipoDocumento}: ${doc.nombreOriginal}` }),
     UI.el('a', { href: doc.urlDescarga || `/api/documentos/${doc.id}/descargar`, class: 'btn btn--ghost btn--sm', text: 'Descargar' })
   ]);
+
+  const renderEntrevistaProceso = (item) => UI.el('article', { class: 'interview-card proceso-interview-card' }, [
+    UI.el('header', { class: 'interview-card__head' }, [
+      UI.el('div', {}, [
+        UI.el('strong', { text: item.tipoEntrevista === 'EVALUACION_PSICOLOGICA' ? 'Evaluacion psicologica' : 'Entrevista tecnica' }),
+        UI.el('p', { class: 'soft', text: textoResumenEntrevista(item) })
+      ]),
+      UI.el('div', { class: 'badge-row' }, [
+        badgeEntrevista(item.estadoEntrevista),
+        item.resultado && item.resultado !== 'PENDIENTE' ? badgeEntrevista(item.resultado) : null
+      ].filter(Boolean))
+    ]),
+    UI.el('div', { class: 'interview-meta' }, [
+      procesoInfo('Modalidad', item.modalidad || '-'),
+      procesoInfo(item.modalidad === 'VIRTUAL' ? 'Enlace' : 'Lugar', item.modalidad === 'VIRTUAL' ? item.enlaceVirtual : item.lugar),
+      procesoInfo('Entrevistador', [item.entrevistadorNombre, item.entrevistadorCargo].filter(Boolean).join(' - ') || '-'),
+      item.resultado && item.resultado !== 'PENDIENTE' ? procesoInfo('Resultado', item.resultado.replaceAll('_', ' ')) : null,
+      procesoInfo('Observacion', item.observacionPostulante || 'Sin observacion visible.'),
+      procesoInfo('Proximo paso', nextStepInterview(item))
+    ].filter(Boolean))
+  ]);
+
+  const textoResumenEntrevista = (item) =>
+    `${UI.formatDate(item.fechaProgramada || item.fechaEntrevista)} a las ${item.horaInicio || '--:--'}`;
+
+  const procesoInfo = (label, value) => UI.el('p', { class: 'admin-info-row' }, [
+    UI.el('span', { text: label }),
+    UI.el('strong', { text: value || '-' })
+  ]);
+
+  const badgeEntrevista = (value) => {
+    const cls = value === 'APROBADO' ? 'badge--aceptado'
+      : ['DESAPROBADO', 'CANCELADA'].includes(value) ? 'badge--rechazado'
+      : ['PROGRAMADA', 'REPROGRAMADA', 'PENDIENTE'].includes(value) ? 'badge--psicologica'
+      : 'badge--entrevista';
+    return UI.el('span', { class: `badge ${cls}`, text: (value || 'PENDIENTE').replaceAll('_', ' ') });
+  };
+
+  const nextStepInterview = (item) => {
+    if (item.estadoEntrevista === 'CANCELADA') return 'Esperar una nueva programacion del administrador.';
+    if (item.resultado === 'APROBADO' && item.tipoEntrevista === 'ENTREVISTA_NORMAL') return 'Esperar la evaluacion psicologica.';
+    if (item.resultado === 'APROBADO' && item.tipoEntrevista === 'EVALUACION_PSICOLOGICA') return 'Esperar la comunicacion final.';
+    if (item.resultado === 'DESAPROBADO') return 'El proceso finalizo para esta oferta.';
+    return 'Asistir puntualmente a la entrevista programada.';
+  };
 
   document.addEventListener('DOMContentLoaded', init);
 })();

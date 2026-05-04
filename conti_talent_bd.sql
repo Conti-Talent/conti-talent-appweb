@@ -189,13 +189,30 @@ CREATE TABLE tbl_historial_estado_postulante (
 CREATE TABLE tbl_entrevista_postulante (
   id BIGINT NOT NULL AUTO_INCREMENT,
   postulante_id BIGINT NOT NULL,
-  fecha_entrevista BIGINT NOT NULL,
-  resultado VARCHAR(40),
-  observacion TEXT,
+  tipo_entrevista VARCHAR(40) NOT NULL,
+  fecha_programada BIGINT NOT NULL,
+  hora_inicio VARCHAR(5),
+  hora_fin VARCHAR(5),
+  modalidad VARCHAR(30) NOT NULL,
+  lugar VARCHAR(255),
+  enlace_virtual VARCHAR(500),
+  entrevistador_nombre VARCHAR(120),
+  entrevistador_cargo VARCHAR(120),
+  estado_entrevista VARCHAR(30) NOT NULL,
+  resultado VARCHAR(30) NOT NULL,
+  observacion_interna TEXT,
+  observacion_postulante TEXT,
   usuario_admin VARCHAR(120),
+  creado_por_admin_id BIGINT,
+  actualizado_por_admin_id BIGINT,
+  actualizado_por_admin VARCHAR(120),
+  observacion_cambio TEXT,
   creado_en BIGINT NOT NULL,
+  actualizado_en BIGINT,
   PRIMARY KEY (id),
-  CONSTRAINT fk_entrevista_postulante FOREIGN KEY (postulante_id) REFERENCES tbl_postulante (id)
+  CONSTRAINT fk_entrevista_postulante FOREIGN KEY (postulante_id) REFERENCES tbl_postulante (id),
+  CONSTRAINT fk_entrevista_admin_creador FOREIGN KEY (creado_por_admin_id) REFERENCES tbl_usuario (id),
+  CONSTRAINT fk_entrevista_admin_editor FOREIGN KEY (actualizado_por_admin_id) REFERENCES tbl_usuario (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE tbl_evaluacion_psicologica_postulante (
@@ -363,10 +380,28 @@ INSERT INTO tbl_historial_estado_postulante (postulante_id, estado_anterior, est
 (6, 'EVALUACION_PSICOLOGICA', 'ACEPTADO', @ahora - (@dia * 12), 'admin@contitalent.com', 'Candidato aceptado', 'Fuiste aceptado para la posicion.'),
 (7, 'EN_EVALUACION', 'RECHAZADO', @ahora - (@dia * 6), 'admin@contitalent.com', 'No cumple perfil requerido', 'El proceso finalizo para esta oferta.');
 
-INSERT INTO tbl_entrevista_postulante (id, postulante_id, fecha_entrevista, resultado, observacion, usuario_admin, creado_en) VALUES
-(1, 4, @ahora - (@dia * 5), 'PROGRAMADA', 'Entrevista tecnica con lider de area', 'admin@contitalent.com', @ahora - (@dia * 5)),
-(2, 5, @ahora - (@dia * 8), 'APTO', 'Buen dominio del rol docente', 'admin@contitalent.com', @ahora - (@dia * 8)),
-(3, 6, @ahora - (@dia * 13), 'APTO', 'Perfil senior validado', 'admin@contitalent.com', @ahora - (@dia * 13));
+INSERT INTO tbl_entrevista_postulante (
+  id, postulante_id, tipo_entrevista, fecha_programada, hora_inicio, hora_fin, modalidad,
+  lugar, enlace_virtual, entrevistador_nombre, entrevistador_cargo, estado_entrevista, resultado,
+  observacion_interna, observacion_postulante, usuario_admin, creado_por_admin_id,
+  actualizado_por_admin_id, actualizado_por_admin, observacion_cambio, creado_en, actualizado_en
+) VALUES
+(1, 4, 'ENTREVISTA_NORMAL', @ahora + (@dia * 2), '10:00', '10:45', 'VIRTUAL',
+ NULL, 'https://meet.contitalent.com/entrevista-4', 'Ana Castillo', 'Lider de seleccion',
+ 'PROGRAMADA', 'PENDIENTE', 'Entrevista tecnica con lider de area', 'Tu entrevista tecnica fue programada.',
+ 'admin@contitalent.com', 1, NULL, NULL, NULL, @ahora - (@dia * 1), NULL),
+(2, 5, 'ENTREVISTA_NORMAL', @ahora - (@dia * 8), '09:00', '09:40', 'PRESENCIAL',
+ 'Campus principal - Oficina RRHH', NULL, 'Rafael Vega', 'Coordinador academico',
+ 'REALIZADA', 'APROBADO', 'Buen dominio del rol docente', 'Aprobaste la entrevista. Continuaras con evaluacion psicologica.',
+ 'admin@contitalent.com', 1, 1, 'admin@contitalent.com', 'Resultado registrado luego de entrevista realizada.', @ahora - (@dia * 8), @ahora - (@dia * 8)),
+(3, 6, 'ENTREVISTA_NORMAL', @ahora - (@dia * 13), '11:00', '11:50', 'VIRTUAL',
+ NULL, 'https://meet.contitalent.com/entrevista-6', 'Sofia Herrera', 'Gerente de area',
+ 'REALIZADA', 'APROBADO', 'Perfil senior validado', 'Aprobaste la entrevista. Continuaras con evaluacion psicologica.',
+ 'admin@contitalent.com', 1, 1, 'admin@contitalent.com', 'Resultado registrado por cierre de entrevista.', @ahora - (@dia * 13), @ahora - (@dia * 13)),
+(4, 6, 'EVALUACION_PSICOLOGICA', @ahora - (@dia * 12), '15:00', '15:45', 'VIRTUAL',
+ NULL, 'https://meet.contitalent.com/psico-6', 'Paola Ruiz', 'Psicologa organizacional',
+ 'REALIZADA', 'APROBADO', 'Sin observaciones restrictivas', 'Aprobaste la evaluacion psicologica.',
+ 'admin@contitalent.com', 1, 1, 'admin@contitalent.com', 'Resultado psicologico registrado.', @ahora - (@dia * 12), @ahora - (@dia * 12));
 
 INSERT INTO tbl_evaluacion_psicologica_postulante (id, postulante_id, fecha_evaluacion, resultado, observacion, usuario_admin, creado_en) VALUES
 (1, 6, @ahora - (@dia * 12), 'APTO', 'Sin observaciones restrictivas', 'admin@contitalent.com', @ahora - (@dia * 12));
@@ -388,5 +423,5 @@ ALTER TABLE tbl_pregunta AUTO_INCREMENT = 14;
 ALTER TABLE tbl_postulante AUTO_INCREMENT = 8;
 ALTER TABLE tbl_documento_postulante AUTO_INCREMENT = 5;
 ALTER TABLE tbl_historial_estado_postulante AUTO_INCREMENT = 9;
-ALTER TABLE tbl_entrevista_postulante AUTO_INCREMENT = 4;
+ALTER TABLE tbl_entrevista_postulante AUTO_INCREMENT = 5;
 ALTER TABLE tbl_evaluacion_psicologica_postulante AUTO_INCREMENT = 2;

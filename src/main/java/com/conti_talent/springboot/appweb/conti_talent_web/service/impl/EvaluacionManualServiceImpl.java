@@ -43,8 +43,11 @@ public class EvaluacionManualServiceImpl implements IEvaluacionManualService {
 
         EntrevistaPostulante entrevista = new EntrevistaPostulante();
         entrevista.setPostulante(postulante);
+        entrevista.setTipoEntrevista("ENTREVISTA_NORMAL");
         entrevista.setFechaEntrevista(request.getFechaEntrevista() > 0 ? request.getFechaEntrevista() : System.currentTimeMillis());
-        entrevista.setResultado(texto(request.getResultado(), "PROGRAMADA"));
+        entrevista.setModalidad("VIRTUAL");
+        entrevista.setEstadoEntrevista("PROGRAMADA");
+        entrevista.setResultado(texto(request.getResultado(), "PENDIENTE"));
         entrevista.setObservacion(request.getObservacion());
         entrevista.setUsuarioAdmin(texto(request.getUsuarioAdmin(), "Admin"));
         entrevista.setCreadoEn(System.currentTimeMillis());

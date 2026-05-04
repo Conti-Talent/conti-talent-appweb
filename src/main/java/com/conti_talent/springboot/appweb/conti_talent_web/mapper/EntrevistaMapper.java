@@ -13,11 +13,28 @@ public class EntrevistaMapper {
         EntrevistaDTO dto = new EntrevistaDTO();
         dto.setId(entrevista.getId());
         dto.setPostulanteId(entrevista.getPostulanteId());
-        dto.setFechaEntrevista(entrevista.getFechaEntrevista());
+        dto.setTipoEntrevista(entrevista.getTipoEntrevista());
+        dto.setFechaProgramada(entrevista.getFechaProgramada());
+        dto.setFechaEntrevista(entrevista.getFechaProgramada());
+        dto.setHoraInicio(entrevista.getHoraInicio());
+        dto.setHoraFin(entrevista.getHoraFin());
+        dto.setModalidad(entrevista.getModalidad());
+        dto.setLugar(entrevista.getLugar());
+        dto.setEnlaceVirtual(entrevista.getEnlaceVirtual());
+        dto.setEntrevistadorNombre(entrevista.getEntrevistadorNombre());
+        dto.setEntrevistadorCargo(entrevista.getEntrevistadorCargo());
+        dto.setEstadoEntrevista(entrevista.getEstadoEntrevista());
         dto.setResultado(entrevista.getResultado());
-        dto.setObservacion(entrevista.getObservacion());
+        dto.setObservacionInterna(entrevista.getObservacionInterna());
+        dto.setObservacionPostulante(entrevista.getObservacionPostulante());
+        dto.setObservacion(entrevista.getObservacionInterna());
         dto.setUsuarioAdmin(entrevista.getUsuarioAdmin());
+        dto.setCreadoPorAdminId(entrevista.getCreadoPorAdminId());
+        dto.setActualizadoPorAdminId(entrevista.getActualizadoPorAdminId());
+        dto.setActualizadoPorAdmin(entrevista.getActualizadoPorAdminNombre());
+        dto.setObservacionCambio(entrevista.getObservacionCambio());
         dto.setCreadoEn(entrevista.getCreadoEn());
+        dto.setActualizadoEn(entrevista.getActualizadoEn());
         return dto;
     }
 

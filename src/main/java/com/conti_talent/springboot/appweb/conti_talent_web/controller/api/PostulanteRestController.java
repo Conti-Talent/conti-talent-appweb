@@ -47,6 +47,11 @@ public class PostulanteRestController {
         return postulanteService.obtenerPorId(id);
     }
 
+    @GetMapping("/{id}/proceso")
+    public PostulanteDTO obtenerProceso(@PathVariable Long id) {
+        return postulanteService.obtenerPorId(id);
+    }
+
     @GetMapping("/ranking")
     public List<PostulanteDTO> ranking(@RequestParam(value = "oferta", required = false) Long ofertaId,
                                        @RequestParam(value = "estado", required = false) String estado,

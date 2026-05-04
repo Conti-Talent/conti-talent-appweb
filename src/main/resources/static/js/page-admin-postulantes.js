@@ -229,8 +229,8 @@
         UI.el('div', { class: 'admin-applicant-actions' }, [
           cvDoc ? UI.el('a', { href: cvDoc.urlDescarga, class: 'btn btn--ghost btn--sm', text: 'Descargar CV' }) : UI.el('span', { class: 'soft', text: 'Sin CV descargable' }),
           UI.el('button', { class: 'btn btn--ghost btn--sm', text: 'Editar estado', onClick: () => openEdit(p) }),
-          UI.el('button', { class: 'btn btn--ghost btn--sm', text: 'Entrevista', onClick: () => openInterview(p) }),
-          UI.el('button', { class: 'btn btn--ghost btn--sm', text: 'Psicologica', onClick: () => openPsych(p) })
+          actionButton('Programar entrevista', puedeProgramarEntrevista(p), motivoEntrevista(p), () => openScheduleInterview(p, 'ENTREVISTA_NORMAL')),
+          actionButton('Programar evaluacion psicologica', puedeProgramarPsicologica(p), motivoPsicologica(p), () => openScheduleInterview(p, 'EVALUACION_PSICOLOGICA'))
         ])
       ]),
       UI.el('section', { class: 'admin-score-strip' }, [
@@ -262,9 +262,12 @@
         detailPanel('Documentos', docs.length ? docs.map(renderAdminDocument) : [
           UI.el('p', { class: 'soft', text: 'No hay documentos subidos.' })
         ]),
-        detailPanel('Evaluaciones manuales', [
-          UI.el('h5', { text: 'Entrevistas' }),
-          ...(entrevistas.length ? entrevistas.map(renderInterview) : [UI.el('p', { class: 'soft', text: 'Sin entrevistas registradas.' })]),
+        detailPanel('Proceso de entrevistas', [
+          UI.el('div', { class: 'interview-actions' }, [
+            actionButton('Programar entrevista', puedeProgramarEntrevista(p), motivoEntrevista(p), () => openScheduleInterview(p, 'ENTREVISTA_NORMAL')),
+            actionButton('Programar evaluacion psicologica', puedeProgramarPsicologica(p), motivoPsicologica(p), () => openScheduleInterview(p, 'EVALUACION_PSICOLOGICA'))
+          ]),
+          ...(entrevistas.length ? entrevistas.map((item) => renderInterview(item, p)) : [UI.el('p', { class: 'soft', text: 'Sin entrevistas registradas.' })]),
           UI.el('h5', { text: 'Evaluacion psicologica', style: 'margin-top:12px' }),
           ...(psicologicas.length ? psicologicas.map(renderPsych) : [UI.el('p', { class: 'soft', text: 'Sin evaluacion psicologica registrada.' })])
         ]),
@@ -306,10 +309,37 @@
     UI.el('a', { href: doc.urlDescarga || `/api/documentos/${doc.id}/descargar`, class: 'btn btn--ghost btn--sm', text: 'Descargar' })
   ]);
 
-  const renderInterview = (item) => UI.el('p', { class: 'admin-info-row' }, [
-    UI.el('span', { text: UI.formatDate(item.fechaEntrevista) }),
-    UI.el('strong', { text: `${item.resultado || 'Pendiente'} - ${item.observacion || 'Sin observacion'}` })
-  ]);
+  const renderInterview = (item, postulante) => {
+    const puedeEditar = !['ACEPTADO', 'RECHAZADO'].includes(postulante.estado) && !['CANCELADA'].includes(item.estadoEntrevista);
+    const puedeResultado = puedeEditar && ['PROGRAMADA', 'REPROGRAMADA', 'REALIZADA'].includes(item.estadoEntrevista) && item.resultado === 'PENDIENTE';
+    const puedeReprogramar = puedeEditar && item.estadoEntrevista === 'PROGRAMADA';
+    const puedeCancelar = puedeEditar && ['PROGRAMADA', 'REPROGRAMADA'].includes(item.estadoEntrevista);
+    return UI.el('article', { class: 'interview-card' }, [
+      UI.el('header', { class: 'interview-card__head' }, [
+        UI.el('div', {}, [
+          UI.el('strong', { text: labelTipoEntrevista(item.tipoEntrevista) }),
+          UI.el('p', { class: 'soft', text: `${UI.formatDate(item.fechaProgramada || item.fechaEntrevista)} - ${item.horaInicio || '--:--'} a ${item.horaFin || '--:--'}` })
+        ]),
+        UI.el('div', { class: 'badge-row' }, [
+          renderInterviewBadge(item.estadoEntrevista),
+          renderInterviewBadge(item.resultado)
+        ])
+      ]),
+      UI.el('div', { class: 'interview-meta' }, [
+        infoRow('Modalidad', item.modalidad || '-'),
+        infoRow(item.modalidad === 'VIRTUAL' ? 'Enlace' : 'Lugar', item.modalidad === 'VIRTUAL' ? item.enlaceVirtual : item.lugar),
+        infoRow('Entrevistador', [item.entrevistadorNombre, item.entrevistadorCargo].filter(Boolean).join(' - ') || '-'),
+        infoRow('Observacion interna', item.observacionInterna || item.observacion || '-'),
+        item.actualizadoEn ? infoRow('Ultima edicion', `${UI.formatDateTime(item.actualizadoEn)} - ${item.actualizadoPorAdmin || '-'}`) : null
+      ].filter(Boolean)),
+      UI.el('div', { class: 'row-actions interview-card__actions' }, [
+        puedeEditar ? UI.el('button', { class: 'btn btn--ghost btn--sm', text: 'Editar entrevista', onClick: () => openEditInterview(postulante, item) }) : null,
+        puedeResultado ? UI.el('button', { class: 'btn btn--primary btn--sm', text: 'Registrar resultado', onClick: () => openInterviewResult(postulante, item) }) : null,
+        puedeReprogramar ? UI.el('button', { class: 'btn btn--ghost btn--sm', text: 'Reprogramar', onClick: () => openReprogramInterview(postulante, item) }) : null,
+        puedeCancelar ? UI.el('button', { class: 'btn btn--danger btn--sm', text: 'Cancelar', onClick: () => cancelInterview(postulante, item) }) : null
+      ].filter(Boolean))
+    ]);
+  };
 
   const renderPsych = (item) => UI.el('p', { class: 'admin-info-row' }, [
     UI.el('span', { text: UI.formatDate(item.fechaEvaluacion) }),
@@ -450,49 +480,155 @@
     ]);
   };
 
-  const openInterview = (p) => openManualEval({
-    title: 'Registrar entrevista',
-    resultName: 'resultado',
-    onSave: (payload) => ContiAPI.registrarEntrevista(p.id, { fechaEntrevista: payload.fecha, ...payload })
+  const openInterview = (p) => openScheduleInterview(p, 'ENTREVISTA_NORMAL');
+  const openPsych = (p) => openScheduleInterview(p, 'EVALUACION_PSICOLOGICA');
+
+  const actionButton = (text, enabled, reason, onClick) =>
+    UI.el('button', { class: 'btn btn--ghost btn--sm', text, title: enabled ? '' : reason, disabled: enabled ? null : 'disabled', onClick: enabled ? onClick : null });
+
+  const puedeProgramarEntrevista = (p) => ['APROBADO_TECNICO', 'ENTREVISTA'].includes(p.estado)
+    && !tieneActiva(p, 'ENTREVISTA_NORMAL');
+  const puedeProgramarPsicologica = (p) => (p.estado === 'EVALUACION_PSICOLOGICA' || tieneAprobada(p, 'ENTREVISTA_NORMAL'))
+    && !['ACEPTADO', 'RECHAZADO'].includes(p.estado)
+    && !tieneActiva(p, 'EVALUACION_PSICOLOGICA');
+  const motivoEntrevista = (p) => ['POSTULADO', 'EN_EVALUACION'].includes(p.estado)
+    ? 'Primero debe aprobar la evaluacion tecnica.'
+    : ['ACEPTADO', 'RECHAZADO'].includes(p.estado) ? 'El proceso ya finalizo.' : 'Ya existe una entrevista activa.';
+  const motivoPsicologica = (p) => ['ACEPTADO', 'RECHAZADO'].includes(p.estado)
+    ? 'El proceso ya finalizo.' : 'Primero debe aprobar la entrevista.';
+  const tieneActiva = (p, tipo) => (p.entrevistas || []).some((e) => e.tipoEntrevista === tipo && ['PROGRAMADA', 'REPROGRAMADA', 'REALIZADA'].includes(e.estadoEntrevista));
+  const tieneAprobada = (p, tipo) => (p.entrevistas || []).some((e) => e.tipoEntrevista === tipo && e.resultado === 'APROBADO');
+
+  const openScheduleInterview = (p, tipo) => openInterviewForm({
+    title: tipo === 'ENTREVISTA_NORMAL' ? 'Programar entrevista' : 'Programar evaluacion psicologica',
+    tipo,
+    submitText: tipo === 'ENTREVISTA_NORMAL' ? 'Programar entrevista' : 'Programar evaluacion psicologica',
+    onSave: (payload) => ContiAPI.registrarEntrevista(p.id, payload)
   });
 
-  const openPsych = (p) => openManualEval({
-    title: 'Registrar evaluacion psicologica',
-    resultName: 'resultado',
-    onSave: (payload) => ContiAPI.registrarEvaluacionPsicologica(p.id, { fechaEvaluacion: payload.fecha, ...payload })
+  const openEditInterview = (_p, item) => openInterviewForm({
+    title: 'Editar entrevista',
+    tipo: item.tipoEntrevista,
+    item,
+    submitText: 'Guardar cambios',
+    includeChangeReason: true,
+    onSave: (payload) => ContiAPI.actualizarEntrevista(item.id, payload)
   });
 
-  const openManualEval = ({ title, onSave }) => {
+  const openReprogramInterview = (_p, item) => openInterviewForm({
+    title: 'Reprogramar entrevista',
+    tipo: item.tipoEntrevista,
+    item,
+    submitText: 'Reprogramar entrevista',
+    includeChangeReason: true,
+    onSave: (payload) => ContiAPI.reprogramarEntrevista(item.id, payload)
+  });
+
+  const openInterviewResult = (_p, item) => {
     const form = UI.el('form', { class: 'form-grid' }, [
-      UI.el('div', { class: 'field' }, [UI.el('label', { text: 'Fecha' }), UI.el('input', { class: 'input', type: 'datetime-local', name: 'fecha' })]),
       UI.el('div', { class: 'field' }, [
         UI.el('label', { text: 'Resultado' }),
         UI.el('select', { class: 'select', name: 'resultado' }, [
-          UI.el('option', { value: 'PROGRAMADA', text: 'Programada / pendiente' }),
-          UI.el('option', { value: 'APTO', text: 'Apto' }),
-          UI.el('option', { value: 'NO_APTO', text: 'No apto' })
+          UI.el('option', { value: 'APROBADO', text: 'Aprobar entrevista' }),
+          UI.el('option', { value: 'DESAPROBADO', text: 'Desaprobar entrevista' })
         ])
       ]),
-      UI.el('div', { class: 'field' }, [UI.el('label', { text: 'Observacion interna' }), UI.el('textarea', { class: 'textarea', name: 'observacion' })]),
-      UI.el('div', { class: 'field' }, [UI.el('label', { text: 'Observacion para postulante' }), UI.el('textarea', { class: 'textarea', name: 'observacionPostulante' })])
+      UI.el('div', { class: 'field' }, [UI.el('label', { text: 'Observacion interna / motivo' }), UI.el('textarea', { class: 'textarea', name: 'observacionInterna' })]),
+      UI.el('div', { class: 'field' }, [UI.el('label', { text: 'Observacion visible para postulante' }), UI.el('textarea', { class: 'textarea', name: 'observacionPostulante' })]),
+      UI.el('div', { class: 'field' }, [UI.el('label', { text: 'Observacion del cambio' }), UI.el('textarea', { class: 'textarea', name: 'observacionCambio', placeholder: 'Registro de auditoria de la modificacion' })])
     ]);
-    const submit = UI.el('button', { class: 'btn btn--primary', text: 'Guardar' });
-    const modal = UI.openModal({ title, content: form, footer: UI.el('footer', { class: 'form-actions' }, [submit]) });
+    const submit = UI.el('button', { class: 'btn btn--primary', text: 'Registrar resultado' });
+    const modal = UI.openModal({ title: 'Registrar resultado', content: form, footer: UI.el('footer', { class: 'form-actions' }, [submit]) });
     submit.addEventListener('click', async (e) => {
       e.preventDefault();
-      const values = Object.fromEntries(new FormData(form).entries());
-      const fecha = values.fecha ? new Date(values.fecha).getTime() : Date.now();
       try {
-        const saved = await onSave({ ...values, fecha, usuarioAdmin: Auth.getSession()?.email || 'Admin' });
+        const values = Object.fromEntries(new FormData(form).entries());
+        const saved = await ContiAPI.registrarResultadoEntrevista(item.id, { ...values, usuarioAdmin: Auth.getSession()?.email || 'Admin' });
         Storage.upsert('postulantes', saved);
-        UI.showToast('Evaluacion manual registrada', 'success');
+        await Storage.refresh('postulantes');
+        UI.showToast('Resultado registrado', 'success');
         modal.close();
         renderTable();
         renderPipeline();
       } catch (err) {
-        UI.showToast(err.message || 'No se pudo registrar', 'error');
+        UI.showToast(err.message || 'No se pudo registrar el resultado', 'error');
       }
     });
+  };
+
+  const cancelInterview = async (_p, item) => {
+    const ok = await UI.confirm({ title: 'Cancelar entrevista', message: '¿Cancelar esta entrevista?', okLabel: 'Cancelar entrevista' });
+    if (!ok) return;
+    try {
+      await ContiAPI.cancelarEntrevista(item.id, { usuarioAdmin: Auth.getSession()?.email || 'Admin', observacionCambio: 'Cancelacion desde ficha admin' });
+      await Storage.refresh('postulantes');
+      UI.showToast('Entrevista cancelada', 'info');
+      renderTable();
+      renderPipeline();
+    } catch (err) {
+      UI.showToast(err.message || 'No se pudo cancelar', 'error');
+    }
+  };
+
+  const openInterviewForm = ({ title, tipo, item = {}, submitText, includeChangeReason = false, onSave }) => {
+    const fechaInput = UI.el('input', { class: 'input', type: 'date', name: 'fecha', value: item.fechaProgramada ? new Date(item.fechaProgramada).toISOString().slice(0, 10) : '' });
+    const form = UI.el('form', { class: 'form-grid' }, [
+      UI.el('div', { class: 'form-grid form-grid--2' }, [
+        UI.el('div', { class: 'field' }, [UI.el('label', { text: 'Fecha programada' }), fechaInput]),
+        UI.el('div', { class: 'field' }, [UI.el('label', { text: 'Modalidad' }), selectField('modalidad', ['VIRTUAL', 'PRESENCIAL', 'TELEFONICA'], item.modalidad || 'VIRTUAL')])
+      ]),
+      UI.el('div', { class: 'form-grid form-grid--2' }, [
+        UI.el('div', { class: 'field' }, [UI.el('label', { text: 'Hora inicio' }), UI.el('input', { class: 'input', type: 'time', name: 'horaInicio', value: item.horaInicio || '' })]),
+        UI.el('div', { class: 'field' }, [UI.el('label', { text: 'Hora fin' }), UI.el('input', { class: 'input', type: 'time', name: 'horaFin', value: item.horaFin || '' })])
+      ]),
+      UI.el('div', { class: 'form-grid form-grid--2' }, [
+        UI.el('div', { class: 'field' }, [UI.el('label', { text: 'Lugar' }), UI.el('input', { class: 'input', name: 'lugar', value: item.lugar || '' })]),
+        UI.el('div', { class: 'field' }, [UI.el('label', { text: 'Enlace virtual' }), UI.el('input', { class: 'input', name: 'enlaceVirtual', value: item.enlaceVirtual || '' })])
+      ]),
+      UI.el('div', { class: 'form-grid form-grid--2' }, [
+        UI.el('div', { class: 'field' }, [UI.el('label', { text: 'Entrevistador' }), UI.el('input', { class: 'input', name: 'entrevistadorNombre', value: item.entrevistadorNombre || '' })]),
+        UI.el('div', { class: 'field' }, [UI.el('label', { text: 'Cargo' }), UI.el('input', { class: 'input', name: 'entrevistadorCargo', value: item.entrevistadorCargo || '' })])
+      ]),
+      UI.el('div', { class: 'field' }, [UI.el('label', { text: 'Observacion interna' }), UI.el('textarea', { class: 'textarea', name: 'observacionInterna', text: item.observacionInterna || item.observacion || '' })]),
+      UI.el('div', { class: 'field' }, [UI.el('label', { text: 'Observacion visible para postulante' }), UI.el('textarea', { class: 'textarea', name: 'observacionPostulante', text: item.observacionPostulante || '' })]),
+      includeChangeReason ? UI.el('div', { class: 'field' }, [UI.el('label', { text: 'Observacion del cambio' }), UI.el('textarea', { class: 'textarea', name: 'observacionCambio', placeholder: 'Motivo de modificacion' })]) : null
+    ].filter(Boolean));
+    const submit = UI.el('button', { class: 'btn btn--primary', text: submitText });
+    const modal = UI.openModal({ title, content: form, footer: UI.el('footer', { class: 'form-actions' }, [submit]) });
+    submit.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const values = Object.fromEntries(new FormData(form).entries());
+      if (!values.fecha) { UI.showToast('Selecciona una fecha', 'error'); return; }
+      try {
+        await onSave({
+          ...values,
+          tipoEntrevista: tipo,
+          fechaProgramada: new Date(`${values.fecha}T00:00:00`).getTime(),
+          usuarioAdmin: Auth.getSession()?.email || 'Admin'
+        });
+        await Storage.refresh('postulantes');
+        UI.showToast('Entrevista guardada', 'success');
+        modal.close();
+        renderTable();
+        renderPipeline();
+      } catch (err) {
+        UI.showToast(err.message || 'No se pudo guardar la entrevista', 'error');
+      }
+    });
+  };
+
+  const selectField = (name, options, selected) => UI.el('select', { class: 'select', name }, options.map((value) =>
+    UI.el('option', { value, text: value.replaceAll('_', ' '), selected: value === selected ? 'selected' : null })
+  ));
+
+  const labelTipoEntrevista = (tipo) => tipo === 'EVALUACION_PSICOLOGICA' ? 'Evaluacion psicologica' : 'Entrevista normal';
+  const renderInterviewBadge = (value) => {
+    const normalized = value || 'PENDIENTE';
+    const cls = ['APROBADO'].includes(normalized) ? 'badge--aceptado'
+      : ['DESAPROBADO', 'CANCELADA'].includes(normalized) ? 'badge--rechazado'
+      : ['PROGRAMADA', 'REPROGRAMADA', 'PENDIENTE'].includes(normalized) ? 'badge--psicologica'
+      : 'badge--entrevista';
+    return UI.el('span', { class: `badge ${cls}`, text: normalized.replaceAll('_', ' ') });
   };
 
   const onSoftDelete = async (p) => {

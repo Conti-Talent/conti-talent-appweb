@@ -70,6 +70,7 @@ const Storage = (() => {
       usuarioId: normalizeId(p.usuarioId),
       ofertaId: normalizeId(p.ofertaId),
       estadoId: normalizeId(p.estadoId),
+      entrevistas: (p.entrevistas || []).map((e) => ({ ...e, id: normalizeId(e.id), postulanteId: normalizeId(e.postulanteId) })),
       respuestas: p.respuestas || {}
     })),
     metricas: (data) => data || { series: {}, estadoActual: {} }
@@ -195,6 +196,18 @@ const ContiAPI = (() => ({
     }),
   registrarEntrevista: (id, data) =>
     Storage.request(`/api/postulantes/${Storage.toNumber(id)}/entrevistas`, { method: 'POST', body: JSON.stringify(data) }),
+  listarEntrevistas: (id) =>
+    Storage.request(`/api/postulantes/${Storage.toNumber(id)}/entrevistas`),
+  actualizarEntrevista: (id, data) =>
+    Storage.request(`/api/entrevistas/${Storage.toNumber(id)}`, { method: 'PUT', body: JSON.stringify(data) }),
+  registrarResultadoEntrevista: (id, data) =>
+    Storage.request(`/api/entrevistas/${Storage.toNumber(id)}/resultado`, { method: 'PATCH', body: JSON.stringify(data) }),
+  cancelarEntrevista: (id, data = {}) =>
+    Storage.request(`/api/entrevistas/${Storage.toNumber(id)}/cancelar`, { method: 'PATCH', body: JSON.stringify(data) }),
+  reprogramarEntrevista: (id, data) =>
+    Storage.request(`/api/entrevistas/${Storage.toNumber(id)}/reprogramar`, { method: 'PATCH', body: JSON.stringify(data) }),
+  obtenerProcesoPostulante: (id) =>
+    Storage.request(`/api/postulantes/${Storage.toNumber(id)}/proceso`),
   registrarEvaluacionPsicologica: (id, data) =>
     Storage.request(`/api/postulantes/${Storage.toNumber(id)}/evaluaciones-psicologicas`, { method: 'POST', body: JSON.stringify(data) }),
   rechazar: (id) => Storage.request(`/api/postulantes/${Storage.toNumber(id)}/rechazar`, { method: 'POST' }),
