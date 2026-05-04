@@ -39,7 +39,7 @@ public class DocumentoPostulanteServiceImpl implements IDocumentoPostulanteServi
     public DocumentoPostulanteServiceImpl(IDocumentoPostulanteRepository documentoRepository,
                                           IPostulanteRepository postulanteRepository,
                                           DocumentoPostulanteMapper documentoMapper,
-                                          @Value("${conti.uploads.postulantes-dir:uploads/postulantes}") String uploadsDir,
+                                          @Value("${conti.uploads.postulantes-dir:uploads}") String uploadsDir,
                                           @Value("${conti.uploads.max-file-size-bytes:5242880}") long maxFileSizeBytes) {
         this.documentoRepository = documentoRepository;
         this.postulanteRepository = postulanteRepository;

@@ -27,7 +27,7 @@
     if (search) items = items.filter((o) => o.titulo.toLowerCase().includes(search));
     UI.clear(tbody);
     if (items.length === 0) {
-      tbody.appendChild(UI.el('tr', {}, [UI.el('td', { colspan: 6, class: 'soft', style: 'text-align:center; padding: 32px;', text: 'Sin ofertas.' })]));
+      tbody.appendChild(UI.el('tr', {}, [UI.el('td', { colspan: 7, class: 'soft', style: 'text-align:center; padding: 32px;', text: 'Sin ofertas.' })]));
       return;
     }
     items.forEach((o) => {
@@ -36,11 +36,21 @@
       const tr = UI.el('tr', {}, [
         UI.el('td', {}, [
           UI.el('div', { class: 'font-medium', text: o.titulo }),
-          UI.el('div', { class: 'soft text-xs', text: o.descripcion?.slice(0, 80) || '' })
+          UI.el('div', { class: 'soft text-xs', text: o.descripcion?.slice(0, 100) || '' }),
+          UI.el('div', { class: 'offer-table-meta' }, [
+            UI.el('span', { text: `Creada: ${UI.formatDate(o.creadaEn)}` }),
+            UI.el('span', { text: `${o.vacantes || 1} vacante(s)` })
+          ])
         ]),
         UI.el('td', {}, [UI.el('span', { class: `badge ${tipoCls}`, text: o.tipo || '—' })]),
         UI.el('td', {}, [UI.el('span', { class: 'badge', text: a?.nombre || '—' })]),
-        UI.el('td', { text: o.modalidad }),
+        UI.el('td', {}, [
+          UI.el('div', { class: 'offer-schedule-cell' }, [
+            UI.el('strong', { text: o.modalidad || '-' }),
+            UI.el('span', { text: o.ubicacion || '-' }),
+            UI.el('small', { text: o.horario || 'Horario por definir' })
+          ])
+        ]),
         UI.el('td', { text: o.vacantes }),
         UI.el('td', { text: o.destacada ? '⭐ Sí' : '—' }),
         UI.el('td', {}, [
@@ -101,6 +111,10 @@
           UI.el('label', { text: 'Vacantes' }),
           UI.el('input', { class: 'input', type: 'number', min: 1, name: 'vacantes', value: oferta?.vacantes || 1 })
         ])
+      ]),
+      UI.el('div', { class: 'field' }, [
+        UI.el('label', { text: 'Horario / jornada' }),
+        UI.el('input', { class: 'input', name: 'horario', value: oferta?.horario || '', placeholder: 'Ej. Lunes a viernes 08:30 - 17:30' })
       ]),
       UI.el('div', { class: 'field' }, [
         UI.el('label', { text: 'Descripción' }),

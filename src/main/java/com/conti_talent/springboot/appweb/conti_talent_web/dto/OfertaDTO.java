@@ -11,6 +11,7 @@ public class OfertaDTO {
     private Long areaId;
     private String modalidad;
     private String ubicacion;
+    private String horario;
     private int vacantes;
     private boolean destacada;
     private String descripcion;
@@ -42,6 +43,9 @@ public class OfertaDTO {
 
     public String getUbicacion() { return ubicacion; }
     public void setUbicacion(String ubicacion) { this.ubicacion = ubicacion; }
+
+    public String getHorario() { return horario; }
+    public void setHorario(String horario) { this.horario = horario; }
 
     public int getVacantes() { return vacantes; }
     public void setVacantes(int vacantes) { this.vacantes = vacantes; }

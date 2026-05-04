@@ -38,6 +38,9 @@ public class Oferta {
     @Column(name = "ubicacion", length = 80)
     private String ubicacion;
 
+    @Column(name = "horario", length = 120)
+    private String horario;
+
     @Column(name = "vacantes", nullable = false)
     private int vacantes;
 
@@ -91,6 +94,7 @@ public class Oferta {
         this.area = area;
         this.modalidad = modalidad;
         this.ubicacion = ubicacion;
+        this.horario = "";
         this.vacantes = vacantes;
         this.destacada = destacada;
         this.descripcion = descripcion;
@@ -120,6 +124,9 @@ public class Oferta {
 
     public String getUbicacion() { return ubicacion; }
     public void setUbicacion(String ubicacion) { this.ubicacion = ubicacion; }
+
+    public String getHorario() { return horario; }
+    public void setHorario(String horario) { this.horario = horario; }
 
     public int getVacantes() { return vacantes; }
     public void setVacantes(int vacantes) { this.vacantes = vacantes; }

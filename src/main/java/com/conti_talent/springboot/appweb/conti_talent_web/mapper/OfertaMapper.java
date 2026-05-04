@@ -19,6 +19,7 @@ public class OfertaMapper {
         dto.setAreaId(oferta.getAreaId());
         dto.setModalidad(oferta.getModalidad());
         dto.setUbicacion(oferta.getUbicacion());
+        dto.setHorario(oferta.getHorario());
         dto.setVacantes(oferta.getVacantes());
         dto.setDestacada(oferta.isDestacada());
         dto.setDescripcion(oferta.getDescripcion());

@@ -12,6 +12,9 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 /**
@@ -45,6 +48,7 @@ public class DataLoader implements CommandLineRunner {
     private final IOfertaRepository ofertaRepository;
     private final IPreguntaRepository preguntaRepository;
     private final IPostulanteRepository postulanteRepository;
+    private final IDocumentoPostulanteRepository documentoRepository;
     private final IMetricasRepository metricasRepository;
 
     public DataLoader(IRolRepository rolRepository,
@@ -54,6 +58,7 @@ public class DataLoader implements CommandLineRunner {
                       IOfertaRepository ofertaRepository,
                       IPreguntaRepository preguntaRepository,
                       IPostulanteRepository postulanteRepository,
+                      IDocumentoPostulanteRepository documentoRepository,
                       IMetricasRepository metricasRepository) {
         this.rolRepository = rolRepository;
         this.estadoRepository = estadoRepository;
@@ -62,6 +67,7 @@ public class DataLoader implements CommandLineRunner {
         this.ofertaRepository = ofertaRepository;
         this.preguntaRepository = preguntaRepository;
         this.postulanteRepository = postulanteRepository;
+        this.documentoRepository = documentoRepository;
         this.metricasRepository = metricasRepository;
     }
 
@@ -188,6 +194,7 @@ public class DataLoader implements CommandLineRunner {
                 List.of("Ingeniero de Sistemas o afin", "2+ anios enseniando o desarrollando software", "Manejo de Java y bases de datos", "Experiencia en metodologias agiles"),
                 List.of("Carga horaria flexible", "Capacitacion pedagogica", "Convenios interinstitucionales"),
                 ahora - MILISEGUNDOS_POR_DIA * 3)));
+        mapa.get("Profesor de Programacion I").setHorario("Lunes, miercoles y viernes 08:00 - 12:00");
 
         mapa.put("Practica Sistemas", ofertaRepository.save(new Oferta(
                 "Practica Pre-Profesional Sistemas", "Practica", areas.get("Ingenieria"),
@@ -196,6 +203,7 @@ public class DataLoader implements CommandLineRunner {
                 List.of("Estudiante de Ingenieria de Sistemas", "Conocimientos de HTML, CSS y JS", "Buena comunicacion"),
                 List.of("Subvencion economica", "Mentoria", "Certificacion de practicas"),
                 ahora - MILISEGUNDOS_POR_DIA * 2)));
+        mapa.get("Practica Sistemas").setHorario("Lunes a viernes 09:00 - 14:00");
 
         mapa.put("Profesor Marketing Digital", ofertaRepository.save(new Oferta(
                 "Profesor de Marketing Digital", "Trabajo", areas.get("Ciencias de la Empresa"),
@@ -204,6 +212,7 @@ public class DataLoader implements CommandLineRunner {
                 List.of("Profesional en Marketing o Negocios", "Experiencia en performance digital", "Maestria (deseable)"),
                 List.of("Plan de carrera docente", "Investigacion remunerada"),
                 ahora - MILISEGUNDOS_POR_DIA * 4)));
+        mapa.get("Profesor Marketing Digital").setHorario("Martes y jueves 18:00 - 21:00");
 
         mapa.put("Practica Marketing", ofertaRepository.save(new Oferta(
                 "Practica Pre-Profesional Marketing", "Practica", areas.get("Ciencias de la Empresa"),
@@ -212,6 +221,7 @@ public class DataLoader implements CommandLineRunner {
                 List.of("Estudiante de Marketing/Administracion", "Manejo de redes sociales", "Curiosidad y proactividad"),
                 List.of("Subvencion economica", "Aprendizaje real", "Certificacion"),
                 ahora - MILISEGUNDOS_POR_DIA)));
+        mapa.get("Practica Marketing").setHorario("Lunes a viernes 08:30 - 13:30");
 
         mapa.put("Profesor Derecho Constitucional", ofertaRepository.save(new Oferta(
                 "Profesor de Derecho Constitucional", "Trabajo", areas.get("Derecho"),
@@ -220,6 +230,7 @@ public class DataLoader implements CommandLineRunner {
                 List.of("Abogado titulado", "Maestria o doctorado en Derecho", "Publicaciones academicas"),
                 List.of("Bonos por publicacion", "Apoyo a investigacion"),
                 ahora - MILISEGUNDOS_POR_DIA * 6)));
+        mapa.get("Profesor Derecho Constitucional").setHorario("Sabados 08:00 - 13:00");
 
         mapa.put("Practica Derecho Civil", ofertaRepository.save(new Oferta(
                 "Practica Profesional Derecho Civil", "Practica", areas.get("Derecho"),
@@ -228,6 +239,7 @@ public class DataLoader implements CommandLineRunner {
                 List.of("Egresado o bachiller en Derecho", "Buen manejo de redaccion"),
                 List.of("Subvencion", "Acompaniamiento profesional"),
                 ahora - MILISEGUNDOS_POR_DIA * 5)));
+        mapa.get("Practica Derecho Civil").setHorario("Lunes a viernes 09:00 - 15:00");
 
         mapa.put("Profesor Comunicacion", ofertaRepository.save(new Oferta(
                 "Profesor de Comunicacion Oral y Escrita", "Trabajo", areas.get("Humanidades"),
@@ -236,6 +248,7 @@ public class DataLoader implements CommandLineRunner {
                 List.of("Licenciado en Comunicacion o Educacion", "Experiencia minima 2 anios"),
                 List.of("Plan docente", "Becas para postgrado"),
                 ahora - MILISEGUNDOS_POR_DIA * 8)));
+        mapa.get("Profesor Comunicacion").setHorario("Lunes y miercoles 16:00 - 20:00");
 
         mapa.put("Asistente Salud Publica", ofertaRepository.save(new Oferta(
                 "Asistente de Investigacion Salud Publica", "Practica", areas.get("Ciencias de la Salud"),
@@ -244,6 +257,7 @@ public class DataLoader implements CommandLineRunner {
                 List.of("Estudiante de Ciencias de la Salud", "Estadistica basica"),
                 List.of("Subvencion", "Co-autoria en publicaciones"),
                 ahora - MILISEGUNDOS_POR_DIA * 9)));
+        mapa.get("Asistente Salud Publica").setHorario("Lunes a viernes 08:00 - 13:00");
 
         mapa.put("Coordinador Investigacion", ofertaRepository.save(new Oferta(
                 "Coordinador de Investigacion", "Trabajo", areas.get("Investigacion y Desarrollo"),
@@ -252,6 +266,7 @@ public class DataLoader implements CommandLineRunner {
                 List.of("Magister o doctor", "Publicaciones indexadas", "Liderazgo de equipos"),
                 List.of("Sueldo competitivo", "Asignacion de proyectos"),
                 ahora - MILISEGUNDOS_POR_DIA * 11)));
+        mapa.get("Coordinador Investigacion").setHorario("Lunes a viernes 08:00 - 17:00");
 
         mapa.put("Practica Soporte TI", ofertaRepository.save(new Oferta(
                 "Practica Soporte de TI Universitario", "Practica", areas.get("Tecnologia y Sistemas"),
@@ -260,6 +275,7 @@ public class DataLoader implements CommandLineRunner {
                 List.of("Estudios tecnicos o universitarios en TI", "Conocimientos de redes y hardware", "Buena atencion al usuario"),
                 List.of("Subvencion economica", "Certificacion de practicas", "Plan de mentoria"),
                 ahora - MILISEGUNDOS_POR_DIA)));
+        mapa.get("Practica Soporte TI").setHorario("Turno maniana 08:00 - 13:00");
 
         mapa.put("Coordinador Bienestar", ofertaRepository.save(new Oferta(
                 "Coordinador de Bienestar Estudiantil", "Trabajo", areas.get("Bienestar Universitario"),
@@ -268,6 +284,7 @@ public class DataLoader implements CommandLineRunner {
                 List.of("Profesional en Psicologia, Educacion o afin", "3+ anios en gestion estudiantil", "Habilidades de liderazgo"),
                 List.of("Plan de carrera", "Capacitacion continua", "Contrato estable"),
                 ahora - MILISEGUNDOS_POR_DIA * 4)));
+        mapa.get("Coordinador Bienestar").setHorario("Lunes a viernes 08:30 - 17:30");
 
         mapa.get("Profesor de Programacion I").setHabilidadesRequeridas(List.of("Java", "bases de datos", "metodologias agiles", "didactica"));
         mapa.get("Practica Sistemas").setHabilidadesRequeridas(List.of("HTML", "CSS", "JavaScript", "soporte tecnico"));
@@ -352,14 +369,14 @@ public class DataLoader implements CommandLineRunner {
         Usuario diego    = usuarios.get(6);
         Usuario fiorella = usuarios.get(7);
 
-        postulanteRepository.save(crearPostulante(lucia, ofertas.get("Practica Sistemas"),
+        Postulante postulanteLucia = postulanteRepository.save(crearPostulante(lucia, ofertas.get("Practica Sistemas"),
                 estados.get(EstadoCodigo.EN_EVALUACION.name()),
                 "Lucia Ramos", "lucia@example.com", "+51 987 654 321",
                 "3 anios apoyando areas de TI en universidades", "JavaScript, soporte tecnico, atencion al usuario",
                 "lucia_cv.pdf", 67, ahora - MILISEGUNDOS_POR_DIA * 4,
                 Map.of(preguntas.get("q6").getId(), 1, preguntas.get("q7").getId(), 1, preguntas.get("q8").getId(), 0)));
 
-        postulanteRepository.save(crearPostulante(carlos, ofertas.get("Profesor de Programacion I"),
+        Postulante postulanteCarlos = postulanteRepository.save(crearPostulante(carlos, ofertas.get("Profesor de Programacion I"),
                 estados.get(EstadoCodigo.APROBADO_TECNICO.name()),
                 "Carlos Mendoza", "carlos@example.com", "+51 911 222 333",
                 "5 anios en arquitectura de software y docencia", "Java, Spring, Docker, didactica universitaria",
@@ -373,14 +390,14 @@ public class DataLoader implements CommandLineRunner {
                 "Estudiante de Marketing en ultimo ciclo", "Community management, creacion de contenido",
                 "maria_cv.pdf", 0, ahora - MILISEGUNDOS_POR_DIA, Map.of()));
 
-        postulanteRepository.save(crearPostulante(pedro, ofertas.get("Practica Sistemas"),
+        Postulante postulantePedro = postulanteRepository.save(crearPostulante(pedro, ofertas.get("Practica Sistemas"),
                 estados.get(EstadoCodigo.ENTREVISTA.name()),
                 "Pedro Salinas", "pedro@example.com", "+51 922 444 666",
                 "Estudiante de Sistemas con practicas previas", "JavaScript, HTML, CSS, soporte",
                 "pedro_cv.pdf", 100, ahora - MILISEGUNDOS_POR_DIA * 6,
                 Map.of(preguntas.get("q6").getId(), 1, preguntas.get("q7").getId(), 1, preguntas.get("q8").getId(), 1)));
 
-        postulanteRepository.save(crearPostulante(andrea, ofertas.get("Profesor Marketing Digital"),
+        Postulante postulanteAndrea = postulanteRepository.save(crearPostulante(andrea, ofertas.get("Profesor Marketing Digital"),
                 estados.get(EstadoCodigo.EVALUACION_PSICOLOGICA.name()),
                 "Andrea Leon", "andrea@example.com", "+51 944 888 111",
                 "6 anios en marketing B2B y docencia universitaria", "Estrategia digital, didactica, public speaking",
@@ -400,6 +417,35 @@ public class DataLoader implements CommandLineRunner {
                 "1 anio en diseno grafico", "Figma, Illustrator",
                 "fiorella_cv.pdf", 50, ahora - MILISEGUNDOS_POR_DIA * 7,
                 Map.of(preguntas.get("q12").getId(), 0, preguntas.get("q13").getId(), 0)));
+
+        cargarDocumentosSeed(ahora, postulanteLucia, postulanteCarlos, postulantePedro, postulanteAndrea);
+    }
+
+    private void cargarDocumentosSeed(long ahora, Postulante lucia, Postulante carlos, Postulante pedro, Postulante andrea) {
+        crearDocumentoSeed(lucia, "CV", "lucia_cv.pdf", "lucia_cv.pdf", ahora - MILISEGUNDOS_POR_DIA * 4);
+        crearDocumentoSeed(carlos, "CV", "carlos_cv.pdf", "carlos_cv.pdf", ahora - MILISEGUNDOS_POR_DIA * 3);
+        crearDocumentoSeed(carlos, "CERTIFICADO", "certificado_spring.pdf", "certificado_spring.pdf", ahora - MILISEGUNDOS_POR_DIA * 3);
+        crearDocumentoSeed(pedro, "CV", "pedro_cv.pdf", "pedro_cv.pdf", ahora - MILISEGUNDOS_POR_DIA * 6);
+        crearDocumentoSeed(andrea, "CV", "andrea_cv.pdf", "andrea_cv.pdf", ahora - MILISEGUNDOS_POR_DIA * 9);
+    }
+
+    private void crearDocumentoSeed(Postulante postulante, String tipo, String nombreOriginal, String nombreArchivo, long fechaSubida) {
+        Path ruta = Paths.get("uploads", nombreArchivo).toAbsolutePath().normalize();
+        DocumentoPostulante documento = new DocumentoPostulante();
+        documento.setPostulante(postulante);
+        documento.setTipoDocumento(tipo);
+        documento.setNombreOriginal(nombreOriginal);
+        documento.setNombreArchivo(nombreArchivo);
+        documento.setRutaArchivo(ruta.toString());
+        documento.setExtension("pdf");
+        try {
+            documento.setTamanio(Files.exists(ruta) ? Files.size(ruta) : 0L);
+        } catch (Exception ignored) {
+            documento.setTamanio(0L);
+        }
+        documento.setFechaSubida(fechaSubida);
+        documentoRepository.save(documento);
+        postulante.getDocumentos().add(documento);
     }
 
     private Postulante crearPostulante(Usuario usuario, Oferta oferta, Estado estado,

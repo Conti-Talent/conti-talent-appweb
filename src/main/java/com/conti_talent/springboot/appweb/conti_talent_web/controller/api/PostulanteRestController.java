@@ -97,10 +97,11 @@ public class PostulanteRestController {
     public ResponseEntity<Resource> descargarDocumento(@PathVariable Long id, @PathVariable Long documentoId) {
         DocumentoPostulante documento = documentoService.obtenerDocumento(id, documentoId);
         Resource resource = documentoService.cargarRecurso(documento);
+        boolean esPdf = "pdf".equalsIgnoreCase(documento.getExtension());
         return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .contentType(esPdf ? MediaType.APPLICATION_PDF : MediaType.APPLICATION_OCTET_STREAM)
                 .header(HttpHeaders.CONTENT_DISPOSITION,
-                        "attachment; filename=\"" + documento.getNombreOriginal().replace("\"", "") + "\"")
+                        (esPdf ? "inline" : "attachment") + "; filename=\"" + documento.getNombreOriginal().replace("\"", "") + "\"")
                 .body(resource);
     }
 

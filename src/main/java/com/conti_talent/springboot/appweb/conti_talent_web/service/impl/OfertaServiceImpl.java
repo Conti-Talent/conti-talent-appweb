@@ -118,6 +118,7 @@ public class OfertaServiceImpl implements IOfertaService {
         }
         if (dto.getModalidad()   != null) oferta.setModalidad(dto.getModalidad());
         if (dto.getUbicacion()   != null) oferta.setUbicacion(dto.getUbicacion());
+        if (dto.getHorario()     != null) oferta.setHorario(dto.getHorario().trim());
         oferta.setVacantes(Math.max(1, dto.getVacantes() == 0 && nuevo ? 1 : dto.getVacantes()));
         oferta.setDestacada(dto.isDestacada());
         if (dto.getDescripcion() != null) oferta.setDescripcion(dto.getDescripcion().trim());

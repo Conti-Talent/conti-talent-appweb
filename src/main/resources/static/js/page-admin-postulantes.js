@@ -149,8 +149,6 @@
           UI.el('div', { class: 'row-actions' }, [
             UI.el('button', { class: 'btn btn--sm btn--ghost',  text: 'Ver',     onClick: () => openDetailV2(p) }),
             UI.el('button', { class: 'btn btn--sm btn--ghost',  text: 'Editar',  onClick: () => openEdit(p) }),
-            UI.el('button', { class: 'btn btn--sm btn--ghost', text: 'Entrevista', onClick: () => openInterview(p) }),
-            UI.el('button', { class: 'btn btn--sm btn--ghost', text: 'Psico', onClick: () => openPsych(p) }),
             UI.el('button', { class: 'btn btn--sm btn--danger', text: 'Rechazar', onClick: () => onSoftDelete(p) })
           ])
         ])
@@ -218,19 +216,21 @@
     const content = UI.el('div', { class: 'admin-applicant-detail' }, [
       UI.el('section', { class: 'admin-applicant-hero' }, [
         UI.el('div', { class: 'applicant-profile__avatar', text: initials }),
-        UI.el('div', {}, [
-          UI.el('div', { class: 'flex gap-2', style: 'align-items:center;flex-wrap:wrap' }, [
-            UI.el('h3', { text: p.nombre, style: 'margin:0' }),
+        UI.el('div', { class: 'admin-applicant-main' }, [
+          UI.el('div', { class: 'admin-applicant-titleline' }, [
+            UI.el('h3', { text: p.nombre }),
             UI.renderEstadoBadge(p.estado)
           ]),
-          UI.el('p', { class: 'muted', text: `${p.email} - ${p.telefono || 'Sin telefono'}` }),
-          UI.el('p', { class: 'soft', text: `Postulacion #${p.id} - ${UI.formatDate(p.fechaPostulacion || p.creadoEn)}` })
+          UI.el('div', { class: 'admin-applicant-contact' }, [
+            UI.el('span', { text: p.email }),
+            UI.el('span', { text: p.telefono || 'Sin telefono' }),
+            UI.el('span', { text: `Postulacion #${p.id}` }),
+            UI.el('span', { text: UI.formatDate(p.fechaPostulacion || p.creadoEn) })
+          ])
         ]),
         UI.el('div', { class: 'admin-applicant-actions' }, [
-          cvDoc ? UI.el('a', { href: cvDoc.urlDescarga, class: 'btn btn--ghost btn--sm', text: 'Descargar CV' }) : UI.el('span', { class: 'soft', text: 'Sin CV descargable' }),
-          UI.el('button', { class: 'btn btn--ghost btn--sm', text: 'Editar estado', onClick: () => openEdit(p) }),
-          actionButton('Programar entrevista', puedeProgramarEntrevista(p), motivoEntrevista(p), () => openScheduleInterview(p, 'ENTREVISTA_NORMAL')),
-          actionButton('Programar evaluacion psicologica', puedeProgramarPsicologica(p), motivoPsicologica(p), () => openScheduleInterview(p, 'EVALUACION_PSICOLOGICA'))
+          cvDoc ? UI.el('a', { href: cvDoc.urlDescarga, target: '_blank', rel: 'noopener', class: 'btn btn--ghost btn--sm', text: 'Ver CV' }) : UI.el('span', { class: 'soft', text: 'Sin CV descargable' }),
+          UI.el('button', { class: 'btn btn--ghost btn--sm', text: 'Editar estado', onClick: () => openEdit(p) })
         ])
       ]),
       UI.el('section', { class: 'admin-score-strip' }, [
@@ -245,6 +245,8 @@
           infoRow('Area', area?.nombre || '-'),
           infoRow('Modalidad', oferta?.modalidad || '-'),
           infoRow('Ubicacion', oferta?.ubicacion || '-'),
+          infoRow('Horario', oferta?.horario || '-'),
+          infoRow('Oferta creada', oferta?.creadaEn ? UI.formatDate(oferta.creadaEn) : '-'),
           infoRow('Evaluacion tecnica', p.fechaEvaluacion ? UI.formatDate(p.fechaEvaluacion) : 'Pendiente')
         ]),
         detailPanel('Perfil del postulante', [
@@ -257,12 +259,13 @@
           infoLink('LinkedIn', p.linkedin),
           infoLink('Portafolio', p.portafolio)
         ]),
-        detailPanel('Experiencia declarada', [UI.el('p', { text: p.experiencia || 'Sin experiencia registrada.' })]),
-        detailPanel('Habilidades declaradas', [UI.el('p', { text: p.habilidades || 'Sin habilidades registradas.' })]),
+        detailPanel('Experiencia declarada', [UI.el('p', { class: 'admin-long-text', text: p.experiencia || 'Sin experiencia registrada.' })], 'admin-detail-panel--wide'),
+        detailPanel('Habilidades declaradas', [UI.el('p', { class: 'admin-long-text', text: p.habilidades || 'Sin habilidades registradas.' })], 'admin-detail-panel--wide'),
         detailPanel('Documentos', docs.length ? docs.map(renderAdminDocument) : [
           UI.el('p', { class: 'soft', text: 'No hay documentos subidos.' })
         ]),
         detailPanel('Proceso de entrevistas', [
+          renderProcessDecision(p),
           UI.el('div', { class: 'interview-actions' }, [
             actionButton('Programar entrevista', puedeProgramarEntrevista(p), motivoEntrevista(p), () => openScheduleInterview(p, 'ENTREVISTA_NORMAL')),
             actionButton('Programar evaluacion psicologica', puedeProgramarPsicologica(p), motivoPsicologica(p), () => openScheduleInterview(p, 'EVALUACION_PSICOLOGICA'))
@@ -270,14 +273,14 @@
           ...(entrevistas.length ? entrevistas.map((item) => renderInterview(item, p)) : [UI.el('p', { class: 'soft', text: 'Sin entrevistas registradas.' })]),
           UI.el('h5', { text: 'Evaluacion psicologica', style: 'margin-top:12px' }),
           ...(psicologicas.length ? psicologicas.map(renderPsych) : [UI.el('p', { class: 'soft', text: 'Sin evaluacion psicologica registrada.' })])
-        ]),
+        ], 'admin-detail-panel--wide'),
         detailPanel('Observaciones', [
           UI.el('p', { class: 'soft', text: 'Interna admin' }),
           UI.el('p', { text: p.observacionAdmin || 'Sin observacion interna.' }),
           UI.el('p', { class: 'soft', text: 'Ultimo mensaje visible para postulante' }),
           UI.el('p', { text: ultimoMensajePostulante(historial) })
         ]),
-        detailPanel('Historial del proceso', [renderAdminTimeline(historial, p.estado)])
+        detailPanel('Historial del proceso', [renderAdminTimeline(historial, p.estado)], 'admin-detail-panel--wide')
       ])
     ]);
 
@@ -289,7 +292,7 @@
     UI.el('strong', { text: value ?? 0 })
   ]);
 
-  const detailPanel = (title, children) => UI.el('article', { class: 'admin-detail-panel' }, [
+  const detailPanel = (title, children, extraClass = '') => UI.el('article', { class: `admin-detail-panel ${extraClass}`.trim() }, [
     UI.el('h4', { text: title }),
     ...children
   ]);
@@ -304,10 +307,21 @@
     value ? UI.el('a', { href: value, target: '_blank', rel: 'noopener', text: value }) : UI.el('strong', { text: '-' })
   ]);
 
-  const renderAdminDocument = (doc) => UI.el('p', { class: 'admin-document-row' }, [
-    UI.el('span', { text: `${doc.tipoDocumento}: ${doc.nombreOriginal}` }),
-    UI.el('a', { href: doc.urlDescarga || `/api/documentos/${doc.id}/descargar`, class: 'btn btn--ghost btn--sm', text: 'Descargar' })
+  const renderAdminDocument = (doc) => UI.el('article', { class: 'admin-document-card' }, [
+    UI.el('div', {}, [
+      UI.el('strong', { text: doc.tipoDocumento || 'DOCUMENTO' }),
+      UI.el('span', { text: doc.nombreOriginal || doc.nombreArchivo || 'documento.pdf' }),
+      UI.el('small', { text: `${(doc.extension || 'pdf').toUpperCase()} - ${formatFileSize(doc.tamanio)}` })
+    ]),
+    UI.el('a', { href: doc.urlDescarga || `/api/documentos/${doc.id}/descargar`, target: '_blank', rel: 'noopener', class: 'btn btn--ghost btn--sm', text: 'Ver PDF' })
   ]);
+
+  const formatFileSize = (bytes) => {
+    const value = Number(bytes || 0);
+    if (!value) return 'Archivo seed';
+    if (value < 1024) return `${value} B`;
+    return `${Math.round(value / 1024)} KB`;
+  };
 
   const renderInterview = (item, postulante) => {
     const puedeEditar = !['ACEPTADO', 'RECHAZADO'].includes(postulante.estado) && !['CANCELADA'].includes(item.estadoEntrevista);
@@ -345,6 +359,48 @@
     UI.el('span', { text: UI.formatDate(item.fechaEvaluacion) }),
     UI.el('strong', { text: `${item.resultado || 'Pendiente'} - ${item.observacion || 'Sin observacion'}` })
   ]);
+
+  const renderProcessDecision = (p) => {
+    const normalAprobada = tieneAprobada(p, 'ENTREVISTA_NORMAL');
+    const psicoAprobada = tieneAprobada(p, 'EVALUACION_PSICOLOGICA')
+      || (p.evaluacionesPsicologicas || []).some((e) => ['APTO', 'APROBADO'].includes(String(e.resultado || '').toUpperCase()));
+    const terminal = ['ACEPTADO', 'RECHAZADO'].includes(p.estado);
+    const rows = [
+      processRule('Evaluacion tecnica', ['APROBADO_TECNICO', 'ENTREVISTA', 'EVALUACION_PSICOLOGICA', 'ACEPTADO'].includes(p.estado), p.estado === 'EN_EVALUACION' ? 'En revision tecnica' : 'Requisito para entrevista normal'),
+      processRule('Entrevista normal', normalAprobada, puedeProgramarEntrevista(p) ? 'Lista para programar' : motivoEntrevista(p)),
+      processRule('Evaluacion psicologica', psicoAprobada, puedeProgramarPsicologica(p) ? 'Lista para programar' : motivoPsicologica(p)),
+      processRule('Decision final', p.estado === 'ACEPTADO', terminal ? 'Proceso cerrado' : 'Pendiente de completar etapas previas')
+    ];
+    return UI.el('section', { class: 'process-decision-box' }, [
+      UI.el('div', { class: 'process-decision-box__head' }, [
+        UI.el('div', {}, [
+          UI.el('strong', { text: 'Estado actual del proceso' }),
+          UI.el('p', { class: 'soft', text: processSummary(p) })
+        ]),
+        UI.renderEstadoBadge(p.estado)
+      ]),
+      UI.el('div', { class: 'process-rule-grid' }, rows)
+    ]);
+  };
+
+  const processRule = (label, done, note) => UI.el('div', { class: `process-rule ${done ? 'is-ok' : ''}` }, [
+    UI.el('span', { text: done ? 'OK' : '...' }),
+    UI.el('div', {}, [
+      UI.el('strong', { text: label }),
+      UI.el('small', { text: note })
+    ])
+  ]);
+
+  const processSummary = (p) => {
+    if (p.estado === 'POSTULADO') return 'El postulante aun debe rendir o iniciar la evaluacion tecnica.';
+    if (p.estado === 'EN_EVALUACION') return 'La evaluacion tecnica esta en revision o no supero el umbral.';
+    if (p.estado === 'APROBADO_TECNICO') return 'Ya puede programarse la entrevista normal.';
+    if (p.estado === 'ENTREVISTA') return tieneAprobada(p, 'ENTREVISTA_NORMAL') ? 'La entrevista fue aprobada; corresponde evaluacion psicologica.' : 'Debe completarse y aprobarse la entrevista normal.';
+    if (p.estado === 'EVALUACION_PSICOLOGICA') return 'Corresponde programar o registrar la evaluacion psicologica.';
+    if (p.estado === 'ACEPTADO') return 'El postulante fue aceptado; no se permiten nuevas acciones del proceso.';
+    if (p.estado === 'RECHAZADO') return 'El postulante fue rechazado; el proceso esta cerrado.';
+    return 'Revisar el estado del postulante antes de actuar.';
+  };
 
   const renderAdminTimeline = (historial, estadoActual) => {
     const estados = ['POSTULADO', 'EN_EVALUACION', 'APROBADO_TECNICO', 'ENTREVISTA', 'EVALUACION_PSICOLOGICA', 'ACEPTADO'];
@@ -479,9 +535,6 @@
       ])
     ]);
   };
-
-  const openInterview = (p) => openScheduleInterview(p, 'ENTREVISTA_NORMAL');
-  const openPsych = (p) => openScheduleInterview(p, 'EVALUACION_PSICOLOGICA');
 
   const actionButton = (text, enabled, reason, onClick) =>
     UI.el('button', { class: 'btn btn--ghost btn--sm', text, title: enabled ? '' : reason, disabled: enabled ? null : 'disabled', onClick: enabled ? onClick : null });

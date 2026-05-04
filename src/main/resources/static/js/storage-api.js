@@ -55,6 +55,7 @@ const Storage = (() => {
       ...o,
       id: normalizeId(o.id),
       areaId: normalizeId(o.areaId),
+      horario: o.horario || '',
       requisitos: o.requisitos || [],
       beneficios: o.beneficios || []
     })),

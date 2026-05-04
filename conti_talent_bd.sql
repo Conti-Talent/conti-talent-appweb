@@ -77,6 +77,7 @@ CREATE TABLE tbl_oferta (
   area_id BIGINT NOT NULL,
   modalidad VARCHAR(20),
   ubicacion VARCHAR(80),
+  horario VARCHAR(120),
   vacantes INT NOT NULL,
   destacada BIT(1) NOT NULL,
   descripcion TEXT,
@@ -271,18 +272,18 @@ INSERT INTO tbl_area (id, nombre, descripcion, icono, color) VALUES
 (7, 'Tecnologia y Sistemas', 'Equipo de TI institucional: infraestructura, soporte y software interno.', 'computer', '#0ea5e9'),
 (8, 'Bienestar Universitario', 'Soporte estudiantil, deportes, cultura y atencion psicopedagogica.', 'handshake', '#f43f5e');
 
-INSERT INTO tbl_oferta (id, titulo, tipo, area_id, modalidad, ubicacion, vacantes, destacada, descripcion, creada_en) VALUES
-(1, 'Profesor de Programacion I', 'Trabajo', 1, 'Presencial', 'Huancayo', 2, b'1', 'Docente para el curso de Programacion I (Java) en la Escuela de Ingenieria de Sistemas.', @ahora - (@dia * 3)),
-(2, 'Practica Pre-Profesional Sistemas', 'Practica', 1, 'Hibrido', 'Huancayo', 4, b'1', 'Apoyo al area de Sistemas y TI: soporte, desarrollo de pequenias mejoras y gestion de tickets.', @ahora - (@dia * 2)),
-(3, 'Profesor de Marketing Digital', 'Trabajo', 2, 'Presencial', 'Huancayo', 1, b'1', 'Docente para Marketing Digital y Estrategia Comercial.', @ahora - (@dia * 4)),
-(4, 'Practica Pre-Profesional Marketing', 'Practica', 2, 'Presencial', 'Huancayo', 3, b'1', 'Apoyo en campanias digitales, contenidos y analitica para la marca Continental.', @ahora - @dia),
-(5, 'Profesor de Derecho Constitucional', 'Trabajo', 3, 'Presencial', 'Huancayo', 1, b'0', 'Docente para el curso de Derecho Constitucional.', @ahora - (@dia * 6)),
-(6, 'Practica Profesional Derecho Civil', 'Practica', 3, 'Hibrido', 'Huancayo', 2, b'0', 'Apoyo al consultorio juridico del area de Derecho.', @ahora - (@dia * 5)),
-(7, 'Profesor de Comunicacion Oral y Escrita', 'Trabajo', 4, 'Presencial', 'Huancayo', 2, b'0', 'Curso transversal en pregrado.', @ahora - (@dia * 8)),
-(8, 'Asistente de Investigacion Salud Publica', 'Practica', 5, 'Hibrido', 'Huancayo', 2, b'0', 'Apoyo a investigacion de campo en proyectos de salud publica.', @ahora - (@dia * 9)),
-(9, 'Coordinador de Investigacion', 'Trabajo', 6, 'Presencial', 'Huancayo', 1, b'0', 'Lidera proyectos del Centro de Investigacion.', @ahora - (@dia * 11)),
-(10, 'Practica Soporte de TI Universitario', 'Practica', 7, 'Presencial', 'Huancayo', 3, b'1', 'Apoyo al equipo institucional de Tecnologia y Sistemas.', @ahora - @dia),
-(11, 'Coordinador de Bienestar Estudiantil', 'Trabajo', 8, 'Presencial', 'Huancayo', 1, b'0', 'Lidera el equipo de Bienestar Universitario.', @ahora - (@dia * 4));
+INSERT INTO tbl_oferta (id, titulo, tipo, area_id, modalidad, ubicacion, horario, vacantes, destacada, descripcion, creada_en) VALUES
+(1, 'Profesor de Programacion I', 'Trabajo', 1, 'Presencial', 'Huancayo', 'Lunes, miercoles y viernes 08:00 - 12:00', 2, b'1', 'Docente para el curso de Programacion I (Java) en la Escuela de Ingenieria de Sistemas.', @ahora - (@dia * 3)),
+(2, 'Practica Pre-Profesional Sistemas', 'Practica', 1, 'Hibrido', 'Huancayo', 'Lunes a viernes 09:00 - 14:00', 4, b'1', 'Apoyo al area de Sistemas y TI: soporte, desarrollo de pequenias mejoras y gestion de tickets.', @ahora - (@dia * 2)),
+(3, 'Profesor de Marketing Digital', 'Trabajo', 2, 'Presencial', 'Huancayo', 'Martes y jueves 18:00 - 21:00', 1, b'1', 'Docente para Marketing Digital y Estrategia Comercial.', @ahora - (@dia * 4)),
+(4, 'Practica Pre-Profesional Marketing', 'Practica', 2, 'Presencial', 'Huancayo', 'Lunes a viernes 08:30 - 13:30', 3, b'1', 'Apoyo en campanias digitales, contenidos y analitica para la marca Continental.', @ahora - @dia),
+(5, 'Profesor de Derecho Constitucional', 'Trabajo', 3, 'Presencial', 'Huancayo', 'Sabados 08:00 - 13:00', 1, b'0', 'Docente para el curso de Derecho Constitucional.', @ahora - (@dia * 6)),
+(6, 'Practica Profesional Derecho Civil', 'Practica', 3, 'Hibrido', 'Huancayo', 'Lunes a viernes 09:00 - 15:00', 2, b'0', 'Apoyo al consultorio juridico del area de Derecho.', @ahora - (@dia * 5)),
+(7, 'Profesor de Comunicacion Oral y Escrita', 'Trabajo', 4, 'Presencial', 'Huancayo', 'Lunes y miercoles 16:00 - 20:00', 2, b'0', 'Curso transversal en pregrado.', @ahora - (@dia * 8)),
+(8, 'Asistente de Investigacion Salud Publica', 'Practica', 5, 'Hibrido', 'Huancayo', 'Lunes a viernes 08:00 - 13:00', 2, b'0', 'Apoyo a investigacion de campo en proyectos de salud publica.', @ahora - (@dia * 9)),
+(9, 'Coordinador de Investigacion', 'Trabajo', 6, 'Presencial', 'Huancayo', 'Lunes a viernes 08:00 - 17:00', 1, b'0', 'Lidera proyectos del Centro de Investigacion.', @ahora - (@dia * 11)),
+(10, 'Practica Soporte de TI Universitario', 'Practica', 7, 'Presencial', 'Huancayo', 'Turno maniana 08:00 - 13:00', 3, b'1', 'Apoyo al equipo institucional de Tecnologia y Sistemas.', @ahora - @dia),
+(11, 'Coordinador de Bienestar Estudiantil', 'Trabajo', 8, 'Presencial', 'Huancayo', 'Lunes a viernes 08:30 - 17:30', 1, b'0', 'Lidera el equipo de Bienestar Universitario.', @ahora - (@dia * 4));
 
 INSERT INTO tbl_oferta_requisito (oferta_id, orden, texto) VALUES
 (1, 0, 'Ingeniero de Sistemas o afin'), (1, 1, '2+ anios enseniando o desarrollando software'), (1, 2, 'Manejo de Java y bases de datos'), (1, 3, 'Experiencia en metodologias agiles'),
@@ -365,10 +366,11 @@ INSERT INTO tbl_postulante (id, usuario_id, oferta_id, estado_id, nombre, email,
 (7, 8, 4, 7, 'Fiorella Rojas', 'fiorella@example.com', '+51 966 333 444', '1 anio en diseno grafico', 'Figma, Illustrator', 'fiorella_cv.pdf', @ahora - (@dia * 7), @ahora - (@dia * 7) + 3600000, 1, 'Universitario', 'Diseno', 'Inmediata', 'Presencial', 50, 30, 60, 46, @ahora - (@dia * 7));
 
 INSERT INTO tbl_documento_postulante (id, postulante_id, tipo_documento, nombre_original, nombre_archivo, ruta_archivo, extension, tamanio, fecha_subida) VALUES
-(1, 1, 'CV', 'lucia_cv.pdf', '1_seed_lucia_cv.pdf', 'uploads/postulantes/1_seed_lucia_cv.pdf', 'pdf', 245760, @ahora - (@dia * 4)),
-(2, 2, 'CV', 'carlos_cv.pdf', '2_seed_carlos_cv.pdf', 'uploads/postulantes/2_seed_carlos_cv.pdf', 'pdf', 286720, @ahora - (@dia * 3)),
-(3, 2, 'CERTIFICADO', 'certificado_spring.pdf', '2_seed_certificado_spring.pdf', 'uploads/postulantes/2_seed_certificado_spring.pdf', 'pdf', 196608, @ahora - (@dia * 3)),
-(4, 5, 'CV', 'andrea_cv.pdf', '5_seed_andrea_cv.pdf', 'uploads/postulantes/5_seed_andrea_cv.pdf', 'pdf', 253952, @ahora - (@dia * 9));
+(1, 1, 'CV', 'lucia_cv.pdf', 'lucia_cv.pdf', 'uploads/lucia_cv.pdf', 'pdf', 4025, @ahora - (@dia * 4)),
+(2, 2, 'CV', 'carlos_cv.pdf', 'carlos_cv.pdf', 'uploads/carlos_cv.pdf', 'pdf', 4021, @ahora - (@dia * 3)),
+(3, 2, 'CERTIFICADO', 'certificado_spring.pdf', 'certificado_spring.pdf', 'uploads/certificado_spring.pdf', 'pdf', 4019, @ahora - (@dia * 3)),
+(4, 4, 'CV', 'pedro_cv.pdf', 'pedro_cv.pdf', 'uploads/pedro_cv.pdf', 'pdf', 4016, @ahora - (@dia * 6)),
+(5, 5, 'CV', 'andrea_cv.pdf', 'andrea_cv.pdf', 'uploads/andrea_cv.pdf', 'pdf', 4026, @ahora - (@dia * 9));
 
 INSERT INTO tbl_historial_estado_postulante (postulante_id, estado_anterior, estado_nuevo, fecha_cambio, usuario_admin, observacion_interna, observacion_postulante) VALUES
 (1, NULL, 'POSTULADO', @ahora - (@dia * 4), 'Sistema', 'Postulacion registrada', 'Tu postulacion fue recibida correctamente.'),
@@ -421,7 +423,7 @@ ALTER TABLE tbl_usuario AUTO_INCREMENT = 9;
 ALTER TABLE tbl_oferta AUTO_INCREMENT = 12;
 ALTER TABLE tbl_pregunta AUTO_INCREMENT = 14;
 ALTER TABLE tbl_postulante AUTO_INCREMENT = 8;
-ALTER TABLE tbl_documento_postulante AUTO_INCREMENT = 5;
+ALTER TABLE tbl_documento_postulante AUTO_INCREMENT = 6;
 ALTER TABLE tbl_historial_estado_postulante AUTO_INCREMENT = 9;
 ALTER TABLE tbl_entrevista_postulante AUTO_INCREMENT = 5;
 ALTER TABLE tbl_evaluacion_psicologica_postulante AUTO_INCREMENT = 2;
