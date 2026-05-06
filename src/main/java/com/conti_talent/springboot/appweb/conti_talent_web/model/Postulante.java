@@ -9,9 +9,21 @@ import java.util.Map;
 
 /**
  * Postulante a una oferta. Tabla TBL_POSTULANTE.
- * Relaciones: ManyToOne a Usuario (nullable), Oferta y Estado.
- * Las respuestas a la evaluacion se persisten en tabla auxiliar
- * TBL_POSTULANTE_RESPUESTA como Map<preguntaId, indiceElegido>.
+ *
+ * Relaciones:
+ *   - ManyToOne a Usuario (nullable, postulante puede ser anonimo o registrado).
+ *   - ManyToOne a Oferta y Estado (obligatorias).
+ *
+ * Las respuestas de la evaluacion tecnica se modelan como una relacion 1:N
+ * hacia la entidad intermedia {@link RespuestaPostulante} (resuelve la N:M
+ * conceptual Postulante - Pregunta). Hacia afuera el Postulante sigue
+ * exponiendo la API legada {@code Map<preguntaId, opcionElegida>} para no
+ * romper services, mappers ni el frontend.
+ *
+ * Las habilidades del postulante se conservan como texto libre en
+ * {@code habilidades} (campo descriptivo del CV). Si en el futuro se desea
+ * un catalogo controlado, se puede crear una entidad PostulanteHabilidad
+ * siguiendo el mismo patron usado para OfertaHabilidad.
  */
 @Entity
 @Table(name = "tbl_postulante")
@@ -99,41 +111,30 @@ public class Postulante {
     @Column(name = "puntaje_final", nullable = false)
     private int puntajeFinal;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(
-            name = "tbl_postulante_respuesta",
-            joinColumns = @JoinColumn(name = "postulante_id",
-                    foreignKey = @ForeignKey(name = "fk_respuesta_postulante")))
-    @MapKeyColumn(name = "pregunta_id")
-    @Column(name = "opcion_elegida", nullable = false)
-    private Map<Long, Integer> respuestas;
+    @OneToMany(mappedBy = "postulante", cascade = CascadeType.ALL,
+            orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<RespuestaPostulante> respuestasEntidades = new ArrayList<>();
 
     @Column(name = "creado_en", nullable = false)
     private long creadoEn;
 
     @OneToMany(mappedBy = "postulante", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("fechaSubida DESC")
-    private List<DocumentoPostulante> documentos;
+    private List<DocumentoPostulante> documentos = new ArrayList<>();
 
     @OneToMany(mappedBy = "postulante", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("fechaCambio DESC")
-    private List<HistorialEstadoPostulante> historialEstados;
+    private List<HistorialEstadoPostulante> historialEstados = new ArrayList<>();
 
     @OneToMany(mappedBy = "postulante", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("fechaProgramada DESC")
-    private List<EntrevistaPostulante> entrevistas;
+    private List<EntrevistaPostulante> entrevistas = new ArrayList<>();
 
     @OneToMany(mappedBy = "postulante", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("fechaEvaluacion DESC")
-    private List<EvaluacionPsicologicaPostulante> evaluacionesPsicologicas;
+    private List<EvaluacionPsicologicaPostulante> evaluacionesPsicologicas = new ArrayList<>();
 
-    public Postulante() {
-        this.respuestas = new HashMap<>();
-        this.documentos = new ArrayList<>();
-        this.historialEstados = new ArrayList<>();
-        this.entrevistas = new ArrayList<>();
-        this.evaluacionesPsicologicas = new ArrayList<>();
-    }
+    public Postulante() {}
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -216,11 +217,6 @@ public class Postulante {
     public int getPuntajeFinal() { return puntajeFinal; }
     public void setPuntajeFinal(int puntajeFinal) { this.puntajeFinal = puntajeFinal; }
 
-    public Map<Long, Integer> getRespuestas() { return respuestas; }
-    public void setRespuestas(Map<Long, Integer> respuestas) {
-        this.respuestas = respuestas != null ? new HashMap<>(respuestas) : new HashMap<>();
-    }
-
     public long getCreadoEn() { return creadoEn; }
     public void setCreadoEn(long creadoEn) { this.creadoEn = creadoEn; }
 
@@ -241,6 +237,35 @@ public class Postulante {
 
     public List<EvaluacionPsicologicaPostulante> getEvaluacionesPsicologicas() { return evaluacionesPsicologicas; }
     public void setEvaluacionesPsicologicas(List<EvaluacionPsicologicaPostulante> evaluacionesPsicologicas) {
-        this.evaluacionesPsicologicas = evaluacionesPsicologicas != null ? new ArrayList<>(evaluacionesPsicologicas) : new ArrayList<>();
+        this.evaluacionesPsicologicas = evaluacionesPsicologicas != null
+                ? new ArrayList<>(evaluacionesPsicologicas)
+                : new ArrayList<>();
+    }
+
+    /* =========================================================
+     * Respuestas: API publica compatible (Map<preguntaId, opcion>)
+     * Internamente trabaja sobre la entidad RespuestaPostulante.
+     * ========================================================= */
+
+    public List<RespuestaPostulante> getRespuestasEntidades() { return respuestasEntidades; }
+
+    public Map<Long, Integer> getRespuestas() {
+        Map<Long, Integer> mapa = new HashMap<>();
+        for (RespuestaPostulante respuesta : respuestasEntidades) {
+            if (respuesta.getPreguntaId() != null) {
+                mapa.put(respuesta.getPreguntaId(), respuesta.getOpcionElegida());
+            }
+        }
+        return mapa;
+    }
+
+    public void setRespuestas(Map<Long, Integer> respuestas) {
+        this.respuestasEntidades.clear();
+        if (respuestas == null) return;
+        for (Map.Entry<Long, Integer> entrada : respuestas.entrySet()) {
+            if (entrada.getKey() == null || entrada.getValue() == null) continue;
+            this.respuestasEntidades.add(
+                    new RespuestaPostulante(this, entrada.getKey(), entrada.getValue()));
+        }
     }
 }

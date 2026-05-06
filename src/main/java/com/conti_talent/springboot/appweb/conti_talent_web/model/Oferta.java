@@ -4,14 +4,25 @@ import jakarta.persistence.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Oferta laboral o de practicas. Tabla TBL_OFERTA.
+ *
  * Tipo y modalidad se guardan como String para conservar 1:1 los valores
  * que ya consume el frontend ('Practica', 'Trabajo', 'Presencial', etc.).
  *
- * `requisitos` y `beneficios` se persisten como tablas auxiliares
- * (TBL_OFERTA_REQUISITO / TBL_OFERTA_BENEFICIO) via @ElementCollection.
+ * Las relaciones que conceptualmente son N:M (requisitos, beneficios,
+ * habilidades) se materializan como 1:N hacia entidades intermedias
+ * explicitas:
+ *
+ *   tbl_oferta_requisito  (OfertaRequisito)
+ *   tbl_oferta_beneficio  (OfertaBeneficio)
+ *   tbl_oferta_habilidad  (OfertaHabilidad)
+ *
+ * Los getters/setters publicos siguen exponiendo {@code List<String>} para
+ * mantener compatibilidad total con services, mappers y frontend, pero
+ * internamente trabajan sobre las colecciones de entidades.
  */
 @Entity
 @Table(name = "tbl_oferta")
@@ -50,41 +61,25 @@ public class Oferta {
     @Column(name = "descripcion", columnDefinition = "TEXT")
     private String descripcion;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(
-            name = "tbl_oferta_requisito",
-            joinColumns = @JoinColumn(name = "oferta_id",
-                    foreignKey = @ForeignKey(name = "fk_requisito_oferta")))
-    @OrderColumn(name = "orden")
-    @Column(name = "texto", length = 255, nullable = false)
-    private List<String> requisitos;
+    @OneToMany(mappedBy = "oferta", cascade = CascadeType.ALL,
+            orphanRemoval = true, fetch = FetchType.EAGER)
+    @OrderBy("orden ASC")
+    private List<OfertaRequisito> requisitosEntidades = new ArrayList<>();
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(
-            name = "tbl_oferta_beneficio",
-            joinColumns = @JoinColumn(name = "oferta_id",
-                    foreignKey = @ForeignKey(name = "fk_beneficio_oferta")))
-    @OrderColumn(name = "orden")
-    @Column(name = "texto", length = 255, nullable = false)
-    private List<String> beneficios;
+    @OneToMany(mappedBy = "oferta", cascade = CascadeType.ALL,
+            orphanRemoval = true, fetch = FetchType.EAGER)
+    @OrderBy("orden ASC")
+    private List<OfertaBeneficio> beneficiosEntidades = new ArrayList<>();
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(
-            name = "tbl_oferta_habilidad",
-            joinColumns = @JoinColumn(name = "oferta_id",
-                    foreignKey = @ForeignKey(name = "fk_habilidad_oferta")))
-    @OrderColumn(name = "orden")
-    @Column(name = "habilidad", length = 120, nullable = false)
-    private List<String> habilidadesRequeridas;
+    @OneToMany(mappedBy = "oferta", cascade = CascadeType.ALL,
+            orphanRemoval = true, fetch = FetchType.EAGER)
+    @OrderBy("orden ASC")
+    private List<OfertaHabilidad> habilidadesEntidades = new ArrayList<>();
 
     @Column(name = "creada_en", nullable = false)
     private long creadaEn;
 
-    public Oferta() {
-        this.requisitos = new ArrayList<>();
-        this.beneficios = new ArrayList<>();
-        this.habilidadesRequeridas = new ArrayList<>();
-    }
+    public Oferta() {}
 
     public Oferta(String titulo, String tipo, Area area, String modalidad,
                   String ubicacion, int vacantes, boolean destacada, String descripcion,
@@ -98,10 +93,9 @@ public class Oferta {
         this.vacantes = vacantes;
         this.destacada = destacada;
         this.descripcion = descripcion;
-        this.requisitos = requisitos != null ? new ArrayList<>(requisitos) : new ArrayList<>();
-        this.beneficios = beneficios != null ? new ArrayList<>(beneficios) : new ArrayList<>();
-        this.habilidadesRequeridas = new ArrayList<>();
         this.creadaEn = creadaEn;
+        setRequisitos(requisitos);
+        setBeneficios(beneficios);
     }
 
     public Long getId() { return id; }
@@ -137,21 +131,63 @@ public class Oferta {
     public String getDescripcion() { return descripcion; }
     public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
 
-    public List<String> getRequisitos() { return requisitos; }
-    public void setRequisitos(List<String> requisitos) {
-        this.requisitos = requisitos != null ? new ArrayList<>(requisitos) : new ArrayList<>();
-    }
-
-    public List<String> getBeneficios() { return beneficios; }
-    public void setBeneficios(List<String> beneficios) {
-        this.beneficios = beneficios != null ? new ArrayList<>(beneficios) : new ArrayList<>();
-    }
-
-    public List<String> getHabilidadesRequeridas() { return habilidadesRequeridas; }
-    public void setHabilidadesRequeridas(List<String> habilidadesRequeridas) {
-        this.habilidadesRequeridas = habilidadesRequeridas != null ? new ArrayList<>(habilidadesRequeridas) : new ArrayList<>();
-    }
-
     public long getCreadaEn() { return creadaEn; }
     public void setCreadaEn(long creadaEn) { this.creadaEn = creadaEn; }
+
+    /* =========================================================
+     * Acceso a las entidades intermedias (uso interno / servicios)
+     * ========================================================= */
+
+    public List<OfertaRequisito> getRequisitosEntidades() { return requisitosEntidades; }
+    public List<OfertaBeneficio> getBeneficiosEntidades() { return beneficiosEntidades; }
+    public List<OfertaHabilidad> getHabilidadesEntidades() { return habilidadesEntidades; }
+
+    /* =========================================================
+     * API publica compatible: lista de Strings (no romper frontend)
+     * ========================================================= */
+
+    public List<String> getRequisitos() {
+        return requisitosEntidades.stream()
+                .map(OfertaRequisito::getTexto)
+                .collect(Collectors.toList());
+    }
+
+    public void setRequisitos(List<String> textos) {
+        this.requisitosEntidades.clear();
+        if (textos == null) return;
+        int orden = 0;
+        for (String texto : textos) {
+            this.requisitosEntidades.add(new OfertaRequisito(this, texto, orden++));
+        }
+    }
+
+    public List<String> getBeneficios() {
+        return beneficiosEntidades.stream()
+                .map(OfertaBeneficio::getTexto)
+                .collect(Collectors.toList());
+    }
+
+    public void setBeneficios(List<String> textos) {
+        this.beneficiosEntidades.clear();
+        if (textos == null) return;
+        int orden = 0;
+        for (String texto : textos) {
+            this.beneficiosEntidades.add(new OfertaBeneficio(this, texto, orden++));
+        }
+    }
+
+    public List<String> getHabilidadesRequeridas() {
+        return habilidadesEntidades.stream()
+                .map(OfertaHabilidad::getHabilidad)
+                .collect(Collectors.toList());
+    }
+
+    public void setHabilidadesRequeridas(List<String> habilidades) {
+        this.habilidadesEntidades.clear();
+        if (habilidades == null) return;
+        int orden = 0;
+        for (String habilidad : habilidades) {
+            this.habilidadesEntidades.add(new OfertaHabilidad(this, habilidad, orden++));
+        }
+    }
 }

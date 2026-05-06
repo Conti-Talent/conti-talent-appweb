@@ -1,3 +1,20 @@
+-- =====================================================================
+-- conti_talent_bd.sql
+-- Script de creacion de base de datos para Conti Talent.
+-- Preparado para futura migracion a MySQL.
+--
+-- Cambios respecto a la version anterior:
+--   * Las tablas auxiliares de oferta (requisito, beneficio, habilidad)
+--     y la de respuestas del postulante ahora son entidades intermedias
+--     con clave primaria propia (BIGINT AUTO_INCREMENT) en lugar de
+--     claves compuestas, para reflejar la conversion de relaciones N:M
+--     conceptuales en relaciones 1:N explicitas (entidades intermedias).
+--   * Se agrego FK fk_respuesta_pregunta en tbl_postulante_respuesta.
+--   * Se mantienen UNIQUE constraints para preservar la cardinalidad
+--     logica original (una sola respuesta por par postulante-pregunta,
+--     un solo orden por par oferta-orden, etc.).
+-- =====================================================================
+
 CREATE DATABASE IF NOT EXISTS conti_talent
   CHARACTER SET utf8mb4
   COLLATE utf8mb4_unicode_ci;
@@ -22,6 +39,10 @@ DROP TABLE IF EXISTS tbl_estado;
 DROP TABLE IF EXISTS tbl_rol;
 DROP TABLE IF EXISTS tbl_area;
 SET FOREIGN_KEY_CHECKS = 1;
+
+-- =====================================================================
+-- CATALOGOS
+-- =====================================================================
 
 CREATE TABLE tbl_area (
   id BIGINT NOT NULL AUTO_INCREMENT,
@@ -56,6 +77,10 @@ CREATE TABLE tbl_estado (
   CONSTRAINT uk_estado_codigo UNIQUE (codigo)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- =====================================================================
+-- USUARIOS
+-- =====================================================================
+
 CREATE TABLE tbl_usuario (
   id BIGINT NOT NULL AUTO_INCREMENT,
   nombre VARCHAR(60) NOT NULL,
@@ -69,6 +94,10 @@ CREATE TABLE tbl_usuario (
   CONSTRAINT uk_usuario_email UNIQUE (email),
   CONSTRAINT fk_usuario_rol FOREIGN KEY (rol_id) REFERENCES tbl_rol (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =====================================================================
+-- OFERTAS Y SUS ENTIDADES INTERMEDIAS
+-- =====================================================================
 
 CREATE TABLE tbl_oferta (
   id BIGINT NOT NULL AUTO_INCREMENT,
@@ -86,29 +115,42 @@ CREATE TABLE tbl_oferta (
   CONSTRAINT fk_oferta_area FOREIGN KEY (area_id) REFERENCES tbl_area (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Entidad intermedia: Oferta - Requisito
 CREATE TABLE tbl_oferta_requisito (
+  id BIGINT NOT NULL AUTO_INCREMENT,
   oferta_id BIGINT NOT NULL,
-  orden INT NOT NULL,
   texto VARCHAR(255) NOT NULL,
-  PRIMARY KEY (oferta_id, orden),
-  CONSTRAINT fk_requisito_oferta FOREIGN KEY (oferta_id) REFERENCES tbl_oferta (id)
+  orden INT NOT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT fk_requisito_oferta FOREIGN KEY (oferta_id) REFERENCES tbl_oferta (id),
+  CONSTRAINT uk_requisito_orden UNIQUE (oferta_id, orden)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Entidad intermedia: Oferta - Beneficio
 CREATE TABLE tbl_oferta_beneficio (
+  id BIGINT NOT NULL AUTO_INCREMENT,
   oferta_id BIGINT NOT NULL,
-  orden INT NOT NULL,
   texto VARCHAR(255) NOT NULL,
-  PRIMARY KEY (oferta_id, orden),
-  CONSTRAINT fk_beneficio_oferta FOREIGN KEY (oferta_id) REFERENCES tbl_oferta (id)
+  orden INT NOT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT fk_beneficio_oferta FOREIGN KEY (oferta_id) REFERENCES tbl_oferta (id),
+  CONSTRAINT uk_beneficio_orden UNIQUE (oferta_id, orden)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Entidad intermedia: Oferta - Habilidad
 CREATE TABLE tbl_oferta_habilidad (
+  id BIGINT NOT NULL AUTO_INCREMENT,
   oferta_id BIGINT NOT NULL,
-  orden INT NOT NULL,
   habilidad VARCHAR(120) NOT NULL,
-  PRIMARY KEY (oferta_id, orden),
-  CONSTRAINT fk_habilidad_oferta FOREIGN KEY (oferta_id) REFERENCES tbl_oferta (id)
+  orden INT NOT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT fk_habilidad_oferta FOREIGN KEY (oferta_id) REFERENCES tbl_oferta (id),
+  CONSTRAINT uk_habilidad_orden UNIQUE (oferta_id, orden)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =====================================================================
+-- PREGUNTAS Y OPCIONES (composicion 1:N pura, no es N:M)
+-- =====================================================================
 
 CREATE TABLE tbl_pregunta (
   id BIGINT NOT NULL AUTO_INCREMENT,
@@ -119,6 +161,8 @@ CREATE TABLE tbl_pregunta (
   CONSTRAINT fk_pregunta_oferta FOREIGN KEY (oferta_id) REFERENCES tbl_oferta (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Las opciones pertenecen logicamente a la pregunta (composicion).
+-- No se modeló como entidad intermedia porque no resuelve un N:M.
 CREATE TABLE tbl_pregunta_opcion (
   pregunta_id BIGINT NOT NULL,
   indice INT NOT NULL,
@@ -126,6 +170,10 @@ CREATE TABLE tbl_pregunta_opcion (
   PRIMARY KEY (pregunta_id, indice),
   CONSTRAINT fk_opcion_pregunta FOREIGN KEY (pregunta_id) REFERENCES tbl_pregunta (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =====================================================================
+-- POSTULANTES Y ENTIDADES RELACIONADAS
+-- =====================================================================
 
 CREATE TABLE tbl_postulante (
   id BIGINT NOT NULL AUTO_INCREMENT,
@@ -228,13 +276,22 @@ CREATE TABLE tbl_evaluacion_psicologica_postulante (
   CONSTRAINT fk_eval_psico_postulante FOREIGN KEY (postulante_id) REFERENCES tbl_postulante (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Entidad intermedia: Postulante - Pregunta (resuelve la N:M conceptual).
+-- La unicidad por (postulante_id, pregunta_id) impide respuestas duplicadas.
 CREATE TABLE tbl_postulante_respuesta (
+  id BIGINT NOT NULL AUTO_INCREMENT,
   postulante_id BIGINT NOT NULL,
   pregunta_id BIGINT NOT NULL,
   opcion_elegida INT NOT NULL,
-  PRIMARY KEY (postulante_id, pregunta_id),
-  CONSTRAINT fk_respuesta_postulante FOREIGN KEY (postulante_id) REFERENCES tbl_postulante (id)
+  PRIMARY KEY (id),
+  CONSTRAINT fk_respuesta_postulante FOREIGN KEY (postulante_id) REFERENCES tbl_postulante (id),
+  CONSTRAINT fk_respuesta_pregunta   FOREIGN KEY (pregunta_id)  REFERENCES tbl_pregunta (id),
+  CONSTRAINT uk_respuesta_postulante_pregunta UNIQUE (postulante_id, pregunta_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =====================================================================
+-- DATOS SEED (alineados con los que produce DataLoader.java)
+-- =====================================================================
 
 SET @ahora := CAST(UNIX_TIMESTAMP(CURRENT_TIMESTAMP(3)) * 1000 AS UNSIGNED);
 SET @dia := 86400000;
@@ -244,86 +301,90 @@ INSERT INTO tbl_rol (id, codigo, nombre, descripcion, activo, creado_en) VALUES
 (2, 'POSTULANTE', 'Postulante', 'Usuario externo que postula a las ofertas publicadas por la institucion.', b'1', @ahora - (@dia * 60));
 
 INSERT INTO tbl_estado (id, codigo, nombre, descripcion, orden, terminal, activo, creado_en) VALUES
-(1, 'POSTULADO', 'Postulado', 'Postulacion recibida y pendiente de evaluacion tecnica.', 1, b'0', b'1', @ahora - (@dia * 60)),
-(2, 'EN_EVALUACION', 'En evaluacion', 'El postulante rindio la prueba pero no alcanzo el umbral de aprobacion.', 2, b'0', b'1', @ahora - (@dia * 60)),
-(3, 'APROBADO_TECNICO', 'Aprobado tecnico', 'Aprobo la evaluacion tecnica y avanza a entrevista.', 3, b'0', b'1', @ahora - (@dia * 60)),
-(4, 'ENTREVISTA', 'Entrevista', 'Citado o citada para entrevista personal.', 4, b'0', b'1', @ahora - (@dia * 60)),
-(5, 'EVALUACION_PSICOLOGICA', 'Evaluacion psicologica', 'Aprobada la entrevista, paso a evaluacion psicologica.', 5, b'0', b'1', @ahora - (@dia * 60)),
-(6, 'ACEPTADO', 'Aceptado', 'Proceso completo. Candidato aceptado para la posicion.', 6, b'1', b'1', @ahora - (@dia * 60)),
-(7, 'RECHAZADO', 'Rechazado', 'Candidato descartado en alguna etapa del proceso.', 7, b'1', b'1', @ahora - (@dia * 60));
+(1, 'POSTULADO',              'Postulado',              'Postulacion recibida y pendiente de evaluacion tecnica.',                  1, b'0', b'1', @ahora - (@dia * 60)),
+(2, 'EN_EVALUACION',          'En evaluacion',          'El postulante rindio la prueba pero no alcanzo el umbral de aprobacion.',  2, b'0', b'1', @ahora - (@dia * 60)),
+(3, 'APROBADO_TECNICO',       'Aprobado tecnico',       'Aprobo la evaluacion tecnica y avanza a entrevista.',                      3, b'0', b'1', @ahora - (@dia * 60)),
+(4, 'ENTREVISTA',             'Entrevista',             'Citado o citada para entrevista personal.',                                4, b'0', b'1', @ahora - (@dia * 60)),
+(5, 'EVALUACION_PSICOLOGICA', 'Evaluacion psicologica', 'Aprobada la entrevista, paso a evaluacion psicologica.',                   5, b'0', b'1', @ahora - (@dia * 60)),
+(6, 'ACEPTADO',               'Aceptado',               'Proceso completo. Candidato aceptado para la posicion.',                   6, b'1', b'1', @ahora - (@dia * 60)),
+(7, 'RECHAZADO',              'Rechazado',              'Candidato descartado en alguna etapa del proceso.',                        7, b'1', b'1', @ahora - (@dia * 60));
 
 INSERT INTO tbl_usuario (id, nombre, apellido, email, password, rol_id, activo, creado_en) VALUES
 (1, 'Administrador', 'Continental', 'admin@contitalent.com', 'admin123', 1, b'1', @ahora - (@dia * 30)),
-(2, 'Lucia', 'Ramos', 'lucia@example.com', 'lucia123', 2, b'1', @ahora - (@dia * 8)),
-(3, 'Carlos', 'Mendoza', 'carlos@example.com', 'carlos123', 2, b'1', @ahora - (@dia * 5)),
-(4, 'Maria', 'Torres', 'maria@example.com', 'maria123', 2, b'1', @ahora - (@dia * 2)),
-(5, 'Pedro', 'Salinas', 'pedro@example.com', 'pedro123', 2, b'1', @ahora - (@dia * 7)),
-(6, 'Andrea', 'Leon', 'andrea@example.com', 'andrea123', 2, b'1', @ahora - (@dia * 10)),
-(7, 'Diego', 'Alvarez', 'diego@example.com', 'diego123', 2, b'1', @ahora - (@dia * 15)),
-(8, 'Fiorella', 'Rojas', 'fiorella@example.com', 'fiora123', 2, b'1', @ahora - (@dia * 8));
+(2, 'Lucia',         'Ramos',       'lucia@example.com',     'lucia123', 2, b'1', @ahora - (@dia * 8)),
+(3, 'Carlos',        'Mendoza',     'carlos@example.com',    'carlos123',2, b'1', @ahora - (@dia * 5)),
+(4, 'Maria',         'Torres',      'maria@example.com',     'maria123', 2, b'1', @ahora - (@dia * 2)),
+(5, 'Pedro',         'Salinas',     'pedro@example.com',     'pedro123', 2, b'1', @ahora - (@dia * 7)),
+(6, 'Andrea',        'Leon',        'andrea@example.com',    'andrea123',2, b'1', @ahora - (@dia * 10)),
+(7, 'Diego',         'Alvarez',     'diego@example.com',     'diego123', 2, b'1', @ahora - (@dia * 15)),
+(8, 'Fiorella',      'Rojas',       'fiorella@example.com',  'fiora123', 2, b'1', @ahora - (@dia * 8));
 
 INSERT INTO tbl_area (id, nombre, descripcion, icono, color) VALUES
-(1, 'Ingenieria', 'Sistemas, civil, industrial, mecatronica y minas.', 'engineering', '#6366f1'),
-(2, 'Ciencias de la Empresa', 'Administracion, contabilidad, marketing y negocios.', 'chart', '#06b6d4'),
-(3, 'Derecho', 'Derecho corporativo, civil, penal y constitucional.', 'scale', '#8b5cf6'),
-(4, 'Humanidades', 'Comunicacion, psicologia y educacion.', 'books', '#ec4899'),
-(5, 'Ciencias de la Salud', 'Enfermeria, psicologia clinica y nutricion.', 'stethoscope', '#10b981'),
-(6, 'Investigacion y Desarrollo', 'Centros de investigacion e innovacion universitaria.', 'microscope', '#f59e0b'),
-(7, 'Tecnologia y Sistemas', 'Equipo de TI institucional: infraestructura, soporte y software interno.', 'computer', '#0ea5e9'),
-(8, 'Bienestar Universitario', 'Soporte estudiantil, deportes, cultura y atencion psicopedagogica.', 'handshake', '#f43f5e');
+(1, 'Ingenieria',                 'Sistemas, civil, industrial, mecatronica y minas.',                          'engineering', '#6366f1'),
+(2, 'Ciencias de la Empresa',     'Administracion, contabilidad, marketing y negocios.',                        'chart',       '#06b6d4'),
+(3, 'Derecho',                    'Derecho corporativo, civil, penal y constitucional.',                        'scale',       '#8b5cf6'),
+(4, 'Humanidades',                'Comunicacion, psicologia y educacion.',                                      'books',       '#ec4899'),
+(5, 'Ciencias de la Salud',       'Enfermeria, psicologia clinica y nutricion.',                                'stethoscope', '#10b981'),
+(6, 'Investigacion y Desarrollo', 'Centros de investigacion e innovacion universitaria.',                       'microscope',  '#f59e0b'),
+(7, 'Tecnologia y Sistemas',      'Equipo de TI institucional: infraestructura, soporte y software interno.',  'computer',    '#0ea5e9'),
+(8, 'Bienestar Universitario',    'Soporte estudiantil, deportes, cultura y atencion psicopedagogica.',         'handshake',   '#f43f5e');
 
 INSERT INTO tbl_oferta (id, titulo, tipo, area_id, modalidad, ubicacion, horario, vacantes, destacada, descripcion, creada_en) VALUES
-(1, 'Profesor de Programacion I', 'Trabajo', 1, 'Presencial', 'Huancayo', 'Lunes, miercoles y viernes 08:00 - 12:00', 2, b'1', 'Docente para el curso de Programacion I (Java) en la Escuela de Ingenieria de Sistemas.', @ahora - (@dia * 3)),
-(2, 'Practica Pre-Profesional Sistemas', 'Practica', 1, 'Hibrido', 'Huancayo', 'Lunes a viernes 09:00 - 14:00', 4, b'1', 'Apoyo al area de Sistemas y TI: soporte, desarrollo de pequenias mejoras y gestion de tickets.', @ahora - (@dia * 2)),
-(3, 'Profesor de Marketing Digital', 'Trabajo', 2, 'Presencial', 'Huancayo', 'Martes y jueves 18:00 - 21:00', 1, b'1', 'Docente para Marketing Digital y Estrategia Comercial.', @ahora - (@dia * 4)),
-(4, 'Practica Pre-Profesional Marketing', 'Practica', 2, 'Presencial', 'Huancayo', 'Lunes a viernes 08:30 - 13:30', 3, b'1', 'Apoyo en campanias digitales, contenidos y analitica para la marca Continental.', @ahora - @dia),
-(5, 'Profesor de Derecho Constitucional', 'Trabajo', 3, 'Presencial', 'Huancayo', 'Sabados 08:00 - 13:00', 1, b'0', 'Docente para el curso de Derecho Constitucional.', @ahora - (@dia * 6)),
-(6, 'Practica Profesional Derecho Civil', 'Practica', 3, 'Hibrido', 'Huancayo', 'Lunes a viernes 09:00 - 15:00', 2, b'0', 'Apoyo al consultorio juridico del area de Derecho.', @ahora - (@dia * 5)),
-(7, 'Profesor de Comunicacion Oral y Escrita', 'Trabajo', 4, 'Presencial', 'Huancayo', 'Lunes y miercoles 16:00 - 20:00', 2, b'0', 'Curso transversal en pregrado.', @ahora - (@dia * 8)),
-(8, 'Asistente de Investigacion Salud Publica', 'Practica', 5, 'Hibrido', 'Huancayo', 'Lunes a viernes 08:00 - 13:00', 2, b'0', 'Apoyo a investigacion de campo en proyectos de salud publica.', @ahora - (@dia * 9)),
-(9, 'Coordinador de Investigacion', 'Trabajo', 6, 'Presencial', 'Huancayo', 'Lunes a viernes 08:00 - 17:00', 1, b'0', 'Lidera proyectos del Centro de Investigacion.', @ahora - (@dia * 11)),
-(10, 'Practica Soporte de TI Universitario', 'Practica', 7, 'Presencial', 'Huancayo', 'Turno maniana 08:00 - 13:00', 3, b'1', 'Apoyo al equipo institucional de Tecnologia y Sistemas.', @ahora - @dia),
-(11, 'Coordinador de Bienestar Estudiantil', 'Trabajo', 8, 'Presencial', 'Huancayo', 'Lunes a viernes 08:30 - 17:30', 1, b'0', 'Lidera el equipo de Bienestar Universitario.', @ahora - (@dia * 4));
+(1,  'Profesor de Programacion I',              'Trabajo',  1, 'Presencial', 'Huancayo', 'Lunes, miercoles y viernes 08:00 - 12:00', 2, b'1', 'Docente para el curso de Programacion I (Java) en la Escuela de Ingenieria de Sistemas.',                  @ahora - (@dia * 3)),
+(2,  'Practica Pre-Profesional Sistemas',       'Practica', 1, 'Hibrido',    'Huancayo', 'Lunes a viernes 09:00 - 14:00',            4, b'1', 'Apoyo al area de Sistemas y TI: soporte, desarrollo de pequenias mejoras y gestion de tickets.',           @ahora - (@dia * 2)),
+(3,  'Profesor de Marketing Digital',           'Trabajo',  2, 'Presencial', 'Huancayo', 'Martes y jueves 18:00 - 21:00',            1, b'1', 'Docente para Marketing Digital y Estrategia Comercial.',                                                    @ahora - (@dia * 4)),
+(4,  'Practica Pre-Profesional Marketing',      'Practica', 2, 'Presencial', 'Huancayo', 'Lunes a viernes 08:30 - 13:30',            3, b'1', 'Apoyo en campanias digitales, contenidos y analitica para la marca Continental.',                          @ahora - @dia),
+(5,  'Profesor de Derecho Constitucional',      'Trabajo',  3, 'Presencial', 'Huancayo', 'Sabados 08:00 - 13:00',                    1, b'0', 'Docente para el curso de Derecho Constitucional.',                                                          @ahora - (@dia * 6)),
+(6,  'Practica Profesional Derecho Civil',      'Practica', 3, 'Hibrido',    'Huancayo', 'Lunes a viernes 09:00 - 15:00',            2, b'0', 'Apoyo al consultorio juridico del area de Derecho.',                                                        @ahora - (@dia * 5)),
+(7,  'Profesor de Comunicacion Oral y Escrita', 'Trabajo',  4, 'Presencial', 'Huancayo', 'Lunes y miercoles 16:00 - 20:00',          2, b'0', 'Curso transversal en pregrado.',                                                                            @ahora - (@dia * 8)),
+(8,  'Asistente de Investigacion Salud Publica','Practica', 5, 'Hibrido',    'Huancayo', 'Lunes a viernes 08:00 - 13:00',            2, b'0', 'Apoyo a investigacion de campo en proyectos de salud publica.',                                             @ahora - (@dia * 9)),
+(9,  'Coordinador de Investigacion',            'Trabajo',  6, 'Presencial', 'Huancayo', 'Lunes a viernes 08:00 - 17:00',            1, b'0', 'Lidera proyectos del Centro de Investigacion.',                                                             @ahora - (@dia * 11)),
+(10, 'Practica Soporte de TI Universitario',    'Practica', 7, 'Presencial', 'Huancayo', 'Turno maniana 08:00 - 13:00',              3, b'1', 'Apoyo al equipo institucional de Tecnologia y Sistemas.',                                                   @ahora - @dia),
+(11, 'Coordinador de Bienestar Estudiantil',    'Trabajo',  8, 'Presencial', 'Huancayo', 'Lunes a viernes 08:30 - 17:30',            1, b'0', 'Lidera el equipo de Bienestar Universitario.',                                                              @ahora - (@dia * 4));
 
-INSERT INTO tbl_oferta_requisito (oferta_id, orden, texto) VALUES
-(1, 0, 'Ingeniero de Sistemas o afin'), (1, 1, '2+ anios enseniando o desarrollando software'), (1, 2, 'Manejo de Java y bases de datos'), (1, 3, 'Experiencia en metodologias agiles'),
-(2, 0, 'Estudiante de Ingenieria de Sistemas'), (2, 1, 'Conocimientos de HTML, CSS y JS'), (2, 2, 'Buena comunicacion'),
-(3, 0, 'Profesional en Marketing o Negocios'), (3, 1, 'Experiencia en performance digital'), (3, 2, 'Maestria (deseable)'),
-(4, 0, 'Estudiante de Marketing/Administracion'), (4, 1, 'Manejo de redes sociales'), (4, 2, 'Curiosidad y proactividad'),
-(5, 0, 'Abogado titulado'), (5, 1, 'Maestria o doctorado en Derecho'), (5, 2, 'Publicaciones academicas'),
-(6, 0, 'Egresado o bachiller en Derecho'), (6, 1, 'Buen manejo de redaccion'),
-(7, 0, 'Licenciado en Comunicacion o Educacion'), (7, 1, 'Experiencia minima 2 anios'),
-(8, 0, 'Estudiante de Ciencias de la Salud'), (8, 1, 'Estadistica basica'),
-(9, 0, 'Magister o doctor'), (9, 1, 'Publicaciones indexadas'), (9, 2, 'Liderazgo de equipos'),
-(10, 0, 'Estudios tecnicos o universitarios en TI'), (10, 1, 'Conocimientos de redes y hardware'), (10, 2, 'Buena atencion al usuario'),
-(11, 0, 'Profesional en Psicologia, Educacion o afin'), (11, 1, '3+ anios en gestion estudiantil'), (11, 2, 'Habilidades de liderazgo');
+-- ===== Requisitos por oferta =====
+INSERT INTO tbl_oferta_requisito (oferta_id, texto, orden) VALUES
+(1, 'Ingeniero de Sistemas o afin', 0), (1, '2+ anios enseniando o desarrollando software', 1), (1, 'Manejo de Java y bases de datos', 2), (1, 'Experiencia en metodologias agiles', 3),
+(2, 'Estudiante de Ingenieria de Sistemas', 0), (2, 'Conocimientos de HTML, CSS y JS', 1), (2, 'Buena comunicacion', 2),
+(3, 'Profesional en Marketing o Negocios', 0), (3, 'Experiencia en performance digital', 1), (3, 'Maestria (deseable)', 2),
+(4, 'Estudiante de Marketing/Administracion', 0), (4, 'Manejo de redes sociales', 1), (4, 'Curiosidad y proactividad', 2),
+(5, 'Abogado titulado', 0), (5, 'Maestria o doctorado en Derecho', 1), (5, 'Publicaciones academicas', 2),
+(6, 'Egresado o bachiller en Derecho', 0), (6, 'Buen manejo de redaccion', 1),
+(7, 'Licenciado en Comunicacion o Educacion', 0), (7, 'Experiencia minima 2 anios', 1),
+(8, 'Estudiante de Ciencias de la Salud', 0), (8, 'Estadistica basica', 1),
+(9, 'Magister o doctor', 0), (9, 'Publicaciones indexadas', 1), (9, 'Liderazgo de equipos', 2),
+(10, 'Estudios tecnicos o universitarios en TI', 0), (10, 'Conocimientos de redes y hardware', 1), (10, 'Buena atencion al usuario', 2),
+(11, 'Profesional en Psicologia, Educacion o afin', 0), (11, '3+ anios en gestion estudiantil', 1), (11, 'Habilidades de liderazgo', 2);
 
-INSERT INTO tbl_oferta_beneficio (oferta_id, orden, texto) VALUES
-(1, 0, 'Carga horaria flexible'), (1, 1, 'Capacitacion pedagogica'), (1, 2, 'Convenios interinstitucionales'),
-(2, 0, 'Subvencion economica'), (2, 1, 'Mentoria'), (2, 2, 'Certificacion de practicas'),
-(3, 0, 'Plan de carrera docente'), (3, 1, 'Investigacion remunerada'),
-(4, 0, 'Subvencion economica'), (4, 1, 'Aprendizaje real'), (4, 2, 'Certificacion'),
-(5, 0, 'Bonos por publicacion'), (5, 1, 'Apoyo a investigacion'),
-(6, 0, 'Subvencion'), (6, 1, 'Acompaniamiento profesional'),
-(7, 0, 'Plan docente'), (7, 1, 'Becas para postgrado'),
-(8, 0, 'Subvencion'), (8, 1, 'Co-autoria en publicaciones'),
-(9, 0, 'Sueldo competitivo'), (9, 1, 'Asignacion de proyectos'),
-(10, 0, 'Subvencion economica'), (10, 1, 'Certificacion de practicas'), (10, 2, 'Plan de mentoria'),
-(11, 0, 'Plan de carrera'), (11, 1, 'Capacitacion continua'), (11, 2, 'Contrato estable');
+-- ===== Beneficios por oferta =====
+INSERT INTO tbl_oferta_beneficio (oferta_id, texto, orden) VALUES
+(1, 'Carga horaria flexible', 0), (1, 'Capacitacion pedagogica', 1), (1, 'Convenios interinstitucionales', 2),
+(2, 'Subvencion economica', 0), (2, 'Mentoria', 1), (2, 'Certificacion de practicas', 2),
+(3, 'Plan de carrera docente', 0), (3, 'Investigacion remunerada', 1),
+(4, 'Subvencion economica', 0), (4, 'Aprendizaje real', 1), (4, 'Certificacion', 2),
+(5, 'Bonos por publicacion', 0), (5, 'Apoyo a investigacion', 1),
+(6, 'Subvencion', 0), (6, 'Acompaniamiento profesional', 1),
+(7, 'Plan docente', 0), (7, 'Becas para postgrado', 1),
+(8, 'Subvencion', 0), (8, 'Co-autoria en publicaciones', 1),
+(9, 'Sueldo competitivo', 0), (9, 'Asignacion de proyectos', 1),
+(10, 'Subvencion economica', 0), (10, 'Certificacion de practicas', 1), (10, 'Plan de mentoria', 2),
+(11, 'Plan de carrera', 0), (11, 'Capacitacion continua', 1), (11, 'Contrato estable', 2);
 
-INSERT INTO tbl_oferta_habilidad (oferta_id, orden, habilidad) VALUES
-(1, 0, 'Java'), (1, 1, 'bases de datos'), (1, 2, 'metodologias agiles'), (1, 3, 'didactica'),
-(2, 0, 'HTML'), (2, 1, 'CSS'), (2, 2, 'JavaScript'), (2, 3, 'soporte tecnico'),
-(3, 0, 'SEO'), (3, 1, 'Ads'), (3, 2, 'analitica'), (3, 3, 'didactica'),
-(4, 0, 'redes sociales'), (4, 1, 'contenido'), (4, 2, 'Figma'),
-(5, 0, 'Derecho'), (5, 1, 'publicaciones academicas'), (5, 2, 'docencia'),
-(6, 0, 'redaccion'), (6, 1, 'Derecho civil'),
-(7, 0, 'comunicacion'), (7, 1, 'educacion'), (7, 2, 'docencia'),
-(8, 0, 'estadistica'), (8, 1, 'investigacion'),
-(9, 0, 'publicaciones indexadas'), (9, 1, 'liderazgo'), (9, 2, 'investigacion'),
-(10, 0, 'redes'), (10, 1, 'hardware'), (10, 2, 'atencion al usuario'),
-(11, 0, 'liderazgo'), (11, 1, 'gestion estudiantil'), (11, 2, 'psicologia');
+-- ===== Habilidades requeridas por oferta =====
+INSERT INTO tbl_oferta_habilidad (oferta_id, habilidad, orden) VALUES
+(1, 'Java', 0), (1, 'bases de datos', 1), (1, 'metodologias agiles', 2), (1, 'didactica', 3),
+(2, 'HTML', 0), (2, 'CSS', 1), (2, 'JavaScript', 2), (2, 'soporte tecnico', 3),
+(3, 'SEO', 0), (3, 'Ads', 1), (3, 'analitica', 2), (3, 'didactica', 3),
+(4, 'redes sociales', 0), (4, 'contenido', 1), (4, 'Figma', 2),
+(5, 'Derecho', 0), (5, 'publicaciones academicas', 1), (5, 'docencia', 2),
+(6, 'redaccion', 0), (6, 'Derecho civil', 1),
+(7, 'comunicacion', 0), (7, 'educacion', 1), (7, 'docencia', 2),
+(8, 'estadistica', 0), (8, 'investigacion', 1),
+(9, 'publicaciones indexadas', 0), (9, 'liderazgo', 1), (9, 'investigacion', 2),
+(10, 'redes', 0), (10, 'hardware', 1), (10, 'atencion al usuario', 2),
+(11, 'liderazgo', 0), (11, 'gestion estudiantil', 1), (11, 'psicologia', 2);
 
+-- ===== Preguntas y opciones =====
 INSERT INTO tbl_pregunta (id, oferta_id, enunciado, correcta) VALUES
 (1, 1, 'Que patron de diseno desacopla logica de presentacion?', 1),
 (2, 1, 'Cual es la principal ventaja de la inyeccion de dependencias?', 1),
@@ -354,33 +415,34 @@ INSERT INTO tbl_pregunta_opcion (pregunta_id, indice, texto) VALUES
 (12, 0, 'Figma'), (12, 1, 'Photoshop'), (12, 2, 'Excel'), (12, 3, 'Notepad'),
 (13, 0, 'Pinterest'), (13, 1, 'LinkedIn'), (13, 2, 'TikTok'), (13, 3, 'Snapchat');
 
+-- ===== Postulantes =====
 INSERT INTO tbl_postulante (id, usuario_id, oferta_id, estado_id, nombre, email, telefono, experiencia, habilidades, cv,
   fecha_postulacion, fecha_evaluacion, anios_experiencia, nivel_estudios, carrera, disponibilidad, modalidad_preferida,
   puntaje_cuestionario, puntaje_experiencia, puntaje_habilidades, puntaje_final, creado_en) VALUES
-(1, 2, 2, 2, 'Lucia Ramos', 'lucia@example.com', '+51 987 654 321', '3 anios apoyando areas de TI en universidades', 'JavaScript, soporte tecnico, atencion al usuario', 'lucia_cv.pdf', @ahora - (@dia * 4), @ahora - (@dia * 4) + 3600000, 3, 'Universitario', 'Ingenieria de Sistemas', 'Inmediata', 'Hibrido', 67, 100, 60, 76, @ahora - (@dia * 4)),
-(2, 3, 1, 3, 'Carlos Mendoza', 'carlos@example.com', '+51 911 222 333', '5 anios en arquitectura de software y docencia', 'Java, Spring, Docker, didactica universitaria', 'carlos_cv.pdf', @ahora - (@dia * 3), @ahora - (@dia * 3) + 3600000, 5, 'Titulado', 'Ingenieria de Sistemas', 'Inmediata', 'Presencial', 100, 100, 60, 92, @ahora - (@dia * 3)),
-(3, 4, 4, 1, 'Maria Torres', 'maria@example.com', '+51 933 555 777', 'Estudiante de Marketing en ultimo ciclo', 'Community management, creacion de contenido', 'maria_cv.pdf', @ahora - @dia, NULL, 0, 'Universitario', 'Marketing', '15 dias', 'Presencial', 0, 0, 60, 12, @ahora - @dia),
-(4, 5, 2, 4, 'Pedro Salinas', 'pedro@example.com', '+51 922 444 666', 'Estudiante de Sistemas con practicas previas', 'JavaScript, HTML, CSS, soporte', 'pedro_cv.pdf', @ahora - (@dia * 6), @ahora - (@dia * 6) + 3600000, 1, 'Universitario', 'Ingenieria de Sistemas', 'Inmediata', 'Hibrido', 100, 30, 60, 71, @ahora - (@dia * 6)),
-(5, 6, 3, 5, 'Andrea Leon', 'andrea@example.com', '+51 944 888 111', '6 anios en marketing B2B y docencia universitaria', 'Estrategia digital, didactica, public speaking', 'andrea_cv.pdf', @ahora - (@dia * 9), @ahora - (@dia * 9) + 3600000, 6, 'Maestria', 'Marketing', 'Inmediata', 'Presencial', 100, 100, 60, 92, @ahora - (@dia * 9)),
-(6, 7, 3, 6, 'Diego Alvarez', 'diego@example.com', '+51 955 777 222', '8 anios liderando agencias de marketing digital', 'Ads, SEO, analitica, formacion de equipos', 'diego_cv.pdf', @ahora - (@dia * 14), @ahora - (@dia * 14) + 3600000, 8, 'Titulado', 'Marketing', 'Inmediata', 'Presencial', 100, 100, 60, 92, @ahora - (@dia * 14)),
-(7, 8, 4, 7, 'Fiorella Rojas', 'fiorella@example.com', '+51 966 333 444', '1 anio en diseno grafico', 'Figma, Illustrator', 'fiorella_cv.pdf', @ahora - (@dia * 7), @ahora - (@dia * 7) + 3600000, 1, 'Universitario', 'Diseno', 'Inmediata', 'Presencial', 50, 30, 60, 46, @ahora - (@dia * 7));
+(1, 2, 2, 2, 'Lucia Ramos',     'lucia@example.com',    '+51 987 654 321', '3 anios apoyando areas de TI en universidades',     'JavaScript, soporte tecnico, atencion al usuario',          'lucia_cv.pdf',    @ahora - (@dia * 4), @ahora - (@dia * 4) + 3600000, 3, 'Universitario', 'Ingenieria de Sistemas', 'Inmediata', 'Hibrido',     67,  100, 60, 76,  @ahora - (@dia * 4)),
+(2, 3, 1, 3, 'Carlos Mendoza',  'carlos@example.com',   '+51 911 222 333', '5 anios en arquitectura de software y docencia',     'Java, Spring, Docker, didactica universitaria',             'carlos_cv.pdf',   @ahora - (@dia * 3), @ahora - (@dia * 3) + 3600000, 5, 'Titulado',      'Ingenieria de Sistemas', 'Inmediata', 'Presencial',  100, 100, 60, 92,  @ahora - (@dia * 3)),
+(3, 4, 4, 1, 'Maria Torres',    'maria@example.com',    '+51 933 555 777', 'Estudiante de Marketing en ultimo ciclo',            'Community management, creacion de contenido',               'maria_cv.pdf',    @ahora - @dia,        NULL,                          0, 'Universitario', 'Marketing',              '15 dias',  'Presencial',  0,   0,   60, 12,  @ahora - @dia),
+(4, 5, 2, 4, 'Pedro Salinas',   'pedro@example.com',    '+51 922 444 666', 'Estudiante de Sistemas con practicas previas',       'JavaScript, HTML, CSS, soporte',                            'pedro_cv.pdf',    @ahora - (@dia * 6), @ahora - (@dia * 6) + 3600000, 1, 'Universitario', 'Ingenieria de Sistemas', 'Inmediata', 'Hibrido',     100, 30,  60, 71,  @ahora - (@dia * 6)),
+(5, 6, 3, 5, 'Andrea Leon',     'andrea@example.com',   '+51 944 888 111', '6 anios en marketing B2B y docencia universitaria',  'Estrategia digital, didactica, public speaking',            'andrea_cv.pdf',   @ahora - (@dia * 9), @ahora - (@dia * 9) + 3600000, 6, 'Maestria',      'Marketing',              'Inmediata', 'Presencial',  100, 100, 60, 92,  @ahora - (@dia * 9)),
+(6, 7, 3, 6, 'Diego Alvarez',   'diego@example.com',    '+51 955 777 222', '8 anios liderando agencias de marketing digital',    'Ads, SEO, analitica, formacion de equipos',                 'diego_cv.pdf',    @ahora - (@dia * 14),@ahora - (@dia * 14)+ 3600000, 8, 'Titulado',      'Marketing',              'Inmediata', 'Presencial',  100, 100, 60, 92,  @ahora - (@dia * 14)),
+(7, 8, 4, 7, 'Fiorella Rojas',  'fiorella@example.com', '+51 966 333 444', '1 anio en diseno grafico',                            'Figma, Illustrator',                                        'fiorella_cv.pdf', @ahora - (@dia * 7), @ahora - (@dia * 7) + 3600000, 1, 'Universitario', 'Diseno',                 'Inmediata', 'Presencial',  50,  30,  60, 46,  @ahora - (@dia * 7));
 
 INSERT INTO tbl_documento_postulante (id, postulante_id, tipo_documento, nombre_original, nombre_archivo, ruta_archivo, extension, tamanio, fecha_subida) VALUES
-(1, 1, 'CV', 'lucia_cv.pdf', 'lucia_cv.pdf', 'uploads/lucia_cv.pdf', 'pdf', 4025, @ahora - (@dia * 4)),
-(2, 2, 'CV', 'carlos_cv.pdf', 'carlos_cv.pdf', 'uploads/carlos_cv.pdf', 'pdf', 4021, @ahora - (@dia * 3)),
+(1, 1, 'CV',          'lucia_cv.pdf',           'lucia_cv.pdf',           'uploads/lucia_cv.pdf',           'pdf', 4025, @ahora - (@dia * 4)),
+(2, 2, 'CV',          'carlos_cv.pdf',          'carlos_cv.pdf',          'uploads/carlos_cv.pdf',          'pdf', 4021, @ahora - (@dia * 3)),
 (3, 2, 'CERTIFICADO', 'certificado_spring.pdf', 'certificado_spring.pdf', 'uploads/certificado_spring.pdf', 'pdf', 4019, @ahora - (@dia * 3)),
-(4, 4, 'CV', 'pedro_cv.pdf', 'pedro_cv.pdf', 'uploads/pedro_cv.pdf', 'pdf', 4016, @ahora - (@dia * 6)),
-(5, 5, 'CV', 'andrea_cv.pdf', 'andrea_cv.pdf', 'uploads/andrea_cv.pdf', 'pdf', 4026, @ahora - (@dia * 9));
+(4, 4, 'CV',          'pedro_cv.pdf',           'pedro_cv.pdf',           'uploads/pedro_cv.pdf',           'pdf', 4016, @ahora - (@dia * 6)),
+(5, 5, 'CV',          'andrea_cv.pdf',          'andrea_cv.pdf',          'uploads/andrea_cv.pdf',          'pdf', 4026, @ahora - (@dia * 9));
 
 INSERT INTO tbl_historial_estado_postulante (postulante_id, estado_anterior, estado_nuevo, fecha_cambio, usuario_admin, observacion_interna, observacion_postulante) VALUES
-(1, NULL, 'POSTULADO', @ahora - (@dia * 4), 'Sistema', 'Postulacion registrada', 'Tu postulacion fue recibida correctamente.'),
-(1, 'POSTULADO', 'EN_EVALUACION', @ahora - (@dia * 4) + 3600000, 'Sistema', 'Evaluacion tecnica registrada', 'Tu evaluacion tecnica fue registrada.'),
-(2, NULL, 'POSTULADO', @ahora - (@dia * 3), 'Sistema', 'Postulacion registrada', 'Tu postulacion fue recibida correctamente.'),
-(2, 'POSTULADO', 'APROBADO_TECNICO', @ahora - (@dia * 3) + 3600000, 'Sistema', 'Evaluacion tecnica aprobada', 'Aprobaste la evaluacion tecnica.'),
-(4, 'APROBADO_TECNICO', 'ENTREVISTA', @ahora - (@dia * 5), 'admin@contitalent.com', 'Entrevista agendada', 'Tu entrevista fue programada.'),
-(5, 'ENTREVISTA', 'EVALUACION_PSICOLOGICA', @ahora - (@dia * 8), 'admin@contitalent.com', 'Pasa a evaluacion psicologica', 'Continuas a evaluacion psicologica.'),
-(6, 'EVALUACION_PSICOLOGICA', 'ACEPTADO', @ahora - (@dia * 12), 'admin@contitalent.com', 'Candidato aceptado', 'Fuiste aceptado para la posicion.'),
-(7, 'EN_EVALUACION', 'RECHAZADO', @ahora - (@dia * 6), 'admin@contitalent.com', 'No cumple perfil requerido', 'El proceso finalizo para esta oferta.');
+(1, NULL,                     'POSTULADO',              @ahora - (@dia * 4),                'Sistema',              'Postulacion registrada',         'Tu postulacion fue recibida correctamente.'),
+(1, 'POSTULADO',              'EN_EVALUACION',          @ahora - (@dia * 4) + 3600000,      'Sistema',              'Evaluacion tecnica registrada',  'Tu evaluacion tecnica fue registrada.'),
+(2, NULL,                     'POSTULADO',              @ahora - (@dia * 3),                'Sistema',              'Postulacion registrada',         'Tu postulacion fue recibida correctamente.'),
+(2, 'POSTULADO',              'APROBADO_TECNICO',       @ahora - (@dia * 3) + 3600000,      'Sistema',              'Evaluacion tecnica aprobada',    'Aprobaste la evaluacion tecnica.'),
+(4, 'APROBADO_TECNICO',       'ENTREVISTA',             @ahora - (@dia * 5),                'admin@contitalent.com', 'Entrevista agendada',           'Tu entrevista fue programada.'),
+(5, 'ENTREVISTA',             'EVALUACION_PSICOLOGICA', @ahora - (@dia * 8),                'admin@contitalent.com', 'Pasa a evaluacion psicologica', 'Continuas a evaluacion psicologica.'),
+(6, 'EVALUACION_PSICOLOGICA', 'ACEPTADO',               @ahora - (@dia * 12),               'admin@contitalent.com', 'Candidato aceptado',            'Fuiste aceptado para la posicion.'),
+(7, 'EN_EVALUACION',          'RECHAZADO',              @ahora - (@dia * 6),                'admin@contitalent.com', 'No cumple perfil requerido',    'El proceso finalizo para esta oferta.');
 
 INSERT INTO tbl_entrevista_postulante (
   id, postulante_id, tipo_entrevista, fecha_programada, hora_inicio, hora_fin, modalidad,
@@ -388,26 +450,15 @@ INSERT INTO tbl_entrevista_postulante (
   observacion_interna, observacion_postulante, usuario_admin, creado_por_admin_id,
   actualizado_por_admin_id, actualizado_por_admin, observacion_cambio, creado_en, actualizado_en
 ) VALUES
-(1, 4, 'ENTREVISTA_NORMAL', @ahora + (@dia * 2), '10:00', '10:45', 'VIRTUAL',
- NULL, 'https://meet.contitalent.com/entrevista-4', 'Ana Castillo', 'Lider de seleccion',
- 'PROGRAMADA', 'PENDIENTE', 'Entrevista tecnica con lider de area', 'Tu entrevista tecnica fue programada.',
- 'admin@contitalent.com', 1, NULL, NULL, NULL, @ahora - (@dia * 1), NULL),
-(2, 5, 'ENTREVISTA_NORMAL', @ahora - (@dia * 8), '09:00', '09:40', 'PRESENCIAL',
- 'Campus principal - Oficina RRHH', NULL, 'Rafael Vega', 'Coordinador academico',
- 'REALIZADA', 'APROBADO', 'Buen dominio del rol docente', 'Aprobaste la entrevista. Continuaras con evaluacion psicologica.',
- 'admin@contitalent.com', 1, 1, 'admin@contitalent.com', 'Resultado registrado luego de entrevista realizada.', @ahora - (@dia * 8), @ahora - (@dia * 8)),
-(3, 6, 'ENTREVISTA_NORMAL', @ahora - (@dia * 13), '11:00', '11:50', 'VIRTUAL',
- NULL, 'https://meet.contitalent.com/entrevista-6', 'Sofia Herrera', 'Gerente de area',
- 'REALIZADA', 'APROBADO', 'Perfil senior validado', 'Aprobaste la entrevista. Continuaras con evaluacion psicologica.',
- 'admin@contitalent.com', 1, 1, 'admin@contitalent.com', 'Resultado registrado por cierre de entrevista.', @ahora - (@dia * 13), @ahora - (@dia * 13)),
-(4, 6, 'EVALUACION_PSICOLOGICA', @ahora - (@dia * 12), '15:00', '15:45', 'VIRTUAL',
- NULL, 'https://meet.contitalent.com/psico-6', 'Paola Ruiz', 'Psicologa organizacional',
- 'REALIZADA', 'APROBADO', 'Sin observaciones restrictivas', 'Aprobaste la evaluacion psicologica.',
- 'admin@contitalent.com', 1, 1, 'admin@contitalent.com', 'Resultado psicologico registrado.', @ahora - (@dia * 12), @ahora - (@dia * 12));
+(1, 4, 'ENTREVISTA_NORMAL',     @ahora + (@dia * 2),  '10:00', '10:45', 'VIRTUAL',     NULL,                                  'https://meet.contitalent.com/entrevista-4', 'Ana Castillo',   'Lider de seleccion',          'PROGRAMADA', 'PENDIENTE', 'Entrevista tecnica con lider de area', 'Tu entrevista tecnica fue programada.',                                'admin@contitalent.com', 1, NULL, NULL,                       NULL,                                                  @ahora - (@dia * 1),  NULL),
+(2, 5, 'ENTREVISTA_NORMAL',     @ahora - (@dia * 8),  '09:00', '09:40', 'PRESENCIAL',  'Campus principal - Oficina RRHH',     NULL,                                        'Rafael Vega',    'Coordinador academico',       'REALIZADA',  'APROBADO',  'Buen dominio del rol docente',         'Aprobaste la entrevista. Continuaras con evaluacion psicologica.',     'admin@contitalent.com', 1, 1,    'admin@contitalent.com',    'Resultado registrado luego de entrevista realizada.',  @ahora - (@dia * 8),  @ahora - (@dia * 8)),
+(3, 6, 'ENTREVISTA_NORMAL',     @ahora - (@dia * 13), '11:00', '11:50', 'VIRTUAL',     NULL,                                  'https://meet.contitalent.com/entrevista-6', 'Sofia Herrera',  'Gerente de area',             'REALIZADA',  'APROBADO',  'Perfil senior validado',               'Aprobaste la entrevista. Continuaras con evaluacion psicologica.',     'admin@contitalent.com', 1, 1,    'admin@contitalent.com',    'Resultado registrado por cierre de entrevista.',       @ahora - (@dia * 13), @ahora - (@dia * 13)),
+(4, 6, 'EVALUACION_PSICOLOGICA',@ahora - (@dia * 12), '15:00', '15:45', 'VIRTUAL',     NULL,                                  'https://meet.contitalent.com/psico-6',      'Paola Ruiz',     'Psicologa organizacional',    'REALIZADA',  'APROBADO',  'Sin observaciones restrictivas',       'Aprobaste la evaluacion psicologica.',                                  'admin@contitalent.com', 1, 1,    'admin@contitalent.com',    'Resultado psicologico registrado.',                    @ahora - (@dia * 12), @ahora - (@dia * 12));
 
 INSERT INTO tbl_evaluacion_psicologica_postulante (id, postulante_id, fecha_evaluacion, resultado, observacion, usuario_admin, creado_en) VALUES
 (1, 6, @ahora - (@dia * 12), 'APTO', 'Sin observaciones restrictivas', 'admin@contitalent.com', @ahora - (@dia * 12));
 
+-- ===== Respuestas (entidad intermedia Postulante - Pregunta) =====
 INSERT INTO tbl_postulante_respuesta (postulante_id, pregunta_id, opcion_elegida) VALUES
 (1, 6, 1), (1, 7, 1), (1, 8, 0),
 (2, 1, 1), (2, 2, 1), (2, 3, 1), (2, 4, 1), (2, 5, 3),
@@ -416,14 +467,21 @@ INSERT INTO tbl_postulante_respuesta (postulante_id, pregunta_id, opcion_elegida
 (6, 9, 1), (6, 10, 1), (6, 11, 1),
 (7, 12, 0), (7, 13, 0);
 
-ALTER TABLE tbl_area AUTO_INCREMENT = 9;
-ALTER TABLE tbl_rol AUTO_INCREMENT = 3;
-ALTER TABLE tbl_estado AUTO_INCREMENT = 8;
-ALTER TABLE tbl_usuario AUTO_INCREMENT = 9;
-ALTER TABLE tbl_oferta AUTO_INCREMENT = 12;
-ALTER TABLE tbl_pregunta AUTO_INCREMENT = 14;
-ALTER TABLE tbl_postulante AUTO_INCREMENT = 8;
-ALTER TABLE tbl_documento_postulante AUTO_INCREMENT = 6;
-ALTER TABLE tbl_historial_estado_postulante AUTO_INCREMENT = 9;
-ALTER TABLE tbl_entrevista_postulante AUTO_INCREMENT = 5;
+-- =====================================================================
+-- Ajuste de auto-increment (siguiente id disponible)
+-- =====================================================================
+ALTER TABLE tbl_area                              AUTO_INCREMENT = 9;
+ALTER TABLE tbl_rol                               AUTO_INCREMENT = 3;
+ALTER TABLE tbl_estado                            AUTO_INCREMENT = 8;
+ALTER TABLE tbl_usuario                           AUTO_INCREMENT = 9;
+ALTER TABLE tbl_oferta                            AUTO_INCREMENT = 12;
+ALTER TABLE tbl_oferta_requisito                  AUTO_INCREMENT = 100;
+ALTER TABLE tbl_oferta_beneficio                  AUTO_INCREMENT = 100;
+ALTER TABLE tbl_oferta_habilidad                  AUTO_INCREMENT = 100;
+ALTER TABLE tbl_pregunta                          AUTO_INCREMENT = 14;
+ALTER TABLE tbl_postulante                        AUTO_INCREMENT = 8;
+ALTER TABLE tbl_documento_postulante              AUTO_INCREMENT = 6;
+ALTER TABLE tbl_historial_estado_postulante       AUTO_INCREMENT = 9;
+ALTER TABLE tbl_entrevista_postulante             AUTO_INCREMENT = 5;
 ALTER TABLE tbl_evaluacion_psicologica_postulante AUTO_INCREMENT = 2;
+ALTER TABLE tbl_postulante_respuesta              AUTO_INCREMENT = 100;
