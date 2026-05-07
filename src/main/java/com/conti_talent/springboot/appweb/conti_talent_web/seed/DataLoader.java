@@ -49,6 +49,9 @@ public class DataLoader implements CommandLineRunner {
     private final IPreguntaRepository preguntaRepository;
     private final IPostulanteRepository postulanteRepository;
     private final IDocumentoPostulanteRepository documentoRepository;
+    private final IHistorialEstadoPostulanteRepository historialRepository;
+    private final IEntrevistaPostulanteRepository entrevistaRepository;
+    private final IEvaluacionPsicologicaPostulanteRepository psicologicaRepository;
     private final IMetricasRepository metricasRepository;
 
     public DataLoader(IRolRepository rolRepository,
@@ -59,6 +62,9 @@ public class DataLoader implements CommandLineRunner {
                       IPreguntaRepository preguntaRepository,
                       IPostulanteRepository postulanteRepository,
                       IDocumentoPostulanteRepository documentoRepository,
+                      IHistorialEstadoPostulanteRepository historialRepository,
+                      IEntrevistaPostulanteRepository entrevistaRepository,
+                      IEvaluacionPsicologicaPostulanteRepository psicologicaRepository,
                       IMetricasRepository metricasRepository) {
         this.rolRepository = rolRepository;
         this.estadoRepository = estadoRepository;
@@ -68,6 +74,9 @@ public class DataLoader implements CommandLineRunner {
         this.preguntaRepository = preguntaRepository;
         this.postulanteRepository = postulanteRepository;
         this.documentoRepository = documentoRepository;
+        this.historialRepository = historialRepository;
+        this.entrevistaRepository = entrevistaRepository;
+        this.psicologicaRepository = psicologicaRepository;
         this.metricasRepository = metricasRepository;
     }
 
@@ -166,6 +175,12 @@ public class DataLoader implements CommandLineRunner {
         creados.add(usuarioRepository.save(new Usuario("Andrea",        "Leon",        "andrea@example.com",    "andrea123", rolPostulante, true, ahora - MILISEGUNDOS_POR_DIA * 10)));
         creados.add(usuarioRepository.save(new Usuario("Diego",         "Alvarez",     "diego@example.com",     "diego123",  rolPostulante, true, ahora - MILISEGUNDOS_POR_DIA * 15)));
         creados.add(usuarioRepository.save(new Usuario("Fiorella",      "Rojas",       "fiorella@example.com",  "fiora123",  rolPostulante, true, ahora - MILISEGUNDOS_POR_DIA * 8)));
+        creados.add(usuarioRepository.save(new Usuario("Renato",        "Quispe",      "renato@example.com",    "renato123", rolPostulante, true, ahora - MILISEGUNDOS_POR_DIA * 4)));
+        creados.add(usuarioRepository.save(new Usuario("Valeria",       "Campos",      "valeria@example.com",   "vale123",   rolPostulante, true, ahora - MILISEGUNDOS_POR_DIA * 6)));
+        creados.add(usuarioRepository.save(new Usuario("Nicolas",       "Vargas",      "nicolas@example.com",   "nico123",   rolPostulante, true, ahora - MILISEGUNDOS_POR_DIA * 7)));
+        creados.add(usuarioRepository.save(new Usuario("Gabriela",      "Paredes",     "gabriela@example.com",  "gaby123",   rolPostulante, true, ahora - MILISEGUNDOS_POR_DIA * 11)));
+        creados.add(usuarioRepository.save(new Usuario("Sofia",         "Huaman",      "sofia@example.com",     "sofia123",  rolPostulante, true, ahora - MILISEGUNDOS_POR_DIA * 13)));
+        creados.add(usuarioRepository.save(new Usuario("Mateo",         "Caceres",     "mateo@example.com",     "mateo123",  rolPostulante, true, ahora - MILISEGUNDOS_POR_DIA * 9)));
         return creados;
     }
 
@@ -368,6 +383,12 @@ public class DataLoader implements CommandLineRunner {
         Usuario andrea   = usuarios.get(5);
         Usuario diego    = usuarios.get(6);
         Usuario fiorella = usuarios.get(7);
+        Usuario renato   = usuarios.get(8);
+        Usuario valeria  = usuarios.get(9);
+        Usuario nicolas  = usuarios.get(10);
+        Usuario gabriela = usuarios.get(11);
+        Usuario sofia    = usuarios.get(12);
+        Usuario mateo    = usuarios.get(13);
 
         Postulante postulanteLucia = postulanteRepository.save(crearPostulante(lucia, ofertas.get("Practica Sistemas"),
                 estados.get(EstadoCodigo.EN_EVALUACION.name()),
@@ -418,7 +439,198 @@ public class DataLoader implements CommandLineRunner {
                 "fiorella_cv.pdf", 50, ahora - MILISEGUNDOS_POR_DIA * 7,
                 Map.of(preguntas.get("q12").getId(), 0, preguntas.get("q13").getId(), 0)));
 
+        Postulante postulanteRenato = postulanteRepository.save(crearPostulante(renato, ofertas.get("Profesor de Programacion I"),
+                estados.get(EstadoCodigo.APROBADO_TECNICO.name()),
+                "Renato Quispe", "renato@example.com", "+51 900 111 222",
+                "4 anios desarrollando backend Java y apoyando laboratorios", "Java, Spring Boot, SQL, tutoria academica",
+                "renato_cv.pdf", 80, ahora - MILISEGUNDOS_POR_DIA * 4,
+                Map.of(preguntas.get("q1").getId(), 1, preguntas.get("q2").getId(), 1,
+                       preguntas.get("q3").getId(), 1, preguntas.get("q4").getId(), 0, preguntas.get("q5").getId(), 3)));
+
+        Postulante postulanteValeria = postulanteRepository.save(crearPostulante(valeria, ofertas.get("Practica Sistemas"),
+                estados.get(EstadoCodigo.ENTREVISTA.name()),
+                "Valeria Campos", "valeria@example.com", "+51 900 333 444",
+                "2 anios en mesa de ayuda universitaria", "HTML, CSS, soporte tecnico, comunicacion",
+                "valeria_cv.pdf", 100, ahora - MILISEGUNDOS_POR_DIA * 6,
+                Map.of(preguntas.get("q6").getId(), 1, preguntas.get("q7").getId(), 1, preguntas.get("q8").getId(), 1)));
+
+        Postulante postulanteNicolas = postulanteRepository.save(crearPostulante(nicolas, ofertas.get("Practica Marketing"),
+                estados.get(EstadoCodigo.ENTREVISTA.name()),
+                "Nicolas Vargas", "nicolas@example.com", "+51 900 555 666",
+                "2 anios creando contenido y reportes de campanias", "Figma, contenido, LinkedIn, analitica basica",
+                "nicolas_cv.pdf", 100, ahora - MILISEGUNDOS_POR_DIA * 7,
+                Map.of(preguntas.get("q12").getId(), 0, preguntas.get("q13").getId(), 1)));
+
+        Postulante postulanteGabriela = postulanteRepository.save(crearPostulante(gabriela, ofertas.get("Profesor Marketing Digital"),
+                estados.get(EstadoCodigo.EVALUACION_PSICOLOGICA.name()),
+                "Gabriela Paredes", "gabriela@example.com", "+51 900 777 888",
+                "7 anios en estrategia digital y clases de especializacion", "SEO, Ads, analitica, didactica",
+                "gabriela_cv.pdf", 100, ahora - MILISEGUNDOS_POR_DIA * 11,
+                Map.of(preguntas.get("q9").getId(), 1, preguntas.get("q10").getId(), 1, preguntas.get("q11").getId(), 1)));
+
+        Postulante postulanteSofia = postulanteRepository.save(crearPostulante(sofia, ofertas.get("Coordinador Bienestar"),
+                estados.get(EstadoCodigo.ACEPTADO.name()),
+                "Sofia Huaman", "sofia@example.com", "+51 900 999 111",
+                "6 anios liderando programas de bienestar estudiantil", "psicologia, liderazgo, gestion estudiantil",
+                "sofia_cv.pdf", 0, ahora - MILISEGUNDOS_POR_DIA * 13, Map.of()));
+
+        Postulante postulanteMateo = postulanteRepository.save(crearPostulante(mateo, ofertas.get("Profesor de Programacion I"),
+                estados.get(EstadoCodigo.RECHAZADO.name()),
+                "Mateo Caceres", "mateo@example.com", "+51 901 222 333",
+                "3 anios como desarrollador junior", "Java basico, SQL, Git",
+                "mateo_cv.pdf", 60, ahora - MILISEGUNDOS_POR_DIA * 9,
+                Map.of(preguntas.get("q1").getId(), 1, preguntas.get("q2").getId(), 0,
+                       preguntas.get("q3").getId(), 1, preguntas.get("q4").getId(), 0, preguntas.get("q5").getId(), 3)));
+
         cargarDocumentosSeed(ahora, postulanteLucia, postulanteCarlos, postulantePedro, postulanteAndrea);
+        cargarFlujoDemo(ahora, postulanteLucia, postulanteCarlos, postulantePedro, postulanteAndrea,
+                postulanteRenato, postulanteValeria, postulanteNicolas, postulanteGabriela, postulanteSofia, postulanteMateo);
+    }
+
+    private void cargarFlujoDemo(long ahora, Postulante lucia, Postulante carlos,
+                                 Postulante pedro, Postulante andrea, Postulante renato, Postulante valeria,
+                                 Postulante nicolas, Postulante gabriela, Postulante sofia, Postulante mateo) {
+        crearHistorial(lucia, null, EstadoCodigo.POSTULADO.name(), lucia.getFechaPostulacion(),
+                "Sistema", "Postulacion registrada", "Tu postulacion fue recibida correctamente.");
+        crearHistorial(lucia, EstadoCodigo.POSTULADO.name(), EstadoCodigo.EN_EVALUACION.name(), lucia.getFechaEvaluacion(),
+                "Sistema", "Evaluacion tecnica registrada con puntaje bajo el umbral", "Tu evaluacion tecnica fue registrada.");
+
+        crearHistorial(carlos, null, EstadoCodigo.POSTULADO.name(), carlos.getFechaPostulacion(),
+                "Sistema", "Postulacion registrada", "Tu postulacion fue recibida correctamente.");
+        crearHistorial(carlos, EstadoCodigo.POSTULADO.name(), EstadoCodigo.APROBADO_TECNICO.name(), carlos.getFechaEvaluacion(),
+                "Sistema", "Evaluacion tecnica aprobada", "Aprobaste la evaluacion tecnica. Ya puedes ser citado a entrevista.");
+
+        crearHistorial(pedro, EstadoCodigo.APROBADO_TECNICO.name(), EstadoCodigo.ENTREVISTA.name(), ahora - MILISEGUNDOS_POR_DIA * 5,
+                "admin@contitalent.com", "Entrevista normal programada", "Tu entrevista normal fue programada.");
+        crearEntrevista(pedro, "ENTREVISTA_NORMAL", ahora + MILISEGUNDOS_POR_DIA * 2,
+                "10:00", "10:45", "VIRTUAL", null, "https://meet.contitalent.com/entrevista-pedro",
+                "Ana Castillo", "Lider de seleccion", "PROGRAMADA", "PENDIENTE",
+                "Demo: postulante en estado ENTREVISTA con entrevista normal pendiente.",
+                "Tu entrevista normal fue programada para validar experiencia y disponibilidad.", ahora - MILISEGUNDOS_POR_DIA);
+
+        crearHistorial(andrea, EstadoCodigo.ENTREVISTA.name(), EstadoCodigo.EVALUACION_PSICOLOGICA.name(), ahora - MILISEGUNDOS_POR_DIA * 8,
+                "admin@contitalent.com", "Entrevista aprobada; pasa a psicologica", "Continuas a evaluacion psicologica.");
+        crearEntrevista(andrea, "ENTREVISTA_NORMAL", ahora - MILISEGUNDOS_POR_DIA * 8,
+                "09:00", "09:40", "PRESENCIAL", "Campus principal - Oficina RRHH", null,
+                "Rafael Vega", "Coordinador academico", "REALIZADA", "APROBADO",
+                "Buen dominio del rol docente.", "Aprobaste la entrevista. Continuaras con evaluacion psicologica.",
+                ahora - MILISEGUNDOS_POR_DIA * 8);
+
+        crearHistorial(renato, EstadoCodigo.POSTULADO.name(), EstadoCodigo.APROBADO_TECNICO.name(), renato.getFechaEvaluacion(),
+                "Sistema", "Aprobado tecnico, pendiente de agendar entrevista", "Aprobaste la evaluacion tecnica. RRHH puede programar tu entrevista.");
+
+        crearHistorial(valeria, EstadoCodigo.APROBADO_TECNICO.name(), EstadoCodigo.ENTREVISTA.name(), ahora - MILISEGUNDOS_POR_DIA * 3,
+                "admin@contitalent.com", "Entrevista normal agendada para demo", "Tu entrevista normal esta programada.");
+        crearEntrevista(valeria, "ENTREVISTA_NORMAL", ahora + MILISEGUNDOS_POR_DIA,
+                "15:00", "15:30", "PRESENCIAL", "Campus Huancayo - Laboratorio TI", null,
+                "Jorge Poma", "Jefe de Soporte TI", "PROGRAMADA", "PENDIENTE",
+                "Demo: entrevista normal presencial programada.", "Presentarse con DNI y portafolio de practicas.",
+                ahora - MILISEGUNDOS_POR_DIA * 2);
+
+        crearHistorial(nicolas, EstadoCodigo.APROBADO_TECNICO.name(), EstadoCodigo.ENTREVISTA.name(), ahora - MILISEGUNDOS_POR_DIA * 4,
+                "admin@contitalent.com", "Entrevista reprogramada por disponibilidad", "Tu entrevista fue reprogramada.");
+        crearEntrevista(nicolas, "ENTREVISTA_NORMAL", ahora + MILISEGUNDOS_POR_DIA * 3,
+                "11:00", "11:40", "VIRTUAL", null, "https://meet.contitalent.com/entrevista-nicolas",
+                "Mariana Solis", "Coordinadora de Marketing", "REPROGRAMADA", "PENDIENTE",
+                "Demo: entrevista normal reprogramada.", "Nueva fecha confirmada para tu entrevista normal.",
+                ahora - MILISEGUNDOS_POR_DIA * 3);
+
+        crearHistorial(gabriela, EstadoCodigo.ENTREVISTA.name(), EstadoCodigo.EVALUACION_PSICOLOGICA.name(), ahora - MILISEGUNDOS_POR_DIA * 6,
+                "admin@contitalent.com", "Entrevista normal aprobada; psicologica creada", "Tu evaluacion psicologica fue creada.");
+        crearEntrevista(gabriela, "ENTREVISTA_NORMAL", ahora - MILISEGUNDOS_POR_DIA * 6,
+                "08:30", "09:10", "VIRTUAL", null, "https://meet.contitalent.com/entrevista-gabriela",
+                "Rafael Vega", "Coordinador academico", "REALIZADA", "APROBADO",
+                "Perfil docente validado.", "Aprobaste la entrevista normal.",
+                ahora - MILISEGUNDOS_POR_DIA * 6);
+        crearEntrevista(gabriela, "EVALUACION_PSICOLOGICA", ahora + MILISEGUNDOS_POR_DIA * 4,
+                "16:00", "16:45", "VIRTUAL", null, "https://meet.contitalent.com/psico-gabriela",
+                "Paola Ruiz", "Psicologa organizacional", "PROGRAMADA", "PENDIENTE",
+                "Demo: evaluacion psicologica creada y pendiente.", "Tu evaluacion psicologica esta programada.",
+                ahora - MILISEGUNDOS_POR_DIA * 2);
+        crearEvaluacionPsicologica(gabriela, ahora + MILISEGUNDOS_POR_DIA * 4, "PENDIENTE",
+                "Demo: registro psicologico creado para mostrar la etapa pendiente.", ahora - MILISEGUNDOS_POR_DIA * 2);
+
+        crearHistorial(sofia, EstadoCodigo.EVALUACION_PSICOLOGICA.name(), EstadoCodigo.ACEPTADO.name(), ahora - MILISEGUNDOS_POR_DIA * 10,
+                "admin@contitalent.com", "Evaluacion psicologica apta", "Fuiste aceptada para la posicion.");
+        crearEntrevista(sofia, "ENTREVISTA_NORMAL", ahora - MILISEGUNDOS_POR_DIA * 11,
+                "10:00", "10:45", "PRESENCIAL", "Campus principal - Bienestar Universitario", null,
+                "Carmen Rios", "Directora de Bienestar", "REALIZADA", "APROBADO",
+                "Experiencia alineada al cargo.", "Aprobaste la entrevista normal.",
+                ahora - MILISEGUNDOS_POR_DIA * 11);
+        crearEntrevista(sofia, "EVALUACION_PSICOLOGICA", ahora - MILISEGUNDOS_POR_DIA * 10,
+                "14:00", "14:40", "PRESENCIAL", "Campus principal - Psicologia", null,
+                "Paola Ruiz", "Psicologa organizacional", "REALIZADA", "APROBADO",
+                "Sin observaciones restrictivas.", "Aprobaste la evaluacion psicologica.",
+                ahora - MILISEGUNDOS_POR_DIA * 10);
+        crearEvaluacionPsicologica(sofia, ahora - MILISEGUNDOS_POR_DIA * 10, "APTO",
+                "Competencias socioemocionales acordes al puesto.", ahora - MILISEGUNDOS_POR_DIA * 10);
+
+        crearHistorial(mateo, EstadoCodigo.ENTREVISTA.name(), EstadoCodigo.RECHAZADO.name(), ahora - MILISEGUNDOS_POR_DIA * 7,
+                "admin@contitalent.com", "Entrevista normal desaprobada", "El proceso finalizo para esta oferta.");
+        crearEntrevista(mateo, "ENTREVISTA_NORMAL", ahora - MILISEGUNDOS_POR_DIA * 7,
+                "12:00", "12:30", "VIRTUAL", null, "https://meet.contitalent.com/entrevista-mateo",
+                "Ana Castillo", "Lider de seleccion", "REALIZADA", "DESAPROBADO",
+                "Necesita mayor experiencia docente.", "Por ahora no continuas en el proceso.",
+                ahora - MILISEGUNDOS_POR_DIA * 7);
+    }
+
+    private void crearHistorial(Postulante postulante, String estadoAnterior, String estadoNuevo, Long fechaCambio,
+                                String usuarioAdmin, String observacionInterna, String observacionPostulante) {
+        if (fechaCambio == null) return;
+        HistorialEstadoPostulante historial = new HistorialEstadoPostulante();
+        historial.setPostulante(postulante);
+        historial.setEstadoAnterior(estadoAnterior);
+        historial.setEstadoNuevo(estadoNuevo);
+        historial.setFechaCambio(fechaCambio);
+        historial.setUsuarioAdmin(usuarioAdmin);
+        historial.setObservacionInterna(observacionInterna);
+        historial.setObservacionPostulante(observacionPostulante);
+        historialRepository.save(historial);
+        postulante.getHistorialEstados().add(historial);
+    }
+
+    private void crearEntrevista(Postulante postulante, String tipo, long fechaProgramada, String horaInicio,
+                                 String horaFin, String modalidad, String lugar, String enlaceVirtual,
+                                 String entrevistadorNombre, String entrevistadorCargo, String estadoEntrevista,
+                                 String resultado, String observacionInterna, String observacionPostulante,
+                                 long creadoEn) {
+        EntrevistaPostulante entrevista = new EntrevistaPostulante();
+        entrevista.setPostulante(postulante);
+        entrevista.setTipoEntrevista(tipo);
+        entrevista.setFechaProgramada(fechaProgramada);
+        entrevista.setHoraInicio(horaInicio);
+        entrevista.setHoraFin(horaFin);
+        entrevista.setModalidad(modalidad);
+        entrevista.setLugar(lugar);
+        entrevista.setEnlaceVirtual(enlaceVirtual);
+        entrevista.setEntrevistadorNombre(entrevistadorNombre);
+        entrevista.setEntrevistadorCargo(entrevistadorCargo);
+        entrevista.setEstadoEntrevista(estadoEntrevista);
+        entrevista.setResultado(resultado);
+        entrevista.setObservacionInterna(observacionInterna);
+        entrevista.setObservacionPostulante(observacionPostulante);
+        entrevista.setUsuarioAdmin("admin@contitalent.com");
+        entrevista.setCreadoEn(creadoEn);
+        if ("REALIZADA".equals(estadoEntrevista)) {
+            entrevista.setActualizadoPorAdminNombre("admin@contitalent.com");
+            entrevista.setActualizadoEn(creadoEn);
+            entrevista.setObservacionCambio("Resultado cargado como dato demo.");
+        }
+        entrevistaRepository.save(entrevista);
+        postulante.getEntrevistas().add(entrevista);
+    }
+
+    private void crearEvaluacionPsicologica(Postulante postulante, long fechaEvaluacion, String resultado,
+                                            String observacion, long creadoEn) {
+        EvaluacionPsicologicaPostulante evaluacion = new EvaluacionPsicologicaPostulante();
+        evaluacion.setPostulante(postulante);
+        evaluacion.setFechaEvaluacion(fechaEvaluacion);
+        evaluacion.setResultado(resultado);
+        evaluacion.setObservacion(observacion);
+        evaluacion.setUsuarioAdmin("admin@contitalent.com");
+        evaluacion.setCreadoEn(creadoEn);
+        psicologicaRepository.save(evaluacion);
+        postulante.getEvaluacionesPsicologicas().add(evaluacion);
     }
 
     private void cargarDocumentosSeed(long ahora, Postulante lucia, Postulante carlos, Postulante pedro, Postulante andrea) {

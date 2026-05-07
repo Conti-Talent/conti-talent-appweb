@@ -46,8 +46,8 @@
     const punctualSeries = [
       { label: 'Postulantes activos hoy',         value: data.estadoActual.postulantesActivos, unit: '' },
       { label: 'Ofertas abiertas',                value: data.estadoActual.ofertasAbiertas,    unit: '' },
-      { label: 'Entrevistas hoy',                 value: data.estadoActual.entrevistasHoy,     unit: '' },
-      { label: 'Contrataciones del mes',          value: data.estadoActual.ofertasEsteMes,     unit: '' },
+      { label: 'Entrevistas activas',             value: data.estadoActual.entrevistasHoy,     unit: '' },
+      { label: 'Postulantes aceptados',           value: data.estadoActual.ofertasEsteMes,     unit: '' },
       { label: 'Tiempo promedio de cierre',       value: data.estadoActual.tiempoPromedio,     unit: '' }
     ];
 

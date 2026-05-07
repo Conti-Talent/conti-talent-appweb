@@ -317,7 +317,13 @@ INSERT INTO tbl_usuario (id, nombre, apellido, email, password, rol_id, activo, 
 (5, 'Pedro',         'Salinas',     'pedro@example.com',     'pedro123', 2, b'1', @ahora - (@dia * 7)),
 (6, 'Andrea',        'Leon',        'andrea@example.com',    'andrea123',2, b'1', @ahora - (@dia * 10)),
 (7, 'Diego',         'Alvarez',     'diego@example.com',     'diego123', 2, b'1', @ahora - (@dia * 15)),
-(8, 'Fiorella',      'Rojas',       'fiorella@example.com',  'fiora123', 2, b'1', @ahora - (@dia * 8));
+(8, 'Fiorella',      'Rojas',       'fiorella@example.com',  'fiora123', 2, b'1', @ahora - (@dia * 8)),
+(9, 'Renato',        'Quispe',      'renato@example.com',    'renato123',2, b'1', @ahora - (@dia * 4)),
+(10,'Valeria',       'Campos',      'valeria@example.com',   'vale123',  2, b'1', @ahora - (@dia * 6)),
+(11,'Nicolas',       'Vargas',      'nicolas@example.com',   'nico123',  2, b'1', @ahora - (@dia * 7)),
+(12,'Gabriela',      'Paredes',     'gabriela@example.com',  'gaby123',  2, b'1', @ahora - (@dia * 11)),
+(13,'Sofia',         'Huaman',      'sofia@example.com',     'sofia123', 2, b'1', @ahora - (@dia * 13)),
+(14,'Mateo',         'Caceres',     'mateo@example.com',     'mateo123', 2, b'1', @ahora - (@dia * 9));
 
 INSERT INTO tbl_area (id, nombre, descripcion, icono, color) VALUES
 (1, 'Ingenieria',                 'Sistemas, civil, industrial, mecatronica y minas.',                          'engineering', '#6366f1'),
@@ -425,7 +431,13 @@ INSERT INTO tbl_postulante (id, usuario_id, oferta_id, estado_id, nombre, email,
 (4, 5, 2, 4, 'Pedro Salinas',   'pedro@example.com',    '+51 922 444 666', 'Estudiante de Sistemas con practicas previas',       'JavaScript, HTML, CSS, soporte',                            'pedro_cv.pdf',    @ahora - (@dia * 6), @ahora - (@dia * 6) + 3600000, 1, 'Universitario', 'Ingenieria de Sistemas', 'Inmediata', 'Hibrido',     100, 30,  60, 71,  @ahora - (@dia * 6)),
 (5, 6, 3, 5, 'Andrea Leon',     'andrea@example.com',   '+51 944 888 111', '6 anios en marketing B2B y docencia universitaria',  'Estrategia digital, didactica, public speaking',            'andrea_cv.pdf',   @ahora - (@dia * 9), @ahora - (@dia * 9) + 3600000, 6, 'Maestria',      'Marketing',              'Inmediata', 'Presencial',  100, 100, 60, 92,  @ahora - (@dia * 9)),
 (6, 7, 3, 6, 'Diego Alvarez',   'diego@example.com',    '+51 955 777 222', '8 anios liderando agencias de marketing digital',    'Ads, SEO, analitica, formacion de equipos',                 'diego_cv.pdf',    @ahora - (@dia * 14),@ahora - (@dia * 14)+ 3600000, 8, 'Titulado',      'Marketing',              'Inmediata', 'Presencial',  100, 100, 60, 92,  @ahora - (@dia * 14)),
-(7, 8, 4, 7, 'Fiorella Rojas',  'fiorella@example.com', '+51 966 333 444', '1 anio en diseno grafico',                            'Figma, Illustrator',                                        'fiorella_cv.pdf', @ahora - (@dia * 7), @ahora - (@dia * 7) + 3600000, 1, 'Universitario', 'Diseno',                 'Inmediata', 'Presencial',  50,  30,  60, 46,  @ahora - (@dia * 7));
+(7, 8, 4, 7, 'Fiorella Rojas',  'fiorella@example.com', '+51 966 333 444', '1 anio en diseno grafico',                            'Figma, Illustrator',                                        'fiorella_cv.pdf', @ahora - (@dia * 7), @ahora - (@dia * 7) + 3600000, 1, 'Universitario', 'Diseno',                 'Inmediata', 'Presencial',  50,  30,  60, 46,  @ahora - (@dia * 7)),
+(8, 9, 1, 3, 'Renato Quispe',   'renato@example.com',   '+51 900 111 222', '4 anios desarrollando backend Java y apoyando laboratorios', 'Java, Spring Boot, SQL, tutoria academica',             'renato_cv.pdf',   @ahora - (@dia * 4), @ahora - (@dia * 4) + 3600000, 4, 'Universitario', 'No especificada',       'Inmediata', 'Presencial',  80,  100, 60, 82,  @ahora - (@dia * 4)),
+(9, 10,2, 4, 'Valeria Campos',  'valeria@example.com',  '+51 900 333 444', '2 anios en mesa de ayuda universitaria',              'HTML, CSS, soporte tecnico, comunicacion',                  'valeria_cv.pdf',  @ahora - (@dia * 6), @ahora - (@dia * 6) + 3600000, 2, 'Universitario', 'No especificada',       'Inmediata', 'Hibrido',     100, 60,  60, 80,  @ahora - (@dia * 6)),
+(10,11,4, 4, 'Nicolas Vargas',  'nicolas@example.com',  '+51 900 555 666', '2 anios creando contenido y reportes de campanias',   'Figma, contenido, LinkedIn, analitica basica',              'nicolas_cv.pdf',  @ahora - (@dia * 7), @ahora - (@dia * 7) + 3600000, 2, 'Universitario', 'No especificada',       'Inmediata', 'Presencial',  100, 60,  60, 80,  @ahora - (@dia * 7)),
+(11,12,3, 5, 'Gabriela Paredes','gabriela@example.com', '+51 900 777 888', '7 anios en estrategia digital y clases de especializacion', 'SEO, Ads, analitica, didactica',                         'gabriela_cv.pdf', @ahora - (@dia * 11),@ahora - (@dia * 11)+ 3600000, 7, 'Universitario', 'No especificada',       'Inmediata', 'Presencial',  100, 100, 60, 92,  @ahora - (@dia * 11)),
+(12,13,11,6, 'Sofia Huaman',    'sofia@example.com',    '+51 900 999 111', '6 anios liderando programas de bienestar estudiantil','psicologia, liderazgo, gestion estudiantil',                'sofia_cv.pdf',    @ahora - (@dia * 13),NULL,                          6, 'Universitario', 'No especificada',       'Inmediata', 'Presencial',  0,   100, 60, 42,  @ahora - (@dia * 13)),
+(13,14,1, 7, 'Mateo Caceres',   'mateo@example.com',    '+51 901 222 333', '3 anios como desarrollador junior',                   'Java basico, SQL, Git',                                     'mateo_cv.pdf',    @ahora - (@dia * 9), @ahora - (@dia * 9) + 3600000, 3, 'Universitario', 'No especificada',       'Inmediata', 'Presencial',  60,  100, 60, 72,  @ahora - (@dia * 9));
 
 INSERT INTO tbl_documento_postulante (id, postulante_id, tipo_documento, nombre_original, nombre_archivo, ruta_archivo, extension, tamanio, fecha_subida) VALUES
 (1, 1, 'CV',          'lucia_cv.pdf',           'lucia_cv.pdf',           'uploads/lucia_cv.pdf',           'pdf', 4025, @ahora - (@dia * 4)),
@@ -442,7 +454,13 @@ INSERT INTO tbl_historial_estado_postulante (postulante_id, estado_anterior, est
 (4, 'APROBADO_TECNICO',       'ENTREVISTA',             @ahora - (@dia * 5),                'admin@contitalent.com', 'Entrevista agendada',           'Tu entrevista fue programada.'),
 (5, 'ENTREVISTA',             'EVALUACION_PSICOLOGICA', @ahora - (@dia * 8),                'admin@contitalent.com', 'Pasa a evaluacion psicologica', 'Continuas a evaluacion psicologica.'),
 (6, 'EVALUACION_PSICOLOGICA', 'ACEPTADO',               @ahora - (@dia * 12),               'admin@contitalent.com', 'Candidato aceptado',            'Fuiste aceptado para la posicion.'),
-(7, 'EN_EVALUACION',          'RECHAZADO',              @ahora - (@dia * 6),                'admin@contitalent.com', 'No cumple perfil requerido',    'El proceso finalizo para esta oferta.');
+(7, 'EN_EVALUACION',          'RECHAZADO',              @ahora - (@dia * 6),                'admin@contitalent.com', 'No cumple perfil requerido',    'El proceso finalizo para esta oferta.'),
+(8, 'POSTULADO',              'APROBADO_TECNICO',       @ahora - (@dia * 4) + 3600000,      'Sistema',              'Aprobado tecnico, pendiente de agendar entrevista', 'Aprobaste la evaluacion tecnica. RRHH puede programar tu entrevista.'),
+(9, 'APROBADO_TECNICO',       'ENTREVISTA',             @ahora - (@dia * 3),                'admin@contitalent.com', 'Entrevista normal agendada para demo', 'Tu entrevista normal esta programada.'),
+(10,'APROBADO_TECNICO',       'ENTREVISTA',             @ahora - (@dia * 4),                'admin@contitalent.com', 'Entrevista reprogramada por disponibilidad', 'Tu entrevista fue reprogramada.'),
+(11,'ENTREVISTA',             'EVALUACION_PSICOLOGICA', @ahora - (@dia * 6),                'admin@contitalent.com', 'Entrevista normal aprobada; psicologica creada', 'Tu evaluacion psicologica fue creada.'),
+(12,'EVALUACION_PSICOLOGICA', 'ACEPTADO',               @ahora - (@dia * 10),               'admin@contitalent.com', 'Evaluacion psicologica apta', 'Fuiste aceptada para la posicion.'),
+(13,'ENTREVISTA',             'RECHAZADO',              @ahora - (@dia * 7),                'admin@contitalent.com', 'Entrevista normal desaprobada', 'El proceso finalizo para esta oferta.');
 
 INSERT INTO tbl_entrevista_postulante (
   id, postulante_id, tipo_entrevista, fecha_programada, hora_inicio, hora_fin, modalidad,
@@ -453,10 +471,19 @@ INSERT INTO tbl_entrevista_postulante (
 (1, 4, 'ENTREVISTA_NORMAL',     @ahora + (@dia * 2),  '10:00', '10:45', 'VIRTUAL',     NULL,                                  'https://meet.contitalent.com/entrevista-4', 'Ana Castillo',   'Lider de seleccion',          'PROGRAMADA', 'PENDIENTE', 'Entrevista tecnica con lider de area', 'Tu entrevista tecnica fue programada.',                                'admin@contitalent.com', 1, NULL, NULL,                       NULL,                                                  @ahora - (@dia * 1),  NULL),
 (2, 5, 'ENTREVISTA_NORMAL',     @ahora - (@dia * 8),  '09:00', '09:40', 'PRESENCIAL',  'Campus principal - Oficina RRHH',     NULL,                                        'Rafael Vega',    'Coordinador academico',       'REALIZADA',  'APROBADO',  'Buen dominio del rol docente',         'Aprobaste la entrevista. Continuaras con evaluacion psicologica.',     'admin@contitalent.com', 1, 1,    'admin@contitalent.com',    'Resultado registrado luego de entrevista realizada.',  @ahora - (@dia * 8),  @ahora - (@dia * 8)),
 (3, 6, 'ENTREVISTA_NORMAL',     @ahora - (@dia * 13), '11:00', '11:50', 'VIRTUAL',     NULL,                                  'https://meet.contitalent.com/entrevista-6', 'Sofia Herrera',  'Gerente de area',             'REALIZADA',  'APROBADO',  'Perfil senior validado',               'Aprobaste la entrevista. Continuaras con evaluacion psicologica.',     'admin@contitalent.com', 1, 1,    'admin@contitalent.com',    'Resultado registrado por cierre de entrevista.',       @ahora - (@dia * 13), @ahora - (@dia * 13)),
-(4, 6, 'EVALUACION_PSICOLOGICA',@ahora - (@dia * 12), '15:00', '15:45', 'VIRTUAL',     NULL,                                  'https://meet.contitalent.com/psico-6',      'Paola Ruiz',     'Psicologa organizacional',    'REALIZADA',  'APROBADO',  'Sin observaciones restrictivas',       'Aprobaste la evaluacion psicologica.',                                  'admin@contitalent.com', 1, 1,    'admin@contitalent.com',    'Resultado psicologico registrado.',                    @ahora - (@dia * 12), @ahora - (@dia * 12));
+(4, 6, 'EVALUACION_PSICOLOGICA',@ahora - (@dia * 12), '15:00', '15:45', 'VIRTUAL',     NULL,                                  'https://meet.contitalent.com/psico-6',      'Paola Ruiz',     'Psicologa organizacional',    'REALIZADA',  'APROBADO',  'Sin observaciones restrictivas',       'Aprobaste la evaluacion psicologica.',                                  'admin@contitalent.com', 1, 1,    'admin@contitalent.com',    'Resultado psicologico registrado.',                    @ahora - (@dia * 12), @ahora - (@dia * 12)),
+(5, 9, 'ENTREVISTA_NORMAL',     @ahora + @dia,        '15:00', '15:30', 'PRESENCIAL',  'Campus Huancayo - Laboratorio TI',     NULL,                                        'Jorge Poma',     'Jefe de Soporte TI',          'PROGRAMADA', 'PENDIENTE', 'Demo: entrevista normal presencial programada.', 'Presentarse con DNI y portafolio de practicas.',                 'admin@contitalent.com', 1, NULL, NULL,                       NULL,                                                  @ahora - (@dia * 2),  NULL),
+(6, 10,'ENTREVISTA_NORMAL',     @ahora + (@dia * 3),  '11:00', '11:40', 'VIRTUAL',     NULL,                                  'https://meet.contitalent.com/entrevista-nicolas', 'Mariana Solis', 'Coordinadora de Marketing',   'REPROGRAMADA','PENDIENTE','Demo: entrevista normal reprogramada.', 'Nueva fecha confirmada para tu entrevista normal.',                  'admin@contitalent.com', 1, NULL, NULL,                       NULL,                                                  @ahora - (@dia * 3),  NULL),
+(7, 11,'ENTREVISTA_NORMAL',     @ahora - (@dia * 6),  '08:30', '09:10', 'VIRTUAL',     NULL,                                  'https://meet.contitalent.com/entrevista-gabriela','Rafael Vega', 'Coordinador academico',       'REALIZADA',  'APROBADO',  'Perfil docente validado.', 'Aprobaste la entrevista normal.',                                            'admin@contitalent.com', 1, 1,    'admin@contitalent.com',    'Resultado cargado como dato demo.',                    @ahora - (@dia * 6),  @ahora - (@dia * 6)),
+(8, 11,'EVALUACION_PSICOLOGICA',@ahora + (@dia * 4),  '16:00', '16:45', 'VIRTUAL',     NULL,                                  'https://meet.contitalent.com/psico-gabriela', 'Paola Ruiz',   'Psicologa organizacional',    'PROGRAMADA', 'PENDIENTE', 'Demo: evaluacion psicologica creada y pendiente.', 'Tu evaluacion psicologica esta programada.',                        'admin@contitalent.com', 1, NULL, NULL,                       NULL,                                                  @ahora - (@dia * 2),  NULL),
+(9, 12,'ENTREVISTA_NORMAL',     @ahora - (@dia * 11), '10:00', '10:45', 'PRESENCIAL',  'Campus principal - Bienestar Universitario', NULL,                                  'Carmen Rios',    'Directora de Bienestar',      'REALIZADA',  'APROBADO',  'Experiencia alineada al cargo.', 'Aprobaste la entrevista normal.',                                      'admin@contitalent.com', 1, 1,    'admin@contitalent.com',    'Resultado cargado como dato demo.',                    @ahora - (@dia * 11), @ahora - (@dia * 11)),
+(10,12,'EVALUACION_PSICOLOGICA',@ahora - (@dia * 10), '14:00', '14:40', 'PRESENCIAL',  'Campus principal - Psicologia',         NULL,                                        'Paola Ruiz',     'Psicologa organizacional',    'REALIZADA',  'APROBADO',  'Sin observaciones restrictivas.', 'Aprobaste la evaluacion psicologica.',                                  'admin@contitalent.com', 1, 1,    'admin@contitalent.com',    'Resultado cargado como dato demo.',                    @ahora - (@dia * 10), @ahora - (@dia * 10)),
+(11,13,'ENTREVISTA_NORMAL',     @ahora - (@dia * 7),  '12:00', '12:30', 'VIRTUAL',     NULL,                                  'https://meet.contitalent.com/entrevista-mateo', 'Ana Castillo', 'Lider de seleccion',          'REALIZADA',  'DESAPROBADO','Necesita mayor experiencia docente.', 'Por ahora no continuas en el proceso.',                                'admin@contitalent.com', 1, 1,    'admin@contitalent.com',    'Resultado cargado como dato demo.',                    @ahora - (@dia * 7),  @ahora - (@dia * 7));
 
 INSERT INTO tbl_evaluacion_psicologica_postulante (id, postulante_id, fecha_evaluacion, resultado, observacion, usuario_admin, creado_en) VALUES
-(1, 6, @ahora - (@dia * 12), 'APTO', 'Sin observaciones restrictivas', 'admin@contitalent.com', @ahora - (@dia * 12));
+(1, 6, @ahora - (@dia * 12), 'APTO', 'Sin observaciones restrictivas', 'admin@contitalent.com', @ahora - (@dia * 12)),
+(2, 11,@ahora + (@dia * 4),  'PENDIENTE', 'Demo: registro psicologico creado para mostrar la etapa pendiente.', 'admin@contitalent.com', @ahora - (@dia * 2)),
+(3, 12,@ahora - (@dia * 10), 'APTO', 'Competencias socioemocionales acordes al puesto.', 'admin@contitalent.com', @ahora - (@dia * 10));
 
 -- ===== Respuestas (entidad intermedia Postulante - Pregunta) =====
 INSERT INTO tbl_postulante_respuesta (postulante_id, pregunta_id, opcion_elegida) VALUES
@@ -465,7 +492,12 @@ INSERT INTO tbl_postulante_respuesta (postulante_id, pregunta_id, opcion_elegida
 (4, 6, 1), (4, 7, 1), (4, 8, 1),
 (5, 9, 1), (5, 10, 1), (5, 11, 1),
 (6, 9, 1), (6, 10, 1), (6, 11, 1),
-(7, 12, 0), (7, 13, 0);
+(7, 12, 0), (7, 13, 0),
+(8, 1, 1), (8, 2, 1), (8, 3, 1), (8, 4, 0), (8, 5, 3),
+(9, 6, 1), (9, 7, 1), (9, 8, 1),
+(10, 12, 0), (10, 13, 1),
+(11, 9, 1), (11, 10, 1), (11, 11, 1),
+(13, 1, 1), (13, 2, 0), (13, 3, 1), (13, 4, 0), (13, 5, 3);
 
 -- =====================================================================
 -- Ajuste de auto-increment (siguiente id disponible)
@@ -473,15 +505,15 @@ INSERT INTO tbl_postulante_respuesta (postulante_id, pregunta_id, opcion_elegida
 ALTER TABLE tbl_area                              AUTO_INCREMENT = 9;
 ALTER TABLE tbl_rol                               AUTO_INCREMENT = 3;
 ALTER TABLE tbl_estado                            AUTO_INCREMENT = 8;
-ALTER TABLE tbl_usuario                           AUTO_INCREMENT = 9;
+ALTER TABLE tbl_usuario                           AUTO_INCREMENT = 15;
 ALTER TABLE tbl_oferta                            AUTO_INCREMENT = 12;
 ALTER TABLE tbl_oferta_requisito                  AUTO_INCREMENT = 100;
 ALTER TABLE tbl_oferta_beneficio                  AUTO_INCREMENT = 100;
 ALTER TABLE tbl_oferta_habilidad                  AUTO_INCREMENT = 100;
 ALTER TABLE tbl_pregunta                          AUTO_INCREMENT = 14;
-ALTER TABLE tbl_postulante                        AUTO_INCREMENT = 8;
+ALTER TABLE tbl_postulante                        AUTO_INCREMENT = 14;
 ALTER TABLE tbl_documento_postulante              AUTO_INCREMENT = 6;
-ALTER TABLE tbl_historial_estado_postulante       AUTO_INCREMENT = 9;
-ALTER TABLE tbl_entrevista_postulante             AUTO_INCREMENT = 5;
-ALTER TABLE tbl_evaluacion_psicologica_postulante AUTO_INCREMENT = 2;
+ALTER TABLE tbl_historial_estado_postulante       AUTO_INCREMENT = 15;
+ALTER TABLE tbl_entrevista_postulante             AUTO_INCREMENT = 12;
+ALTER TABLE tbl_evaluacion_psicologica_postulante AUTO_INCREMENT = 4;
 ALTER TABLE tbl_postulante_respuesta              AUTO_INCREMENT = 100;
