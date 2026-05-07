@@ -5,12 +5,15 @@ import com.conti_talent.springboot.appweb.conti_talent_web.dto.request.Evaluacio
 import com.conti_talent.springboot.appweb.conti_talent_web.exception.BusinessException;
 import com.conti_talent.springboot.appweb.conti_talent_web.exception.ResourceNotFoundException;
 import com.conti_talent.springboot.appweb.conti_talent_web.model.Estado;
+import com.conti_talent.springboot.appweb.conti_talent_web.model.HistorialEstadoPostulante;
 import com.conti_talent.springboot.appweb.conti_talent_web.model.Postulante;
 import com.conti_talent.springboot.appweb.conti_talent_web.model.Pregunta;
 import com.conti_talent.springboot.appweb.conti_talent_web.model.enums.EstadoCodigo;
 import com.conti_talent.springboot.appweb.conti_talent_web.repository.IEstadoRepository;
+import com.conti_talent.springboot.appweb.conti_talent_web.repository.IHistorialEstadoPostulanteRepository;
 import com.conti_talent.springboot.appweb.conti_talent_web.repository.IPostulanteRepository;
 import com.conti_talent.springboot.appweb.conti_talent_web.repository.IPreguntaRepository;
+import com.conti_talent.springboot.appweb.conti_talent_web.service.EvaluacionCompuestaService;
 import com.conti_talent.springboot.appweb.conti_talent_web.service.IEvaluacionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,13 +36,19 @@ public class EvaluacionServiceImpl implements IEvaluacionService {
     private final IPostulanteRepository postulanteRepository;
     private final IPreguntaRepository preguntaRepository;
     private final IEstadoRepository estadoRepository;
+    private final IHistorialEstadoPostulanteRepository historialRepository;
+    private final EvaluacionCompuestaService evaluacionCompuestaService;
 
     public EvaluacionServiceImpl(IPostulanteRepository postulanteRepository,
                                  IPreguntaRepository preguntaRepository,
-                                 IEstadoRepository estadoRepository) {
+                                 IEstadoRepository estadoRepository,
+                                 IHistorialEstadoPostulanteRepository historialRepository,
+                                 EvaluacionCompuestaService evaluacionCompuestaService) {
         this.postulanteRepository = postulanteRepository;
         this.preguntaRepository = preguntaRepository;
         this.estadoRepository = estadoRepository;
+        this.historialRepository = historialRepository;
+        this.evaluacionCompuestaService = evaluacionCompuestaService;
     }
 
     @Override
@@ -136,15 +145,29 @@ public class EvaluacionServiceImpl implements IEvaluacionService {
                                                    Map<Long, Integer> respuestas) {
         postulante.setPuntaje(puntajeFinal);
         postulante.setRespuestas(new HashMap<>(respuestas));
+        postulante.setFechaEvaluacion(System.currentTimeMillis());
+        evaluacionCompuestaService.recalcular(postulante);
 
         EstadoCodigo codigoSiguiente = puntajeFinal >= UMBRAL_APROBACION
                 ? EstadoCodigo.APROBADO_TECNICO
                 : EstadoCodigo.EN_EVALUACION;
+        String codigoAnterior = postulante.getEstado() != null ? postulante.getEstado().getCodigo() : null;
         Estado estadoSiguiente = estadoRepository.findByCodigo(codigoSiguiente.name())
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Estado '" + codigoSiguiente + "' no esta cargado en el sistema"));
         postulante.setEstado(estadoSiguiente);
 
-        postulanteRepository.save(postulante);
+        Postulante guardado = postulanteRepository.save(postulante);
+        if (codigoAnterior == null || !codigoAnterior.equals(codigoSiguiente.name())) {
+            HistorialEstadoPostulante historial = new HistorialEstadoPostulante();
+            historial.setPostulante(guardado);
+            historial.setEstadoAnterior(codigoAnterior);
+            historial.setEstadoNuevo(codigoSiguiente.name());
+            historial.setFechaCambio(System.currentTimeMillis());
+            historial.setUsuarioAdmin("Sistema");
+            historial.setObservacionInterna("Evaluacion tecnica registrada");
+            historial.setObservacionPostulante("Tu evaluacion tecnica fue registrada.");
+            historialRepository.save(historial);
+        }
     }
 }

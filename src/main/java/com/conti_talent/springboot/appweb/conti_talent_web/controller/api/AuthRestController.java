@@ -50,7 +50,7 @@ public class AuthRestController {
     public ResponseEntity<SesionDTO> me(HttpSession session) {
         SesionDTO sesion = (SesionDTO) session.getAttribute(SESSION_ATTR);
         if (sesion == null) {
-            throw new UnauthorizedException("No autenticado");
+            throw new UnauthorizedException("Necesitas autentificación");
         }
         return ResponseEntity.ok(sesion);
     }

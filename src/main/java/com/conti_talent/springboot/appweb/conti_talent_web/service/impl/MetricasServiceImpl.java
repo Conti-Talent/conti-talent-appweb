@@ -6,6 +6,7 @@ import com.conti_talent.springboot.appweb.conti_talent_web.model.Oferta;
 import com.conti_talent.springboot.appweb.conti_talent_web.model.Postulante;
 import com.conti_talent.springboot.appweb.conti_talent_web.model.enums.EstadoCodigo;
 import com.conti_talent.springboot.appweb.conti_talent_web.repository.IMetricasRepository;
+import com.conti_talent.springboot.appweb.conti_talent_web.repository.IEntrevistaPostulanteRepository;
 import com.conti_talent.springboot.appweb.conti_talent_web.repository.IOfertaRepository;
 import com.conti_talent.springboot.appweb.conti_talent_web.repository.IPostulanteRepository;
 import com.conti_talent.springboot.appweb.conti_talent_web.service.IMetricasService;
@@ -20,19 +21,25 @@ public class MetricasServiceImpl implements IMetricasService {
 
     private final IMetricasRepository metricasRepository;
     private final IPostulanteRepository postulanteRepository;
+    private final IEntrevistaPostulanteRepository entrevistaRepository;
     private final IOfertaRepository ofertaRepository;
 
     public MetricasServiceImpl(IMetricasRepository metricasRepository,
                                IPostulanteRepository postulanteRepository,
+                               IEntrevistaPostulanteRepository entrevistaRepository,
                                IOfertaRepository ofertaRepository) {
         this.metricasRepository = metricasRepository;
         this.postulanteRepository = postulanteRepository;
+        this.entrevistaRepository = entrevistaRepository;
         this.ofertaRepository = ofertaRepository;
     }
 
     @Override
+    @Transactional(readOnly = true)
     public MetricasDTO obtenerDashboard() {
-        return metricasRepository.load();
+        MetricasDTO metricas = metricasRepository.load();
+        metricas.setEstadoActual(calcularEstadoActual());
+        return metricas;
     }
 
     @Override
@@ -48,7 +55,7 @@ public class MetricasServiceImpl implements IMetricasService {
         List<Postulante> ordenados = base.stream()
                 .filter(p -> p.getEstado() == null
                         || !EstadoCodigo.RECHAZADO.name().equals(p.getEstado().getCodigo()))
-                .sorted(Comparator.comparingInt(Postulante::getPuntaje).reversed())
+                .sorted(Comparator.comparingInt(Postulante::getPuntajeFinal).reversed())
                 .limit(Math.max(1, limite))
                 .collect(Collectors.toList());
 
@@ -58,14 +65,19 @@ public class MetricasServiceImpl implements IMetricasService {
             String codigoEstado = postulante.getEstado() != null
                     ? postulante.getEstado().getCodigo()
                     : "DESCONOCIDO";
-            filas.add(new RankingItemDTO(
+            RankingItemDTO fila = new RankingItemDTO(
                     i + 1,
                     postulante.getId(),
                     postulante.getNombre(),
                     postulante.getOfertaId(),
                     titulosOferta.getOrDefault(postulante.getOfertaId(), "—"),
                     codigoEstado,
-                    postulante.getPuntaje()));
+                    postulante.getPuntajeFinal());
+            fila.setPuntajeCuestionario(postulante.getPuntaje());
+            fila.setPuntajeExperiencia(postulante.getPuntajeExperiencia());
+            fila.setPuntajeHabilidades(postulante.getPuntajeHabilidades());
+            fila.setPuntajeFinal(postulante.getPuntajeFinal());
+            filas.add(fila);
         }
         return filas;
     }
@@ -107,5 +119,26 @@ public class MetricasServiceImpl implements IMetricasService {
                     return fila;
                 })
                 .collect(Collectors.toList());
+    }
+
+    private MetricasDTO.EstadoActual calcularEstadoActual() {
+        List<Postulante> postulantes = postulanteRepository.findAll();
+        int activos = (int) postulantes.stream()
+                .filter(p -> p.getEstado() == null || !EstadoCodigo.valueOf(p.getEstado().getCodigo()).esTerminal())
+                .count();
+        int aceptados = (int) postulantes.stream()
+                .filter(p -> p.getEstado() != null && EstadoCodigo.ACEPTADO.name().equals(p.getEstado().getCodigo()))
+                .count();
+        int entrevistasActivas = (int) entrevistaRepository.findAll().stream()
+                .filter(e -> List.of("PROGRAMADA", "REPROGRAMADA").contains(e.getEstadoEntrevista()))
+                .count();
+
+        MetricasDTO.EstadoActual estadoActual = new MetricasDTO.EstadoActual();
+        estadoActual.setPostulantesActivos(activos);
+        estadoActual.setOfertasAbiertas((int) ofertaRepository.count());
+        estadoActual.setEntrevistasHoy(entrevistasActivas);
+        estadoActual.setOfertasEsteMes(aceptados);
+        estadoActual.setTiempoPromedio("Demo actual");
+        return estadoActual;
     }
 }

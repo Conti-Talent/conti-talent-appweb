@@ -16,9 +16,8 @@
 <body>
   <header class="site-header">
     <div class="site-header__inner">
-      <a class="brand" th:href="@{/}" href="/">
-        <span class="brand__mark">C</span>
-        <span class="brand__name">Conti<span>Talent</span></span>
+      <a class="brand" th:href="@{/}" href="/" aria-label="Inicio Conti Talent">
+        <img class="brand__logo" th:src="@{/img/contitalent.png}" src="/img/contitalent.png" alt="Conti Talent" />
       </a>
       <nav class="primary-nav">
         <a th:href="@{/registro}" href="/registro" class="btn btn--ghost btn--sm">Crear cuenta</a>

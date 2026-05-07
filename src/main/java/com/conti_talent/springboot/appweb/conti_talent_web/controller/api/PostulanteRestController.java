@@ -4,12 +4,15 @@ import com.conti_talent.springboot.appweb.conti_talent_web.dto.PostulanteDTO;
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.request.PostularRequest;
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.response.ApiResponse;
 import com.conti_talent.springboot.appweb.conti_talent_web.exception.ResourceNotFoundException;
+import com.conti_talent.springboot.appweb.conti_talent_web.model.DocumentoPostulante;
 import com.conti_talent.springboot.appweb.conti_talent_web.service.CvStorageService;
+import com.conti_talent.springboot.appweb.conti_talent_web.service.IDocumentoPostulanteService;
 import com.conti_talent.springboot.appweb.conti_talent_web.service.IPostulanteService;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,11 +27,14 @@ public class PostulanteRestController {
 
     private final IPostulanteService postulanteService;
     private final CvStorageService cvStorageService;
+    private final IDocumentoPostulanteService documentoService;
 
     public PostulanteRestController(IPostulanteService postulanteService,
-                                    CvStorageService cvStorageService) {
+                                    CvStorageService cvStorageService,
+                                    IDocumentoPostulanteService documentoService) {
         this.postulanteService = postulanteService;
         this.cvStorageService = cvStorageService;
+        this.documentoService = documentoService;
     }
 
     /**
@@ -47,6 +53,18 @@ public class PostulanteRestController {
     @GetMapping("/{id}")
     public PostulanteDTO obtener(@PathVariable Long id) {
         return postulanteService.obtenerPorId(id);
+    }
+
+    @GetMapping("/{id}/proceso")
+    public PostulanteDTO obtenerProceso(@PathVariable Long id) {
+        return postulanteService.obtenerPorId(id);
+    }
+
+    @GetMapping("/ranking")
+    public List<PostulanteDTO> ranking(@RequestParam(value = "oferta", required = false) Long ofertaId,
+                                       @RequestParam(value = "estado", required = false) String estado,
+                                       @RequestParam(value = "area", required = false) Long areaId) {
+        return postulanteService.obtenerRanking(ofertaId, estado, areaId);
     }
 
     @PostMapping
@@ -87,7 +105,37 @@ public class PostulanteRestController {
     @PatchMapping("/{id}/estado")
     public PostulanteDTO cambiarEstado(@PathVariable Long id, @RequestBody Map<String, String> body) {
         String referenciaEstado = body.containsKey("estadoId") ? body.get("estadoId") : body.get("estado");
-        return postulanteService.cambiarEstado(id, referenciaEstado);
+        return postulanteService.cambiarEstado(id, referenciaEstado, body.get("usuarioAdmin"),
+                body.get("observacionInterna"), body.get("observacionPostulante"));
+    }
+
+    @PatchMapping("/{id}/observaciones")
+    public PostulanteDTO actualizarObservacion(@PathVariable Long id, @RequestBody Map<String, String> body) {
+        return postulanteService.actualizarObservacionAdmin(id, body.get("observacionAdmin"));
+    }
+
+    @PostMapping(value = "/{id}/documentos", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> subirDocumento(@PathVariable Long id,
+                                            @RequestParam("tipoDocumento") String tipoDocumento,
+                                            @RequestParam("archivo") MultipartFile archivo) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(documentoService.subir(id, tipoDocumento, archivo));
+    }
+
+    @GetMapping("/{id}/documentos")
+    public List<?> listarDocumentos(@PathVariable Long id) {
+        return documentoService.listar(id);
+    }
+
+    @GetMapping("/{id}/documentos/{documentoId}/descargar")
+    public ResponseEntity<Resource> descargarDocumento(@PathVariable Long id, @PathVariable Long documentoId) {
+        DocumentoPostulante documento = documentoService.obtenerDocumento(id, documentoId);
+        Resource resource = documentoService.cargarRecurso(documento);
+        boolean esPdf = "pdf".equalsIgnoreCase(documento.getExtension());
+        return ResponseEntity.ok()
+                .contentType(esPdf ? MediaType.APPLICATION_PDF : MediaType.APPLICATION_OCTET_STREAM)
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        (esPdf ? "inline" : "attachment") + "; filename=\"" + documento.getNombreOriginal().replace("\"", "") + "\"")
+                .body(resource);
     }
 
     @DeleteMapping("/{id}")

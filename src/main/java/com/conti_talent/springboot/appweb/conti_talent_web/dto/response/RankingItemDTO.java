@@ -9,6 +9,10 @@ public class RankingItemDTO {
     private String ofertaTitulo;
     private String estadoCodigo;
     private int puntaje;
+    private int puntajeCuestionario;
+    private int puntajeExperiencia;
+    private int puntajeHabilidades;
+    private int puntajeFinal;
 
     public RankingItemDTO() {
     }
@@ -23,6 +27,8 @@ public class RankingItemDTO {
         this.ofertaTitulo = ofertaTitulo;
         this.estadoCodigo = estadoCodigo;
         this.puntaje = puntaje;
+        this.puntajeCuestionario = puntaje;
+        this.puntajeFinal = puntaje;
     }
 
     public int getPosicion() { return posicion; }
@@ -45,4 +51,16 @@ public class RankingItemDTO {
 
     public int getPuntaje() { return puntaje; }
     public void setPuntaje(int puntaje) { this.puntaje = puntaje; }
+
+    public int getPuntajeCuestionario() { return puntajeCuestionario; }
+    public void setPuntajeCuestionario(int puntajeCuestionario) { this.puntajeCuestionario = puntajeCuestionario; }
+
+    public int getPuntajeExperiencia() { return puntajeExperiencia; }
+    public void setPuntajeExperiencia(int puntajeExperiencia) { this.puntajeExperiencia = puntajeExperiencia; }
+
+    public int getPuntajeHabilidades() { return puntajeHabilidades; }
+    public void setPuntajeHabilidades(int puntajeHabilidades) { this.puntajeHabilidades = puntajeHabilidades; }
+
+    public int getPuntajeFinal() { return puntajeFinal; }
+    public void setPuntajeFinal(int puntajeFinal) { this.puntajeFinal = puntajeFinal; }
 }

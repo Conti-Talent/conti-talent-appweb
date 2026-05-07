@@ -17,6 +17,7 @@ const Ofertas = (() => {
     areaId: Storage.toNumber(data.areaId),
     modalidad: data.modalidad || 'Presencial',
     ubicacion: data.ubicacion || '',
+    horario: data.horario || '',
     vacantes: parseInt(data.vacantes, 10) || 1,
     destacada: !!data.destacada,
     descripcion: (data.descripcion || '').trim(),

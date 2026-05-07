@@ -7,8 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/base.css" />
-  <link rel="stylesheet" href="../css/layout.css" />
+  <link rel="stylesheet" href="../css/base.css?v=logo-big" />
+  <link rel="stylesheet" href="../css/layout.css?v=logo-full" />
   <link rel="stylesheet" href="../css/components.css" />
   <link rel="stylesheet" href="../css/pages.css" />
   <link rel="stylesheet" href="../css/animations.css" />
@@ -17,8 +17,7 @@
   <header class="site-header">
     <div class="site-header__inner">
       <a class="brand" th:href="@{/}" href="/">
-        <span class="brand__mark">C</span>
-        <span class="brand__name">Conti<span>Talent</span> · Admin</span>
+        <img class="brand__logo" th:src="@{/img/contitalent.png}" src="/img/contitalent.png" alt="Conti Talent" /><span class="brand__admin">Admin</span>
       </a>
       <nav class="primary-nav">
         <a th:href="@{/}" href="/">Ir al sitio</a>
@@ -69,26 +68,34 @@
       </section>
 
       <section class="section--top-loose">
-        <header class="page-header">
-          <h2>Ranking de postulantes</h2>
-          <select class="select" id="ranking-oferta-filter">
-            <option value="">Todas las ofertas</option>
-          </select>
-        </header>
+          <header class="page-header">
+            <h2>Ranking de postulantes</h2>
+            <div class="filters-bar" style="margin:0">
+              <select class="select" id="ranking-oferta-filter">
+                <option value="">Todas las ofertas</option>
+              </select>
+              <select class="select" id="ranking-estado-filter">
+                <option value="">Todos los estados</option>
+              </select>
+              <select class="select" id="ranking-area-filter">
+                <option value="">Todas las areas</option>
+              </select>
+            </div>
+          </header>
         <div class="ranking-list" id="ranking-list"></div>
       </section>
     </main>
   </div>
 
-  <script src="../js/storage-api.js?v=rest3"></script>
-  <script src="../js/ui.js?v=rest3"></script>
-  <script src="../js/validators.js?v=rest3"></script>
-  <script src="../js/auth.js?v=rest3"></script>
-  <script src="../js/areas.js?v=rest3"></script>
-  <script src="../js/ofertas.js?v=rest3"></script>
-  <script src="../js/postulantes.js?v=rest3"></script>
-  <script src="../js/chart.js?v=rest3"></script>
-  <script src="../js/main.js?v=rest3"></script>
-  <script src="../js/page-admin-metricas.js?v=rest3"></script>
+  <script src="../js/storage-api.js?v=rest7"></script>
+  <script src="../js/ui.js?v=rest7"></script>
+  <script src="../js/validators.js?v=rest7"></script>
+  <script src="../js/auth.js?v=rest7"></script>
+  <script src="../js/areas.js?v=rest7"></script>
+  <script src="../js/ofertas.js?v=rest7"></script>
+  <script src="../js/postulantes.js?v=rest7"></script>
+  <script src="../js/chart.js?v=rest7"></script>
+  <script src="../js/main.js?v=rest7"></script>
+  <script src="../js/page-admin-metricas.js?v=rest7"></script>
 </body>
 </html>

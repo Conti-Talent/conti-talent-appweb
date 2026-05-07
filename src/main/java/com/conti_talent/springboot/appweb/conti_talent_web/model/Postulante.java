@@ -2,14 +2,28 @@ package com.conti_talent.springboot.appweb.conti_talent_web.model;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Postulante a una oferta. Tabla TBL_POSTULANTE.
- * Relaciones: ManyToOne a Usuario (nullable), Oferta y Estado.
- * Las respuestas a la evaluacion se persisten en tabla auxiliar
- * TBL_POSTULANTE_RESPUESTA como Map<preguntaId, indiceElegido>.
+ *
+ * Relaciones:
+ *   - ManyToOne a Usuario (nullable, postulante puede ser anonimo o registrado).
+ *   - ManyToOne a Oferta y Estado (obligatorias).
+ *
+ * Las respuestas de la evaluacion tecnica se modelan como una relacion 1:N
+ * hacia la entidad intermedia {@link RespuestaPostulante} (resuelve la N:M
+ * conceptual Postulante - Pregunta). Hacia afuera el Postulante sigue
+ * exponiendo la API legada {@code Map<preguntaId, opcionElegida>} para no
+ * romper services, mappers ni el frontend.
+ *
+ * Las habilidades del postulante se conservan como texto libre en
+ * {@code habilidades} (campo descriptivo del CV). Si en el futuro se desea
+ * un catalogo controlado, se puede crear una entidad PostulanteHabilidad
+ * siguiendo el mismo patron usado para OfertaHabilidad.
  */
 @Entity
 @Table(name = "tbl_postulante")
@@ -52,24 +66,75 @@ public class Postulante {
     @Column(name = "cv", length = 255)
     private String cv;
 
-    @Column(name = "puntaje", nullable = false)
+    @Column(name = "fecha_postulacion", nullable = false)
+    private long fechaPostulacion;
+
+    @Column(name = "fecha_evaluacion")
+    private Long fechaEvaluacion;
+
+    @Column(name = "anios_experiencia", nullable = false)
+    private int aniosExperiencia;
+
+    @Column(name = "nivel_estudios", length = 80)
+    private String nivelEstudios;
+
+    @Column(name = "carrera", length = 120)
+    private String carrera;
+
+    @Column(name = "disponibilidad", length = 80)
+    private String disponibilidad;
+
+    @Column(name = "modalidad_preferida", length = 40)
+    private String modalidadPreferida;
+
+    @Column(name = "pretension_salarial")
+    private Double pretensionSalarial;
+
+    @Column(name = "linkedin", length = 255)
+    private String linkedin;
+
+    @Column(name = "portafolio", length = 255)
+    private String portafolio;
+
+    @Column(name = "observacion_admin", columnDefinition = "TEXT")
+    private String observacionAdmin;
+
+    @Column(name = "puntaje_cuestionario", nullable = false)
     private int puntaje;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(
-            name = "tbl_postulante_respuesta",
-            joinColumns = @JoinColumn(name = "postulante_id",
-                    foreignKey = @ForeignKey(name = "fk_respuesta_postulante")))
-    @MapKeyColumn(name = "pregunta_id")
-    @Column(name = "opcion_elegida", nullable = false)
-    private Map<Long, Integer> respuestas;
+    @Column(name = "puntaje_experiencia", nullable = false)
+    private int puntajeExperiencia;
+
+    @Column(name = "puntaje_habilidades", nullable = false)
+    private int puntajeHabilidades;
+
+    @Column(name = "puntaje_final", nullable = false)
+    private int puntajeFinal;
+
+    @OneToMany(mappedBy = "postulante", cascade = CascadeType.ALL,
+            orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<RespuestaPostulante> respuestasEntidades = new ArrayList<>();
 
     @Column(name = "creado_en", nullable = false)
     private long creadoEn;
 
-    public Postulante() {
-        this.respuestas = new HashMap<>();
-    }
+    @OneToMany(mappedBy = "postulante", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("fechaSubida DESC")
+    private List<DocumentoPostulante> documentos = new ArrayList<>();
+
+    @OneToMany(mappedBy = "postulante", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("fechaCambio DESC")
+    private List<HistorialEstadoPostulante> historialEstados = new ArrayList<>();
+
+    @OneToMany(mappedBy = "postulante", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("fechaProgramada DESC")
+    private List<EntrevistaPostulante> entrevistas = new ArrayList<>();
+
+    @OneToMany(mappedBy = "postulante", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("fechaEvaluacion DESC")
+    private List<EvaluacionPsicologicaPostulante> evaluacionesPsicologicas = new ArrayList<>();
+
+    public Postulante() {}
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -110,11 +175,97 @@ public class Postulante {
     public int getPuntaje() { return puntaje; }
     public void setPuntaje(int puntaje) { this.puntaje = puntaje; }
 
-    public Map<Long, Integer> getRespuestas() { return respuestas; }
-    public void setRespuestas(Map<Long, Integer> respuestas) {
-        this.respuestas = respuestas != null ? new HashMap<>(respuestas) : new HashMap<>();
-    }
+    public long getFechaPostulacion() { return fechaPostulacion; }
+    public void setFechaPostulacion(long fechaPostulacion) { this.fechaPostulacion = fechaPostulacion; }
+
+    public Long getFechaEvaluacion() { return fechaEvaluacion; }
+    public void setFechaEvaluacion(Long fechaEvaluacion) { this.fechaEvaluacion = fechaEvaluacion; }
+
+    public int getAniosExperiencia() { return aniosExperiencia; }
+    public void setAniosExperiencia(int aniosExperiencia) { this.aniosExperiencia = Math.max(0, aniosExperiencia); }
+
+    public String getNivelEstudios() { return nivelEstudios; }
+    public void setNivelEstudios(String nivelEstudios) { this.nivelEstudios = nivelEstudios; }
+
+    public String getCarrera() { return carrera; }
+    public void setCarrera(String carrera) { this.carrera = carrera; }
+
+    public String getDisponibilidad() { return disponibilidad; }
+    public void setDisponibilidad(String disponibilidad) { this.disponibilidad = disponibilidad; }
+
+    public String getModalidadPreferida() { return modalidadPreferida; }
+    public void setModalidadPreferida(String modalidadPreferida) { this.modalidadPreferida = modalidadPreferida; }
+
+    public Double getPretensionSalarial() { return pretensionSalarial; }
+    public void setPretensionSalarial(Double pretensionSalarial) { this.pretensionSalarial = pretensionSalarial; }
+
+    public String getLinkedin() { return linkedin; }
+    public void setLinkedin(String linkedin) { this.linkedin = linkedin; }
+
+    public String getPortafolio() { return portafolio; }
+    public void setPortafolio(String portafolio) { this.portafolio = portafolio; }
+
+    public String getObservacionAdmin() { return observacionAdmin; }
+    public void setObservacionAdmin(String observacionAdmin) { this.observacionAdmin = observacionAdmin; }
+
+    public int getPuntajeExperiencia() { return puntajeExperiencia; }
+    public void setPuntajeExperiencia(int puntajeExperiencia) { this.puntajeExperiencia = puntajeExperiencia; }
+
+    public int getPuntajeHabilidades() { return puntajeHabilidades; }
+    public void setPuntajeHabilidades(int puntajeHabilidades) { this.puntajeHabilidades = puntajeHabilidades; }
+
+    public int getPuntajeFinal() { return puntajeFinal; }
+    public void setPuntajeFinal(int puntajeFinal) { this.puntajeFinal = puntajeFinal; }
 
     public long getCreadoEn() { return creadoEn; }
     public void setCreadoEn(long creadoEn) { this.creadoEn = creadoEn; }
+
+    public List<DocumentoPostulante> getDocumentos() { return documentos; }
+    public void setDocumentos(List<DocumentoPostulante> documentos) {
+        this.documentos = documentos != null ? new ArrayList<>(documentos) : new ArrayList<>();
+    }
+
+    public List<HistorialEstadoPostulante> getHistorialEstados() { return historialEstados; }
+    public void setHistorialEstados(List<HistorialEstadoPostulante> historialEstados) {
+        this.historialEstados = historialEstados != null ? new ArrayList<>(historialEstados) : new ArrayList<>();
+    }
+
+    public List<EntrevistaPostulante> getEntrevistas() { return entrevistas; }
+    public void setEntrevistas(List<EntrevistaPostulante> entrevistas) {
+        this.entrevistas = entrevistas != null ? new ArrayList<>(entrevistas) : new ArrayList<>();
+    }
+
+    public List<EvaluacionPsicologicaPostulante> getEvaluacionesPsicologicas() { return evaluacionesPsicologicas; }
+    public void setEvaluacionesPsicologicas(List<EvaluacionPsicologicaPostulante> evaluacionesPsicologicas) {
+        this.evaluacionesPsicologicas = evaluacionesPsicologicas != null
+                ? new ArrayList<>(evaluacionesPsicologicas)
+                : new ArrayList<>();
+    }
+
+    /* =========================================================
+     * Respuestas: API publica compatible (Map<preguntaId, opcion>)
+     * Internamente trabaja sobre la entidad RespuestaPostulante.
+     * ========================================================= */
+
+    public List<RespuestaPostulante> getRespuestasEntidades() { return respuestasEntidades; }
+
+    public Map<Long, Integer> getRespuestas() {
+        Map<Long, Integer> mapa = new HashMap<>();
+        for (RespuestaPostulante respuesta : respuestasEntidades) {
+            if (respuesta.getPreguntaId() != null) {
+                mapa.put(respuesta.getPreguntaId(), respuesta.getOpcionElegida());
+            }
+        }
+        return mapa;
+    }
+
+    public void setRespuestas(Map<Long, Integer> respuestas) {
+        this.respuestasEntidades.clear();
+        if (respuestas == null) return;
+        for (Map.Entry<Long, Integer> entrada : respuestas.entrySet()) {
+            if (entrada.getKey() == null || entrada.getValue() == null) continue;
+            this.respuestasEntidades.add(
+                    new RespuestaPostulante(this, entrada.getKey(), entrada.getValue()));
+        }
+    }
 }

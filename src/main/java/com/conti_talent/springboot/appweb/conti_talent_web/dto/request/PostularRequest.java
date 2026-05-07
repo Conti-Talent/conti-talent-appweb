@@ -10,6 +10,14 @@ public class PostularRequest {
     private String experiencia;
     private String habilidades;
     private String cv;
+    private int aniosExperiencia;
+    private String nivelEstudios;
+    private String carrera;
+    private String disponibilidad;
+    private String modalidadPreferida;
+    private Double pretensionSalarial;
+    private String linkedin;
+    private String portafolio;
 
     public PostularRequest() {
     }
@@ -37,4 +45,28 @@ public class PostularRequest {
 
     public String getCv() { return cv; }
     public void setCv(String cv) { this.cv = cv; }
+
+    public int getAniosExperiencia() { return aniosExperiencia; }
+    public void setAniosExperiencia(int aniosExperiencia) { this.aniosExperiencia = aniosExperiencia; }
+
+    public String getNivelEstudios() { return nivelEstudios; }
+    public void setNivelEstudios(String nivelEstudios) { this.nivelEstudios = nivelEstudios; }
+
+    public String getCarrera() { return carrera; }
+    public void setCarrera(String carrera) { this.carrera = carrera; }
+
+    public String getDisponibilidad() { return disponibilidad; }
+    public void setDisponibilidad(String disponibilidad) { this.disponibilidad = disponibilidad; }
+
+    public String getModalidadPreferida() { return modalidadPreferida; }
+    public void setModalidadPreferida(String modalidadPreferida) { this.modalidadPreferida = modalidadPreferida; }
+
+    public Double getPretensionSalarial() { return pretensionSalarial; }
+    public void setPretensionSalarial(Double pretensionSalarial) { this.pretensionSalarial = pretensionSalarial; }
+
+    public String getLinkedin() { return linkedin; }
+    public void setLinkedin(String linkedin) { this.linkedin = linkedin; }
+
+    public String getPortafolio() { return portafolio; }
+    public void setPortafolio(String portafolio) { this.portafolio = portafolio; }
 }

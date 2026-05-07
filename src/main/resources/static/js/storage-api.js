@@ -55,6 +55,7 @@ const Storage = (() => {
       ...o,
       id: normalizeId(o.id),
       areaId: normalizeId(o.areaId),
+      horario: o.horario || '',
       requisitos: o.requisitos || [],
       beneficios: o.beneficios || []
     })),
@@ -70,6 +71,7 @@ const Storage = (() => {
       usuarioId: normalizeId(p.usuarioId),
       ofertaId: normalizeId(p.ofertaId),
       estadoId: normalizeId(p.estadoId),
+      entrevistas: (p.entrevistas || []).map((e) => ({ ...e, id: normalizeId(e.id), postulanteId: normalizeId(e.postulanteId) })),
       respuestas: p.respuestas || {}
     })),
     metricas: (data) => data || { series: {}, estadoActual: {} }
@@ -206,10 +208,48 @@ const ContiAPI = (() => ({
     });
   },
   cvUrl: (postulanteId) => `/api/postulantes/${Storage.toNumber(postulanteId)}/cv`,
-  cambiarEstado: (id, estado) =>
-    Storage.request(`/api/postulantes/${Storage.toNumber(id)}/estado`, { method: 'PATCH', body: JSON.stringify({ estado }) }),
+  cambiarEstado: (id, estado, extra = {}) =>
+    Storage.request(`/api/postulantes/${Storage.toNumber(id)}/estado`, {
+      method: 'PATCH',
+      body: JSON.stringify({ estado, ...extra })
+    }),
+  actualizarObservacionPostulante: (id, observacionAdmin) =>
+    Storage.request(`/api/postulantes/${Storage.toNumber(id)}/observaciones`, {
+      method: 'PATCH',
+      body: JSON.stringify({ observacionAdmin })
+    }),
+  registrarEntrevista: (id, data) =>
+    Storage.request(`/api/postulantes/${Storage.toNumber(id)}/entrevistas`, { method: 'POST', body: JSON.stringify(data) }),
+  listarEntrevistas: (id) =>
+    Storage.request(`/api/postulantes/${Storage.toNumber(id)}/entrevistas`),
+  actualizarEntrevista: (id, data) =>
+    Storage.request(`/api/entrevistas/${Storage.toNumber(id)}`, { method: 'PUT', body: JSON.stringify(data) }),
+  registrarResultadoEntrevista: (id, data) =>
+    Storage.request(`/api/entrevistas/${Storage.toNumber(id)}/resultado`, { method: 'PATCH', body: JSON.stringify(data) }),
+  cancelarEntrevista: (id, data = {}) =>
+    Storage.request(`/api/entrevistas/${Storage.toNumber(id)}/cancelar`, { method: 'PATCH', body: JSON.stringify(data) }),
+  reprogramarEntrevista: (id, data) =>
+    Storage.request(`/api/entrevistas/${Storage.toNumber(id)}/reprogramar`, { method: 'PATCH', body: JSON.stringify(data) }),
+  obtenerProcesoPostulante: (id) =>
+    Storage.request(`/api/postulantes/${Storage.toNumber(id)}/proceso`),
+  registrarEvaluacionPsicologica: (id, data) =>
+    Storage.request(`/api/postulantes/${Storage.toNumber(id)}/evaluaciones-psicologicas`, { method: 'POST', body: JSON.stringify(data) }),
   rechazar: (id) => Storage.request(`/api/postulantes/${Storage.toNumber(id)}/rechazar`, { method: 'POST' }),
   eliminarPostulante: (id) => Storage.request(`/api/postulantes/${Storage.toNumber(id)}`, { method: 'DELETE' }),
+  subirDocumentoPostulante: (id, tipoDocumento, archivo) => {
+    const formData = new FormData();
+    formData.append('tipoDocumento', tipoDocumento);
+    formData.append('archivo', archivo);
+    return fetch(API + `/api/postulantes/${Storage.toNumber(id)}/documentos`, {
+      method: 'POST',
+      credentials: 'include',
+      body: formData
+    }).then(async (response) => {
+      const body = await response.json().catch(() => null);
+      if (!response.ok) throw new Error(body?.message || body?.error || `Error HTTP ${response.status}`);
+      return body;
+    });
+  },
 
   calificar: (postulanteId, respuestas) =>
     Storage.request('/api/evaluaciones', { method: 'POST', body: JSON.stringify({ postulanteId: Storage.toNumber(postulanteId), respuestas }) })

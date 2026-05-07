@@ -65,7 +65,17 @@ public class PublicViewController {
 
     @GetMapping("/mi-estado")
     public String miEstado() {
-        return "mi-estado";
+        return "redirect:/mis-postulaciones";
+    }
+
+    @GetMapping({"/mi-proceso", "/mi-proceso.html"})
+    public String miProceso() {
+        return "mi-proceso";
+    }
+
+    @GetMapping({"/mis-postulaciones", "/mis-postulaciones.html"})
+    public String misPostulaciones() {
+        return "mis-postulaciones";
     }
 
     @GetMapping("/mis-respuestas")
@@ -77,7 +87,7 @@ public class PublicViewController {
             "/index.html", "/login.html", "/registro.html", "/ofertas.html",
             "/detalle-oferta.html", "/postular.html", "/evaluacion.html",
             "/areas.html", "/contacto.html", "/publicidad.html",
-            "/mi-estado.html", "/mis-respuestas.html"
+            "/mi-estado.html", "/mi-proceso.html", "/mis-postulaciones.html", "/mis-respuestas.html"
     })
     public RedirectView redirectLegacyHtml(HttpServletRequest request) {
         String cleanPath = request.getRequestURI().replaceFirst("\\.html$", "");

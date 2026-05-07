@@ -130,7 +130,7 @@
       ]),
       footer: UI.el('footer', { style: 'display:flex;justify-content:flex-end;gap:8px;margin-top:16px;' }, [
         UI.el('a', { href: `/mis-respuestas?postulante=${postulante.id}`, class: 'btn btn--ghost', text: 'Ver mis respuestas' }),
-        UI.el('a', { href: '/mi-estado', class: 'btn btn--primary', text: 'Ir a mi estado' })
+        UI.el('a', { href: `/mi-proceso?postulante=${postulante.id}`, class: 'btn btn--primary', text: 'Ver mi proceso' })
       ])
     });
   };

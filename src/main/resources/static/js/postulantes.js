@@ -18,7 +18,15 @@ const Postulantes = (() => {
     telefono: data.telefono || '',
     experiencia: data.experiencia || '',
     habilidades: data.habilidades || '',
-    cv: data.cv || ''
+    cv: data.cv || '',
+    aniosExperiencia: Storage.toNumber(data.aniosExperiencia) || 0,
+    nivelEstudios: data.nivelEstudios || '',
+    carrera: data.carrera || '',
+    disponibilidad: data.disponibilidad || '',
+    modalidadPreferida: data.modalidadPreferida || '',
+    pretensionSalarial: Storage.toNumber(data.pretensionSalarial),
+    linkedin: data.linkedin || '',
+    portafolio: data.portafolio || ''
   });
 
   const create = (data) => {
@@ -44,10 +52,19 @@ const Postulantes = (() => {
     return Storage.upsert(ENTITY, { ...current, ...data, id });
   };
 
-  const setEstado = (id, estado) => {
+  const setEstado = (id, estado, extra = {}) => {
     const current = get(id);
     const updated = update(id, { estado });
-    ContiAPI.cambiarEstado(id, estado)
+    ContiAPI.cambiarEstado(id, estado, extra)
+      .then((saved) => Storage.upsert(ENTITY, saved))
+      .catch((err) => { if (current) Storage.upsert(ENTITY, current); UI.showToast(err.message, 'error'); });
+    return updated;
+  };
+
+  const setObservacionAdmin = (id, observacionAdmin) => {
+    const current = get(id);
+    const updated = update(id, { observacionAdmin });
+    ContiAPI.actualizarObservacionPostulante(id, observacionAdmin)
       .then((saved) => Storage.upsert(ENTITY, saved))
       .catch((err) => { if (current) Storage.upsert(ENTITY, current); UI.showToast(err.message, 'error'); });
     return updated;
@@ -93,10 +110,10 @@ const Postulantes = (() => {
 
   const ranking = (ofertaId = null) => {
     const data = ofertaId ? byOferta(ofertaId) : list();
-    return [...data].sort((a, b) => b.puntaje - a.puntaje);
+    return [...data].sort((a, b) => (b.puntajeFinal ?? b.puntaje ?? 0) - (a.puntajeFinal ?? a.puntaje ?? 0));
   };
 
-  return { list, get, byOferta, byUsuario, create, update, setEstado, setPuntaje, saveEvaluation, hasRespuestas, remove, softDelete, ranking };
+  return { list, get, byOferta, byUsuario, create, update, setEstado, setObservacionAdmin, setPuntaje, saveEvaluation, hasRespuestas, remove, softDelete, ranking };
 })();
 
 window.Postulantes = Postulantes;

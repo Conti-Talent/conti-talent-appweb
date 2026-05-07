@@ -42,7 +42,7 @@
     if (session.rol === 'admin') {
       slot.appendChild(UI.el('a', { href: '/admin/dashboard', class: 'btn btn--ghost btn--sm', text: 'Panel admin' }));
     } else {
-      slot.appendChild(UI.el('a', { href: '/mi-estado', class: 'btn btn--ghost btn--sm', text: 'Mi estado' }));
+      slot.appendChild(UI.el('a', { href: '/mis-postulaciones', class: 'btn btn--ghost btn--sm', text: 'Mis postulaciones' }));
     }
     slot.appendChild(avatar);
     slot.appendChild(name);
@@ -190,7 +190,7 @@
     if (session.rol === 'admin' && !isAdmin) {
       wrap.appendChild(UI.el('a', { href: '/admin/dashboard', class: 'btn btn--ghost', text: 'Panel admin' }));
     } else if (session.rol !== 'admin') {
-      wrap.appendChild(UI.el('a', { href: '/mi-estado', class: 'btn btn--ghost', text: 'Mi estado' }));
+      wrap.appendChild(UI.el('a', { href: '/mis-postulaciones', class: 'btn btn--ghost', text: 'Mis postulaciones' }));
     }
 
     const logoutBtn = UI.el('button', { class: 'btn btn--danger', 'data-mobile-action': 'logout', text: 'Cerrar sesión' });

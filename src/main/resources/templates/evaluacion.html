@@ -16,12 +16,11 @@
 <body>
   <header class="site-header">
     <div class="site-header__inner">
-      <a class="brand" th:href="@{/}" href="/">
-        <span class="brand__mark">C</span>
-        <span class="brand__name">Conti<span>Talent</span></span>
+      <a class="brand" th:href="@{/}" href="/" aria-label="Inicio Conti Talent">
+        <img class="brand__logo" th:src="@{/img/contitalent.png}" src="/img/contitalent.png" alt="Conti Talent" />
       </a>
       <nav class="primary-nav">
-        <a th:href="@{/mi-estado}" href="/mi-estado">Mi estado</a>
+        <a th:href="@{/mis-postulaciones}" href="/mis-postulaciones">Mis postulaciones</a>
         <span class="session-area" id="session-area"></span>
       </nav>
     </div>
@@ -32,7 +31,7 @@
       <header class="anim-fade-up mb-4">
         <span class="badge" id="quiz-area">—</span>
         <h1 id="quiz-title" class="mt-2">—</h1>
-        <p class="muted">Responde todas las preguntas. Tu puntaje se calculará automáticamente.</p>
+        <p class="muted">Responde todas las preguntas. Tu puntaje se calculará después automáticamente.</p>
       </header>
 
       <div class="quiz__progress">
@@ -46,7 +45,7 @@
       <form id="quiz-form" novalidate>
         <div id="quiz-questions"></div>
         <div class="form-actions mt-5">
-          <a th:href="@{/mi-estado}" href="/mi-estado" class="btn btn--ghost">Guardar y salir</a>
+          <a th:href="@{/mis-postulaciones}" href="/mis-postulaciones" class="btn btn--ghost">Guardar y salir</a>
           <button type="submit" class="btn btn--primary btn--lg">Enviar respuestas</button>
         </div>
       </form>

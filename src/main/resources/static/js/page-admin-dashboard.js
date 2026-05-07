@@ -49,7 +49,7 @@
     const tbody = document.getElementById('admin-recientes');
     if (!tbody) return;
     UI.clear(tbody);
-    const recientes = [...Postulantes.list()].sort((a, b) => b.creadoEn - a.creadoEn).slice(0, 6);
+    const recientes = [...Postulantes.list()].sort((a, b) => b.creadoEn - a.creadoEn);
     recientes.forEach((p) => {
       const oferta = Ofertas.get(p.ofertaId);
       const tr = UI.el('tr', {}, [
@@ -64,7 +64,7 @@
         ]),
         UI.el('td', { text: oferta?.titulo || '—' }),
         UI.el('td', {}, [UI.renderEstadoBadge(p.estado)]),
-        UI.el('td', { text: `${p.puntaje} pts` }),
+        UI.el('td', { text: `${p.puntajeFinal ?? p.puntaje ?? 0} pts` }),
         UI.el('td', { text: UI.formatDate(p.creadoEn) })
       ]);
       tbody.appendChild(tr);
