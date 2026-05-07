@@ -1,14 +1,16 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.dto.request;
 
+import java.time.LocalDateTime;
+
 public class EvaluacionPsicologicaRequest {
-    private long fechaEvaluacion;
+    private LocalDateTime fechaEvaluacion;
     private String resultado;
     private String observacion;
     private String usuarioAdmin;
     private String observacionPostulante;
 
-    public long getFechaEvaluacion() { return fechaEvaluacion; }
-    public void setFechaEvaluacion(long fechaEvaluacion) { this.fechaEvaluacion = fechaEvaluacion; }
+    public LocalDateTime getFechaEvaluacion() { return fechaEvaluacion; }
+    public void setFechaEvaluacion(LocalDateTime fechaEvaluacion) { this.fechaEvaluacion = fechaEvaluacion; }
 
     public String getResultado() { return resultado; }
     public void setResultado(String resultado) { this.resultado = resultado; }

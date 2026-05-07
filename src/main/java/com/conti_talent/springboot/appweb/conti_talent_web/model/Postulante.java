@@ -2,6 +2,8 @@ package com.conti_talent.springboot.appweb.conti_talent_web.model;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -67,10 +69,10 @@ public class Postulante {
     private String cv;
 
     @Column(name = "fecha_postulacion", nullable = false)
-    private long fechaPostulacion;
+    private LocalDateTime fechaPostulacion;
 
     @Column(name = "fecha_evaluacion")
-    private Long fechaEvaluacion;
+    private LocalDateTime fechaEvaluacion;
 
     @Column(name = "anios_experiencia", nullable = false)
     private int aniosExperiencia;
@@ -116,7 +118,7 @@ public class Postulante {
     private List<RespuestaPostulante> respuestasEntidades = new ArrayList<>();
 
     @Column(name = "creado_en", nullable = false)
-    private long creadoEn;
+    private LocalDateTime creadoEn;
 
     @OneToMany(mappedBy = "postulante", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("fechaSubida DESC")
@@ -175,11 +177,11 @@ public class Postulante {
     public int getPuntaje() { return puntaje; }
     public void setPuntaje(int puntaje) { this.puntaje = puntaje; }
 
-    public long getFechaPostulacion() { return fechaPostulacion; }
-    public void setFechaPostulacion(long fechaPostulacion) { this.fechaPostulacion = fechaPostulacion; }
+    public LocalDateTime getFechaPostulacion() { return fechaPostulacion; }
+    public void setFechaPostulacion(LocalDateTime fechaPostulacion) { this.fechaPostulacion = fechaPostulacion; }
 
-    public Long getFechaEvaluacion() { return fechaEvaluacion; }
-    public void setFechaEvaluacion(Long fechaEvaluacion) { this.fechaEvaluacion = fechaEvaluacion; }
+    public LocalDateTime getFechaEvaluacion() { return fechaEvaluacion; }
+    public void setFechaEvaluacion(LocalDateTime fechaEvaluacion) { this.fechaEvaluacion = fechaEvaluacion; }
 
     public int getAniosExperiencia() { return aniosExperiencia; }
     public void setAniosExperiencia(int aniosExperiencia) { this.aniosExperiencia = Math.max(0, aniosExperiencia); }
@@ -217,8 +219,8 @@ public class Postulante {
     public int getPuntajeFinal() { return puntajeFinal; }
     public void setPuntajeFinal(int puntajeFinal) { this.puntajeFinal = puntajeFinal; }
 
-    public long getCreadoEn() { return creadoEn; }
-    public void setCreadoEn(long creadoEn) { this.creadoEn = creadoEn; }
+    public LocalDateTime getCreadoEn() { return creadoEn; }
+    public void setCreadoEn(LocalDateTime creadoEn) { this.creadoEn = creadoEn; }
 
     public List<DocumentoPostulante> getDocumentos() { return documentos; }
     public void setDocumentos(List<DocumentoPostulante> documentos) {

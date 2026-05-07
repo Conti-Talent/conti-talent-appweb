@@ -38,7 +38,7 @@ const Postulantes = (() => {
       estado: 'POSTULADO',
       puntaje: 0,
       respuestas: {},
-      creadoEn: Date.now()
+      creadoEn: new Date().toISOString()
     };
     Storage.upsert(ENTITY, temp);
     ContiAPI.postular(payload(data))

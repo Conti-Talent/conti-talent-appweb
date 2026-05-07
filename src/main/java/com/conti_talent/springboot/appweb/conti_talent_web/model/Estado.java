@@ -2,6 +2,8 @@ package com.conti_talent.springboot.appweb.conti_talent_web.model;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+
 /**
  * Entidad de dominio Estado del flujo de seleccion. Tabla TBL_ESTADO.
  */
@@ -34,13 +36,13 @@ public class Estado {
     private boolean activo;
 
     @Column(name = "creado_en", nullable = false)
-    private long creadoEn;
+    private LocalDateTime creadoEn;
 
     public Estado() {
     }
 
     public Estado(String codigo, String nombre, String descripcion,
-                  int orden, boolean terminal, boolean activo, long creadoEn) {
+                  int orden, boolean terminal, boolean activo, LocalDateTime creadoEn) {
         this.codigo = codigo;
         this.nombre = nombre;
         this.descripcion = descripcion;
@@ -71,6 +73,6 @@ public class Estado {
     public boolean isActivo() { return activo; }
     public void setActivo(boolean activo) { this.activo = activo; }
 
-    public long getCreadoEn() { return creadoEn; }
-    public void setCreadoEn(long creadoEn) { this.creadoEn = creadoEn; }
+    public LocalDateTime getCreadoEn() { return creadoEn; }
+    public void setCreadoEn(LocalDateTime creadoEn) { this.creadoEn = creadoEn; }
 }

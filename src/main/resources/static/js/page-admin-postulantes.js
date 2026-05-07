@@ -223,7 +223,7 @@
     const area = oferta ? Areas.get(oferta.areaId) : null;
     const initials = p.nombre.split(' ').map((n) => n[0]).slice(0, 2).join('');
     const docs = p.documentos || [];
-    const historial = (p.historialEstados || []).slice().sort((a, b) => (a.fechaCambio || 0) - (b.fechaCambio || 0));
+    const historial = (p.historialEstados || []).slice().sort((a, b) => UI.dateValue(a.fechaCambio) - UI.dateValue(b.fechaCambio));
     const entrevistas = p.entrevistas || [];
     const psicologicas = p.evaluacionesPsicologicas || [];
     const cvDoc = docs.find((d) => d.tipoDocumento === 'CV');
@@ -671,7 +671,7 @@
         await onSave({
           ...values,
           tipoEntrevista: tipo,
-          fechaProgramada: new Date(`${values.fecha}T00:00:00`).getTime(),
+          fechaProgramada: `${values.fecha}T00:00:00`,
           usuarioAdmin: Auth.getSession()?.email || 'Admin'
         });
         await Storage.refresh('postulantes');

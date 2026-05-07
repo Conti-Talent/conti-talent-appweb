@@ -1,5 +1,7 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.service.impl;
 
+import java.time.LocalDateTime;
+
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.EvaluacionDTO;
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.request.EvaluacionRequest;
 import com.conti_talent.springboot.appweb.conti_talent_web.exception.BusinessException;
@@ -74,7 +76,7 @@ public class EvaluacionServiceImpl implements IEvaluacionService {
         return new EvaluacionDTO(
                 postulante.getId(), postulante.getOfertaId(),
                 puntajeFinal, respuestasCorrectas, totalPreguntas,
-                respuestasMarcadas, System.currentTimeMillis());
+                respuestasMarcadas, LocalDateTime.now());
     }
 
     @Override
@@ -91,7 +93,7 @@ public class EvaluacionServiceImpl implements IEvaluacionService {
         return new EvaluacionDTO(
                 postulante.getId(), postulante.getOfertaId(), postulante.getPuntaje(),
                 respuestasCorrectas, preguntasOferta.size(),
-                postulante.getRespuestas(), 0L);
+                postulante.getRespuestas(), postulante.getFechaEvaluacion());
     }
 
     /* ============ Helpers privados ============ */
@@ -145,7 +147,7 @@ public class EvaluacionServiceImpl implements IEvaluacionService {
                                                    Map<Long, Integer> respuestas) {
         postulante.setPuntaje(puntajeFinal);
         postulante.setRespuestas(new HashMap<>(respuestas));
-        postulante.setFechaEvaluacion(System.currentTimeMillis());
+        postulante.setFechaEvaluacion(LocalDateTime.now());
         evaluacionCompuestaService.recalcular(postulante);
 
         EstadoCodigo codigoSiguiente = puntajeFinal >= UMBRAL_APROBACION
@@ -163,7 +165,7 @@ public class EvaluacionServiceImpl implements IEvaluacionService {
             historial.setPostulante(guardado);
             historial.setEstadoAnterior(codigoAnterior);
             historial.setEstadoNuevo(codigoSiguiente.name());
-            historial.setFechaCambio(System.currentTimeMillis());
+            historial.setFechaCambio(LocalDateTime.now());
             historial.setUsuarioAdmin("Sistema");
             historial.setObservacionInterna("Evaluacion tecnica registrada");
             historial.setObservacionPostulante("Tu evaluacion tecnica fue registrada.");

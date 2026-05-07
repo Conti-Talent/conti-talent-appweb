@@ -2,6 +2,8 @@ package com.conti_talent.springboot.appweb.conti_talent_web.model;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "tbl_entrevista_postulante")
 public class EntrevistaPostulante {
@@ -19,7 +21,7 @@ public class EntrevistaPostulante {
     private String tipoEntrevista;
 
     @Column(name = "fecha_programada", nullable = false)
-    private long fechaProgramada;
+    private LocalDateTime fechaProgramada;
 
     @Column(name = "hora_inicio", length = 5)
     private String horaInicio;
@@ -74,10 +76,10 @@ public class EntrevistaPostulante {
     private String observacionCambio;
 
     @Column(name = "creado_en", nullable = false)
-    private long creadoEn;
+    private LocalDateTime creadoEn;
 
     @Column(name = "actualizado_en")
-    private Long actualizadoEn;
+    private LocalDateTime actualizadoEn;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -90,11 +92,11 @@ public class EntrevistaPostulante {
     public String getTipoEntrevista() { return tipoEntrevista; }
     public void setTipoEntrevista(String tipoEntrevista) { this.tipoEntrevista = tipoEntrevista; }
 
-    public long getFechaProgramada() { return fechaProgramada; }
-    public void setFechaProgramada(long fechaProgramada) { this.fechaProgramada = fechaProgramada; }
+    public LocalDateTime getFechaProgramada() { return fechaProgramada; }
+    public void setFechaProgramada(LocalDateTime fechaProgramada) { this.fechaProgramada = fechaProgramada; }
 
-    public long getFechaEntrevista() { return fechaProgramada; }
-    public void setFechaEntrevista(long fechaEntrevista) { this.fechaProgramada = fechaEntrevista; }
+    public LocalDateTime getFechaEntrevista() { return fechaProgramada; }
+    public void setFechaEntrevista(LocalDateTime fechaEntrevista) { this.fechaProgramada = fechaEntrevista; }
 
     public String getHoraInicio() { return horaInicio; }
     public void setHoraInicio(String horaInicio) { this.horaInicio = horaInicio; }
@@ -151,9 +153,9 @@ public class EntrevistaPostulante {
     public String getObservacionCambio() { return observacionCambio; }
     public void setObservacionCambio(String observacionCambio) { this.observacionCambio = observacionCambio; }
 
-    public long getCreadoEn() { return creadoEn; }
-    public void setCreadoEn(long creadoEn) { this.creadoEn = creadoEn; }
+    public LocalDateTime getCreadoEn() { return creadoEn; }
+    public void setCreadoEn(LocalDateTime creadoEn) { this.creadoEn = creadoEn; }
 
-    public Long getActualizadoEn() { return actualizadoEn; }
-    public void setActualizadoEn(Long actualizadoEn) { this.actualizadoEn = actualizadoEn; }
+    public LocalDateTime getActualizadoEn() { return actualizadoEn; }
+    public void setActualizadoEn(LocalDateTime actualizadoEn) { this.actualizadoEn = actualizadoEn; }
 }

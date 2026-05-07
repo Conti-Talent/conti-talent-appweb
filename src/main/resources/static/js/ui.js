@@ -88,6 +88,12 @@ const UI = (() => {
     const d = new Date(ts);
     return d.toLocaleString('es-PE', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
   };
+  const dateValue = (ts) => {
+    if (!ts) return 0;
+    const value = ts instanceof Date ? ts.getTime() : new Date(ts).getTime();
+    return Number.isNaN(value) ? 0 : value;
+  };
+
 
   /* ----- Estado postulante ----- */
   const ESTADOS = {
@@ -119,7 +125,7 @@ const UI = (() => {
     });
   };
 
-  return { $, $$, el, clear, showToast, openModal, confirm, formatDate, formatDateTime, ESTADOS, renderEstadoBadge };
+  return { $, $$, el, clear, showToast, openModal, confirm, formatDate, formatDateTime, dateValue, ESTADOS, renderEstadoBadge };
 })();
 
 window.UI = UI;

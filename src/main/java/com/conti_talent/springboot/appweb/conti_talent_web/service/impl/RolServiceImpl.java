@@ -1,5 +1,7 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.service.impl;
 
+import java.time.LocalDateTime;
+
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.RolDTO;
 import com.conti_talent.springboot.appweb.conti_talent_web.exception.BusinessException;
 import com.conti_talent.springboot.appweb.conti_talent_web.exception.ResourceNotFoundException;
@@ -67,7 +69,7 @@ public class RolServiceImpl implements IRolService {
         nuevoRol.setNombre(dto.getNombre().trim());
         nuevoRol.setDescripcion(dto.getDescripcion() != null ? dto.getDescripcion().trim() : "");
         nuevoRol.setActivo(true);
-        nuevoRol.setCreadoEn(System.currentTimeMillis());
+        nuevoRol.setCreadoEn(LocalDateTime.now());
         return rolMapper.convertirADTO(rolRepository.save(nuevoRol));
     }
 

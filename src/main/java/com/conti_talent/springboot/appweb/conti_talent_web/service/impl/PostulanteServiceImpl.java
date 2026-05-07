@@ -1,5 +1,7 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.service.impl;
 
+import java.time.LocalDateTime;
+
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.PostulanteDTO;
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.request.PostularRequest;
 import com.conti_talent.springboot.appweb.conti_talent_web.exception.BusinessException;
@@ -93,7 +95,7 @@ public class PostulanteServiceImpl implements IPostulanteService {
                     .orElseThrow(() -> new BusinessException("Usuario inexistente: " + request.getUsuarioId()));
             nuevoPostulante.setUsuario(usuario);
         }
-        long ahora = System.currentTimeMillis();
+        LocalDateTime ahora = LocalDateTime.now();
         nuevoPostulante.setFechaPostulacion(ahora);
         nuevoPostulante.setCreadoEn(ahora);
         evaluacionCompuestaService.recalcular(nuevoPostulante);
@@ -232,7 +234,7 @@ public class PostulanteServiceImpl implements IPostulanteService {
         historial.setUsuarioAdmin(esTextoVacio(usuarioAdmin) ? "Sistema" : usuarioAdmin.trim());
         historial.setObservacionInterna(observacionInterna);
         historial.setObservacionPostulante(observacionPostulante);
-        historial.setFechaCambio(System.currentTimeMillis());
+        historial.setFechaCambio(LocalDateTime.now());
         historialRepository.save(historial);
         postulante.getHistorialEstados().add(historial);
     }

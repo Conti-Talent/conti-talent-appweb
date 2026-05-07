@@ -1,5 +1,7 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.service.impl;
 
+import java.time.LocalDateTime;
+
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.OfertaDTO;
 import com.conti_talent.springboot.appweb.conti_talent_web.exception.BusinessException;
 import com.conti_talent.springboot.appweb.conti_talent_web.exception.ResourceNotFoundException;
@@ -68,7 +70,7 @@ public class OfertaServiceImpl implements IOfertaService {
         validarDTO(dto, true);
         Oferta oferta = new Oferta();
         aplicarCambios(oferta, dto, true);
-        oferta.setCreadaEn(System.currentTimeMillis());
+        oferta.setCreadaEn(LocalDateTime.now());
         return mapper.toDTO(ofertaRepository.save(oferta));
     }
 

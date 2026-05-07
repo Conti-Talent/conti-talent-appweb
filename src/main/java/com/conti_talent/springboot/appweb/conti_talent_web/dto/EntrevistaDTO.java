@@ -1,11 +1,13 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.dto;
 
+import java.time.LocalDateTime;
+
 public class EntrevistaDTO {
     private Long id;
     private Long postulanteId;
     private String tipoEntrevista;
-    private long fechaProgramada;
-    private long fechaEntrevista;
+    private LocalDateTime fechaProgramada;
+    private LocalDateTime fechaEntrevista;
     private String horaInicio;
     private String horaFin;
     private String modalidad;
@@ -23,8 +25,8 @@ public class EntrevistaDTO {
     private Long actualizadoPorAdminId;
     private String actualizadoPorAdmin;
     private String observacionCambio;
-    private long creadoEn;
-    private Long actualizadoEn;
+    private LocalDateTime creadoEn;
+    private LocalDateTime actualizadoEn;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -35,11 +37,11 @@ public class EntrevistaDTO {
     public String getTipoEntrevista() { return tipoEntrevista; }
     public void setTipoEntrevista(String tipoEntrevista) { this.tipoEntrevista = tipoEntrevista; }
 
-    public long getFechaProgramada() { return fechaProgramada; }
-    public void setFechaProgramada(long fechaProgramada) { this.fechaProgramada = fechaProgramada; }
+    public LocalDateTime getFechaProgramada() { return fechaProgramada; }
+    public void setFechaProgramada(LocalDateTime fechaProgramada) { this.fechaProgramada = fechaProgramada; }
 
-    public long getFechaEntrevista() { return fechaEntrevista; }
-    public void setFechaEntrevista(long fechaEntrevista) { this.fechaEntrevista = fechaEntrevista; }
+    public LocalDateTime getFechaEntrevista() { return fechaEntrevista; }
+    public void setFechaEntrevista(LocalDateTime fechaEntrevista) { this.fechaEntrevista = fechaEntrevista; }
 
     public String getHoraInicio() { return horaInicio; }
     public void setHoraInicio(String horaInicio) { this.horaInicio = horaInicio; }
@@ -92,9 +94,9 @@ public class EntrevistaDTO {
     public String getObservacionCambio() { return observacionCambio; }
     public void setObservacionCambio(String observacionCambio) { this.observacionCambio = observacionCambio; }
 
-    public long getCreadoEn() { return creadoEn; }
-    public void setCreadoEn(long creadoEn) { this.creadoEn = creadoEn; }
+    public LocalDateTime getCreadoEn() { return creadoEn; }
+    public void setCreadoEn(LocalDateTime creadoEn) { this.creadoEn = creadoEn; }
 
-    public Long getActualizadoEn() { return actualizadoEn; }
-    public void setActualizadoEn(Long actualizadoEn) { this.actualizadoEn = actualizadoEn; }
+    public LocalDateTime getActualizadoEn() { return actualizadoEn; }
+    public void setActualizadoEn(LocalDateTime actualizadoEn) { this.actualizadoEn = actualizadoEn; }
 }

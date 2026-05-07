@@ -7,6 +7,8 @@ uploads/*
 !uploads/.gitkeep
 !uploads/cv/
 !uploads/cv/.gitkeep
+!uploads/certificados/
+!uploads/certificados/.gitkeep
 !**/src/main/**/target/
 !**/src/test/**/target/
 

@@ -23,11 +23,11 @@ const Ofertas = (() => {
     descripcion: (data.descripcion || '').trim(),
     requisitos: data.requisitos || [],
     beneficios: data.beneficios || [],
-    creadaEn: data.creadaEn || Date.now()
+    creadaEn: data.creadaEn || new Date().toISOString()
   });
 
   const create = (data) => {
-    const temp = { id: Storage.generateId(), ...payload(data), areaId: String(data.areaId), creadaEn: Date.now() };
+    const temp = { id: Storage.generateId(), ...payload(data), areaId: String(data.areaId), creadaEn: new Date().toISOString() };
     Storage.upsert(ENTITY, temp);
     ContiAPI.crearOferta(payload(data))
       .then((created) => Storage.upsert(ENTITY, created))

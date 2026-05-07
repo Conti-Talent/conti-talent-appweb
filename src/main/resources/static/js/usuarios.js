@@ -25,7 +25,7 @@ const Usuarios = (() => {
       email: data.email.trim(),
       rol: data.rol || 'postulante',
       activo: data.activo !== false,
-      creadoEn: Date.now()
+      creadoEn: new Date().toISOString()
     };
     Storage.upsert(ENTITY, temp);
     ContiAPI.crearUsuario(toRequest(data))

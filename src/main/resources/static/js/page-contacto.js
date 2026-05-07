@@ -22,7 +22,7 @@
       if (!result.valid) return;
 
       const mensajes = Storage.read('mensajes_contacto', []);
-      mensajes.push({ id: Storage.generateId(), ...result.values, recibidoEn: Date.now() });
+      mensajes.push({ id: Storage.generateId(), ...result.values, recibidoEn: new Date().toISOString() });
       Storage.write('mensajes_contacto', mensajes);
 
       UI.showToast('Tu mensaje fue enviado. Te contactaremos pronto.', 'success');

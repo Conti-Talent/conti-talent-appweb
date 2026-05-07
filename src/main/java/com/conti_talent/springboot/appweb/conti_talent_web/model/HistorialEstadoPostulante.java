@@ -2,6 +2,8 @@ package com.conti_talent.springboot.appweb.conti_talent_web.model;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "tbl_historial_estado_postulante")
 public class HistorialEstadoPostulante {
@@ -22,7 +24,7 @@ public class HistorialEstadoPostulante {
     private String estadoNuevo;
 
     @Column(name = "fecha_cambio", nullable = false)
-    private long fechaCambio;
+    private LocalDateTime fechaCambio;
 
     @Column(name = "usuario_admin", length = 120)
     private String usuarioAdmin;
@@ -47,8 +49,8 @@ public class HistorialEstadoPostulante {
     public String getEstadoNuevo() { return estadoNuevo; }
     public void setEstadoNuevo(String estadoNuevo) { this.estadoNuevo = estadoNuevo; }
 
-    public long getFechaCambio() { return fechaCambio; }
-    public void setFechaCambio(long fechaCambio) { this.fechaCambio = fechaCambio; }
+    public LocalDateTime getFechaCambio() { return fechaCambio; }
+    public void setFechaCambio(LocalDateTime fechaCambio) { this.fechaCambio = fechaCambio; }
 
     public String getUsuarioAdmin() { return usuarioAdmin; }
     public void setUsuarioAdmin(String usuarioAdmin) { this.usuarioAdmin = usuarioAdmin; }

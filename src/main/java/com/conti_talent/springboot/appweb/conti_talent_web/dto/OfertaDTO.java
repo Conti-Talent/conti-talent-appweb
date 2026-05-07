@@ -1,5 +1,7 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.dto;
 
+import java.time.LocalDateTime;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +20,7 @@ public class OfertaDTO {
     private List<String> requisitos;
     private List<String> beneficios;
     private List<String> habilidadesRequeridas;
-    private long creadaEn;
+    private LocalDateTime creadaEn;
 
     public OfertaDTO() {
         this.requisitos = new ArrayList<>();
@@ -71,6 +73,6 @@ public class OfertaDTO {
         this.habilidadesRequeridas = habilidadesRequeridas != null ? new ArrayList<>(habilidadesRequeridas) : new ArrayList<>();
     }
 
-    public long getCreadaEn() { return creadaEn; }
-    public void setCreadaEn(long creadaEn) { this.creadaEn = creadaEn; }
+    public LocalDateTime getCreadaEn() { return creadaEn; }
+    public void setCreadaEn(LocalDateTime creadaEn) { this.creadaEn = creadaEn; }
 }

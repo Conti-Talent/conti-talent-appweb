@@ -1,0 +1,29 @@
+{
+  "properties": [
+    {
+      "name": "app.cv.upload-dir",
+      "type": "java.lang.String",
+      "description": "Directorio donde se almacenan los CV subidos por el endpoint dedicado de CV."
+    },
+    {
+      "name": "app.cv.max-file-size",
+      "type": "java.lang.Long",
+      "description": "Tamanio maximo permitido para CV en bytes."
+    },
+    {
+      "name": "app.cv.allowed-content-types",
+      "type": "java.lang.String",
+      "description": "Lista separada por comas de content types permitidos para CV."
+    },
+    {
+      "name": "conti.uploads.postulantes-dir",
+      "type": "java.lang.String",
+      "description": "Directorio raiz de documentos de postulantes. Internamente se separa en cv y certificados."
+    },
+    {
+      "name": "conti.uploads.max-file-size-bytes",
+      "type": "java.lang.Long",
+      "description": "Tamanio maximo permitido para documentos de postulantes en bytes."
+    }
+  ]
+}

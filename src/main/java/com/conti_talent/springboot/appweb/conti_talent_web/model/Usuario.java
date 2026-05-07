@@ -2,6 +2,8 @@ package com.conti_talent.springboot.appweb.conti_talent_web.model;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+
 /**
  * Entidad Usuario. Cuenta autenticable con relacion ManyToOne a Rol.
  * Tabla TBL_USUARIO.
@@ -37,13 +39,13 @@ public class Usuario {
     private boolean activo;
 
     @Column(name = "creado_en", nullable = false)
-    private long creadoEn;
+    private LocalDateTime creadoEn;
 
     public Usuario() {
     }
 
     public Usuario(String nombre, String apellido, String email, String password,
-                   Rol rol, boolean activo, long creadoEn) {
+                   Rol rol, boolean activo, LocalDateTime creadoEn) {
         this.nombre = nombre;
         this.apellido = apellido;
         this.email = email;
@@ -77,6 +79,6 @@ public class Usuario {
     public boolean isActivo() { return activo; }
     public void setActivo(boolean activo) { this.activo = activo; }
 
-    public long getCreadoEn() { return creadoEn; }
-    public void setCreadoEn(long creadoEn) { this.creadoEn = creadoEn; }
+    public LocalDateTime getCreadoEn() { return creadoEn; }
+    public void setCreadoEn(LocalDateTime creadoEn) { this.creadoEn = creadoEn; }
 }
