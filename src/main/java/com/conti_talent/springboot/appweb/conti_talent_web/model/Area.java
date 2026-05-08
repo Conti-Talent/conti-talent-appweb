@@ -1,38 +1,17 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.model;
 
-import jakarta.persistence.*;
-
-/**
- * Area academica o administrativa que agrupa ofertas. Tabla TBL_AREA.
- */
-@Entity
-@Table(name = "tbl_area")
 public class Area {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(name = "nombre", nullable = false, length = 80)
     private String nombre;
-
-    @Column(name = "descripcion", length = 255)
     private String descripcion;
 
-    @Column(name = "icono", length = 30)
-    private String icono;
+    public Area() {}
 
-    @Column(name = "color", length = 10)
-    private String color;
-
-    public Area() {
-    }
-
-    public Area(String nombre, String descripcion, String icono, String color) {
+    public Area(Long id, String nombre, String descripcion) {
+        this.id = id;
         this.nombre = nombre;
         this.descripcion = descripcion;
-        this.icono = icono;
-        this.color = color;
     }
 
     public Long getId() { return id; }
@@ -43,10 +22,4 @@ public class Area {
 
     public String getDescripcion() { return descripcion; }
     public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
-
-    public String getIcono() { return icono; }
-    public void setIcono(String icono) { this.icono = icono; }
-
-    public String getColor() { return color; }
-    public void setColor(String color) { this.color = color; }
 }
