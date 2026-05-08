@@ -25,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 
+@SuppressWarnings("unused")
 @Service
 public class EntrevistaServiceImpl implements IEntrevistaService {
 
