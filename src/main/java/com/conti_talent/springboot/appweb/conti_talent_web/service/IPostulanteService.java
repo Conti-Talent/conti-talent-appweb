@@ -1,6 +1,7 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.service;
 
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.PostulanteDTO;
+import com.conti_talent.springboot.appweb.conti_talent_web.dto.request.PostulanteAdminRequest;
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.request.PostularRequest;
 
 import java.util.List;
@@ -16,6 +17,8 @@ public interface IPostulanteService {
     List<PostulanteDTO> listarPorUsuario(Long usuarioId);
 
     PostulanteDTO registrarPostulacion(PostularRequest request);
+
+    PostulanteDTO actualizarDesdeAdmin(Long idPostulante, PostulanteAdminRequest request);
 
     PostulanteDTO cambiarEstado(Long idPostulante, String estadoDestino);
 

@@ -26,7 +26,9 @@ const Postulantes = (() => {
     modalidadPreferida: data.modalidadPreferida || '',
     pretensionSalarial: Storage.toNumber(data.pretensionSalarial),
     linkedin: data.linkedin || '',
-    portafolio: data.portafolio || ''
+    portafolio: data.portafolio || '',
+    puntaje: Storage.toNumber(data.puntaje),
+    observacionAdmin: data.observacionAdmin || ''
   });
 
   const create = (data) => {
@@ -49,12 +51,21 @@ const Postulantes = (() => {
 
   const update = (id, data) => {
     const current = get(id);
+    const updated = Storage.upsert(ENTITY, { ...current, ...data, id });
+    ContiAPI.actualizarPostulante(id, payload(updated))
+      .then((saved) => Storage.upsert(ENTITY, saved))
+      .catch((err) => { if (current) Storage.upsert(ENTITY, current); UI.showToast(err.message, 'error'); });
+    return updated;
+  };
+
+  const updateLocal = (id, data) => {
+    const current = get(id);
     return Storage.upsert(ENTITY, { ...current, ...data, id });
   };
 
   const setEstado = (id, estado, extra = {}) => {
     const current = get(id);
-    const updated = update(id, { estado });
+    const updated = updateLocal(id, { estado });
     ContiAPI.cambiarEstado(id, estado, extra)
       .then((saved) => Storage.upsert(ENTITY, saved))
       .catch((err) => { if (current) Storage.upsert(ENTITY, current); UI.showToast(err.message, 'error'); });
@@ -63,7 +74,7 @@ const Postulantes = (() => {
 
   const setObservacionAdmin = (id, observacionAdmin) => {
     const current = get(id);
-    const updated = update(id, { observacionAdmin });
+    const updated = updateLocal(id, { observacionAdmin });
     ContiAPI.actualizarObservacionPostulante(id, observacionAdmin)
       .then((saved) => Storage.upsert(ENTITY, saved))
       .catch((err) => { if (current) Storage.upsert(ENTITY, current); UI.showToast(err.message, 'error'); });
@@ -78,7 +89,7 @@ const Postulantes = (() => {
 
   const saveEvaluation = (id, puntaje, respuestas) => {
     const current = get(id);
-    const updated = update(id, {
+    const updated = updateLocal(id, {
       puntaje,
       respuestas,
       estado: puntaje >= 70 ? 'APROBADO_TECNICO' : 'EN_EVALUACION'

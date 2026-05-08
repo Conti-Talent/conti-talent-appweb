@@ -3,6 +3,7 @@ package com.conti_talent.springboot.appweb.conti_talent_web.service.impl;
 import java.time.LocalDateTime;
 
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.PostulanteDTO;
+import com.conti_talent.springboot.appweb.conti_talent_web.dto.request.PostulanteAdminRequest;
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.request.PostularRequest;
 import com.conti_talent.springboot.appweb.conti_talent_web.exception.BusinessException;
 import com.conti_talent.springboot.appweb.conti_talent_web.exception.EstadoInvalidoException;
@@ -103,6 +104,39 @@ public class PostulanteServiceImpl implements IPostulanteService {
         registrarHistorial(guardado, null, estadoInicial.getCodigo(), "Sistema",
                 "Postulacion registrada", "Tu postulacion fue recibida correctamente.");
         return postulanteMapper.convertirADTO(guardado);
+    }
+
+    @Override
+    @Transactional
+    public PostulanteDTO actualizarDesdeAdmin(Long idPostulante, PostulanteAdminRequest request) {
+        if (request == null) throw new BusinessException("Datos de postulante requeridos");
+        Postulante postulante = buscarPostulanteOFallar(idPostulante);
+
+        if (request.getOfertaId() != null
+                && (postulante.getOfertaId() == null || !postulante.getOfertaId().equals(request.getOfertaId()))) {
+            Oferta oferta = ofertaRepository.findById(request.getOfertaId())
+                    .orElseThrow(() -> new BusinessException("Oferta inexistente: " + request.getOfertaId()));
+            postulante.setOferta(oferta);
+        }
+        if (!esTextoVacio(request.getNombre())) postulante.setNombre(request.getNombre().trim());
+        if (!esTextoVacio(request.getEmail())) postulante.setEmail(request.getEmail().trim());
+        if (request.getTelefono() != null) postulante.setTelefono(request.getTelefono().trim());
+        if (request.getExperiencia() != null) postulante.setExperiencia(request.getExperiencia().trim());
+        if (request.getHabilidades() != null) postulante.setHabilidades(request.getHabilidades().trim());
+        if (request.getCv() != null) postulante.setCv(request.getCv().trim());
+        if (request.getPuntaje() != null) postulante.setPuntaje(clampPuntaje(request.getPuntaje()));
+        if (request.getAniosExperiencia() != null) postulante.setAniosExperiencia(request.getAniosExperiencia());
+        if (request.getNivelEstudios() != null) postulante.setNivelEstudios(request.getNivelEstudios().trim());
+        if (request.getCarrera() != null) postulante.setCarrera(request.getCarrera().trim());
+        if (request.getDisponibilidad() != null) postulante.setDisponibilidad(request.getDisponibilidad().trim());
+        if (request.getModalidadPreferida() != null) postulante.setModalidadPreferida(request.getModalidadPreferida().trim());
+        if (request.getPretensionSalarial() != null) postulante.setPretensionSalarial(request.getPretensionSalarial());
+        if (request.getLinkedin() != null) postulante.setLinkedin(request.getLinkedin().trim());
+        if (request.getPortafolio() != null) postulante.setPortafolio(request.getPortafolio().trim());
+        if (request.getObservacionAdmin() != null) postulante.setObservacionAdmin(request.getObservacionAdmin().trim());
+
+        evaluacionCompuestaService.recalcular(postulante);
+        return postulanteMapper.convertirADTO(postulanteRepository.save(postulante));
     }
 
     @Override
@@ -230,5 +264,10 @@ public class PostulanteServiceImpl implements IPostulanteService {
 
     private static boolean esTextoVacio(String texto) {
         return texto == null || texto.trim().isEmpty();
+    }
+
+    private static int clampPuntaje(Integer puntaje) {
+        if (puntaje == null) return 0;
+        return Math.max(0, Math.min(100, puntaje));
     }
 }

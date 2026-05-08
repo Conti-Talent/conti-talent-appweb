@@ -9,11 +9,13 @@
     renderKPIs();
     renderEstadosBreakdown();
     renderRecientes();
+    renderUsuarios();
   };
 
   const renderKPIs = () => {
     const slot = document.getElementById('admin-kpis');
     const all  = Postulantes.list();
+    const usuarios = Usuarios.list();
     const aceptados = all.filter((p) => p.estado === 'ACEPTADO').length;
     const enProceso = all.filter((p) => !['ACEPTADO', 'RECHAZADO'].includes(p.estado)).length;
 
@@ -22,11 +24,43 @@
       { label: 'Postulantes totales', value: all.length },
       { label: 'En proceso',          value: enProceso },
       { label: 'Aceptados',           value: aceptados },
+      { label: 'Usuarios registrados', value: usuarios.length },
+      { label: 'Administradores', value: usuarios.filter((u) => u.rol === 'admin').length },
       { label: 'Ofertas abiertas',    value: Ofertas.list().length }
     ].forEach((kpi, i) => {
       slot.appendChild(UI.el('div', { class: `kpi anim-fade-up delay-${i + 1}` }, [
         UI.el('div', { class: 'kpi__label', text: kpi.label }),
         UI.el('div', { class: 'kpi__value', text: kpi.value })
+      ]));
+    });
+  };
+
+  const renderUsuarios = () => {
+    const tbody = document.getElementById('admin-usuarios-resumen');
+    if (!tbody) return;
+    UI.clear(tbody);
+    const usuarios = [...Usuarios.list()].sort((a, b) =>
+      (UI.dateValue(b.creadoEn)?.getTime() || 0) - (UI.dateValue(a.creadoEn)?.getTime() || 0));
+    if (usuarios.length === 0) {
+      tbody.appendChild(UI.el('tr', {}, [
+        UI.el('td', { colspan: 4, class: 'soft', style: 'text-align:center;padding:32px', text: 'No hay usuarios registrados.' })
+      ]));
+      return;
+    }
+    usuarios.forEach((u) => {
+      tbody.appendChild(UI.el('tr', {}, [
+        UI.el('td', {}, [
+          UI.el('div', { class: 'flex gap-2', style: 'align-items: center;' }, [
+            UI.el('div', { class: 'avatar', text: `${u.nombre?.[0] || ''}${u.apellido?.[0] || ''}` }),
+            UI.el('div', {}, [
+              UI.el('div', { text: `${u.nombre || ''} ${u.apellido || ''}`.trim(), style: 'font-weight: 500;' }),
+              UI.el('div', { class: 'soft', style: 'font-size: 0.8rem;', text: u.email })
+            ])
+          ])
+        ]),
+        UI.el('td', {}, [UI.el('span', { class: `badge ${u.rol === 'admin' ? 'badge--entrevista' : 'badge--evaluacion'}`, text: u.rol || '-' })]),
+        UI.el('td', {}, [UI.el('span', { class: `badge ${u.activo ? 'badge--aceptado' : 'badge--rechazado'}`, text: u.activo ? 'Activo' : 'Inactivo' })]),
+        UI.el('td', { text: UI.formatDate(u.creadoEn) })
       ]));
     });
   };

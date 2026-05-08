@@ -1,5 +1,6 @@
 HELP.md
 target/
+.m2/
 uploads/postulantes/*
 !uploads/postulantes/.gitkeep
 uploads/cv/*

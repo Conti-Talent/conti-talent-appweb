@@ -1,6 +1,7 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.controller.api;
 
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.PostulanteDTO;
+import com.conti_talent.springboot.appweb.conti_talent_web.dto.request.PostulanteAdminRequest;
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.request.PostularRequest;
 import com.conti_talent.springboot.appweb.conti_talent_web.model.DocumentoPostulante;
 import com.conti_talent.springboot.appweb.conti_talent_web.service.IDocumentoPostulanteService;
@@ -62,6 +63,11 @@ public class PostulanteRestController {
     @PostMapping
     public ResponseEntity<PostulanteDTO> postular(@RequestBody PostularRequest body) {
         return ResponseEntity.status(HttpStatus.CREATED).body(postulanteService.registrarPostulacion(body));
+    }
+
+    @PutMapping("/{id}")
+    public PostulanteDTO actualizar(@PathVariable Long id, @RequestBody PostulanteAdminRequest body) {
+        return postulanteService.actualizarDesdeAdmin(id, body);
     }
 
     /**

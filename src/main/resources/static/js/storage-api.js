@@ -185,6 +185,8 @@ const ContiAPI = (() => ({
   eliminarPregunta: (id) => Storage.request(`/api/preguntas/${Storage.toNumber(id)}`, { method: 'DELETE' }),
 
   postular: (data) => Storage.request('/api/postulantes', { method: 'POST', body: JSON.stringify(data) }),
+  actualizarPostulante: (id, data) =>
+    Storage.request(`/api/postulantes/${Storage.toNumber(id)}`, { method: 'PUT', body: JSON.stringify(data) }),
   cambiarEstado: (id, estado, extra = {}) =>
     Storage.request(`/api/postulantes/${Storage.toNumber(id)}/estado`, {
       method: 'PATCH',
