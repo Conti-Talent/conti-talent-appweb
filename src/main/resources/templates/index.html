@@ -1,24 +1,24 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Conti Talent</title>
-  <link rel="stylesheet" th:href="@{/css/base.css}" />
-</head>
+<head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Conti Talent</title><link rel="stylesheet" th:href="@{/css/base.css}"/></head>
 <body>
-  <header class="site-header">
-    <div class="container">
-      <span class="brand">ContiTalent</span>
-      <nav class="primary-nav">
-        <a th:href="@{/}">Inicio</a>
-        <a th:href="@{/areas}">Areas</a>
-        <a th:href="@{/ofertas}">Ofertas</a>
-        <a th:href="@{/contacto}">Contacto</a>
-        <span id="session-area"></span>
-      </nav>
-    </div>
-  </header>
+  <header class="site-header"><div class="container">
+    <a th:href="@{/}" class="brand">ContiTalent</a>
+    <nav class="primary-nav">
+      <a th:href="@{/areas}">Areas</a>
+      <a th:href="@{/ofertas}">Ofertas</a>
+      <a th:href="@{/contacto}">Contacto</a>
+      <th:block th:if="${session.usuario != null}">
+        <span th:text="${session.usuario.nombre}"></span>
+        <a th:href="@{/logout}">Cerrar sesion</a>
+      </th:block>
+      <th:block th:if="${session.usuario == null}">
+        <a th:href="@{/login}">Iniciar sesion</a>
+        <a th:href="@{/registro}" class="btn btn--primary">Crear cuenta</a>
+      </th:block>
+    </nav>
+  </div></header>
 
   <main class="container">
     <section class="hero">
@@ -31,24 +31,26 @@
     </section>
 
     <section class="section">
-      <h2 class="section-title">Areas disponibles</h2>
-      <p class="section-sub">Explora las areas de la universidad.</p>
-      <div class="grid grid--3" id="home-areas"></div>
+      <h2 class="section-title">Areas</h2>
+      <div class="grid grid--3">
+        <div class="card" th:each="area : ${areas}">
+          <h3 th:text="${area.nombre}"></h3>
+          <p th:text="${area.descripcion}"></p>
+        </div>
+      </div>
     </section>
 
     <section class="section">
-      <h2 class="section-title">Ofertas destacadas</h2>
-      <div class="grid grid--2" id="home-ofertas"></div>
+      <h2 class="section-title">Ofertas disponibles</h2>
+      <div class="grid grid--2">
+        <div class="card" th:each="oferta : ${ofertas}">
+          <h3 th:text="${oferta.titulo}"></h3>
+          <p th:text="${oferta.descripcion}"></p>
+          <a th:href="@{/ofertas}" class="btn btn--outline">Ver mas</a>
+        </div>
+      </div>
     </section>
   </main>
 
-  <footer class="site-footer">
-    <p>© 2026 Universidad Continental · Conti Talent · Huancayo, Peru</p>
-  </footer>
-
-  <script th:src="@{/js/storage.js}"></script>
-  <script th:src="@{/js/auth.js}"></script>
-  <script th:src="@{/js/main.js}"></script>
-  <script th:src="@{/js/page-home.js}"></script>
-</body>
-</html>
+  <footer class="site-footer"><p>© 2026 Universidad Continental · Conti Talent</p></footer>
+</body></html>

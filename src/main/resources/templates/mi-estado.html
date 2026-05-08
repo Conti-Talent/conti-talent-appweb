@@ -5,15 +5,19 @@
 <body>
   <header class="site-header"><div class="container">
     <a th:href="@{/}" class="brand">ContiTalent</a>
-    <nav class="primary-nav"><a th:href="@{/ofertas}">Ofertas</a><span id="session-area"></span></nav>
+    <nav class="primary-nav">
+      <a th:href="@{/ofertas}">Ofertas</a>
+      <a th:href="@{/logout}">Cerrar sesion</a>
+    </nav>
   </div></header>
   <main class="container">
     <h1>Mi estado</h1>
-    <div id="estado"><p>Cargando...</p></div>
+    <div class="card" th:if="${usuario != null}">
+      <h3 th:text="${usuario.nombre + ' ' + usuario.apellido}"></h3>
+      <p th:text="${usuario.email}"></p>
+      <p>Rol: <strong th:text="${usuario.rol}"></strong></p>
+    </div>
+    <p th:if="${usuario == null}">No has iniciado sesion. <a th:href="@{/login}">Inicia sesion</a></p>
   </main>
   <footer class="site-footer"><p>© 2026 Universidad Continental · Conti Talent</p></footer>
-  <script th:src="@{/js/storage.js}"></script>
-  <script th:src="@{/js/auth.js}"></script>
-  <script th:src="@{/js/main.js}"></script>
-  <script th:src="@{/js/page-mi-estado.js}"></script>
 </body></html>

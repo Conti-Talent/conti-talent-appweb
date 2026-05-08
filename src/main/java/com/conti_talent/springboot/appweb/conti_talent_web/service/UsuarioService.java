@@ -30,4 +30,8 @@ public class UsuarioService {
         return repository.findByEmail(email)
                 .filter(u -> u.getPassword().equals(password) && u.isActivo());
     }
+
+    public Usuario guardar(Usuario usuario) {
+        return repository.save(usuario);
+    }
 }

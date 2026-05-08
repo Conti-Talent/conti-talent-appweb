@@ -1,23 +1,20 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Iniciar sesion - Conti Talent</title>
-<link rel="stylesheet" th:href="@{/css/base.css}"/></head>
+<title>Iniciar sesion - Conti Talent</title><link rel="stylesheet" th:href="@{/css/base.css}"/></head>
 <body>
   <header class="site-header"><div class="container">
     <a th:href="@{/}" class="brand">ContiTalent</a>
   </div></header>
   <main class="container" style="max-width:420px;margin-top:40px;">
     <h1>Iniciar sesion</h1>
-    <div id="error-msg"></div>
-    <form id="form-login">
-      <div class="form-group"><label>Email</label><input type="email" id="email" required/></div>
-      <div class="form-group"><label>Password</label><input type="password" id="password" required/></div>
+    <div class="alert alert--error" th:if="${error}" th:text="${error}"></div>
+    <form th:action="@{/login}" method="post">
+      <div class="form-group"><label>Email</label><input type="email" name="email" required/></div>
+      <div class="form-group"><label>Password</label><input type="password" name="password" required/></div>
       <button class="btn btn--primary" type="submit">Entrar</button>
     </form>
     <p style="margin-top:16px;">¿No tienes cuenta? <a th:href="@{/registro}">Registrate</a></p>
   </main>
-  <script th:src="@{/js/storage.js}"></script>
-  <script th:src="@{/js/auth.js}"></script>
-  <script th:src="@{/js/page-login.js}"></script>
+  <footer class="site-footer"><p>© 2026 Universidad Continental · Conti Talent</p></footer>
 </body></html>

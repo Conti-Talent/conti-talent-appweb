@@ -1,76 +1,97 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.controller.view;
 
+import com.conti_talent.springboot.appweb.conti_talent_web.model.Usuario;
+import com.conti_talent.springboot.appweb.conti_talent_web.service.AreaService;
+import com.conti_talent.springboot.appweb.conti_talent_web.service.OfertaService;
+import com.conti_talent.springboot.appweb.conti_talent_web.service.UsuarioService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
-/**
- * MVC controller — vistas publicas servidas por Thymeleaf.
- * Solo retornan el nombre de la plantilla. Toda la logica vive en services
- * y se consume desde el JS modular existente via /api/*.
- *
- * Aceptamos tambien las rutas con sufijo .html para no romper los enlaces
- * actuales del frontend (ej. <a href="ofertas.html">).
- */
+import java.util.Optional;
+
 @Controller
 public class PublicViewController {
 
-    @GetMapping({"/", "/index", "/index.html"})
-    public String home() {
+    private final AreaService areaService;
+    private final OfertaService ofertaService;
+    private final UsuarioService usuarioService;
+
+    public PublicViewController(AreaService areaService, OfertaService ofertaService, UsuarioService usuarioService) {
+        this.areaService = areaService;
+        this.ofertaService = ofertaService;
+        this.usuarioService = usuarioService;
+    }
+
+    @GetMapping("/")
+    public String index(Model model) {
+        model.addAttribute("areas", areaService.listar());
+        model.addAttribute("ofertas", ofertaService.listar());
         return "index";
     }
 
-    @GetMapping({"/login", "/login.html"})
-    public String login() {
-        return "login";
-    }
-
-    @GetMapping({"/registro", "/registro.html"})
-    public String registro() {
-        return "registro";
-    }
-
-    @GetMapping({"/ofertas", "/ofertas.html"})
-    public String ofertas() {
-        return "ofertas";
-    }
-
-    @GetMapping({"/detalle-oferta", "/detalle-oferta.html"})
-    public String detalleOferta() {
-        return "detalle-oferta";
-    }
-
-    @GetMapping({"/postular", "/postular.html"})
-    public String postular() {
-        return "postular";
-    }
-
-    @GetMapping({"/evaluacion", "/evaluacion.html"})
-    public String evaluacion() {
-        return "evaluacion";
-    }
-
-    @GetMapping({"/areas", "/areas.html"})
-    public String areas() {
+    @GetMapping("/areas")
+    public String areas(Model model) {
+        model.addAttribute("areas", areaService.listar());
         return "areas";
     }
 
-    @GetMapping({"/contacto", "/contacto.html"})
-    public String contacto() {
-        return "contacto";
+    @GetMapping("/ofertas")
+    public String ofertas(Model model) {
+        model.addAttribute("ofertas", ofertaService.listar());
+        return "ofertas";
     }
 
-    @GetMapping({"/publicidad", "/publicidad.html"})
-    public String publicidad() {
-        return "publicidad";
+    @GetMapping("/contacto")
+    public String contacto() { return "contacto"; }
+
+    @GetMapping("/publicidad")
+    public String publicidad() { return "publicidad"; }
+
+    @GetMapping("/login")
+    public String loginForm() { return "login"; }
+
+    @PostMapping("/login")
+    public String login(@RequestParam String email,
+                        @RequestParam String password,
+                        HttpSession session, Model model) {
+        Optional<Usuario> usuario = usuarioService.login(email, password);
+        if (usuario.isPresent()) {
+            session.setAttribute("usuario", usuario.get());
+            return "admin".equals(usuario.get().getRol()) ? "redirect:/admin" : "redirect:/";
+        }
+        model.addAttribute("error", "Credenciales invalidas o cuenta desactivada");
+        return "login";
     }
 
-    @GetMapping({"/mi-estado", "/mi-estado.html"})
-    public String miEstado() {
+    @GetMapping("/registro")
+    public String registroForm() { return "registro"; }
+
+    @PostMapping("/registro")
+    public String registro(@RequestParam String nombre,
+                           @RequestParam String apellido,
+                           @RequestParam String email,
+                           @RequestParam String password,
+                           HttpSession session) {
+        Usuario u = new Usuario();
+        u.setNombre(nombre); u.setApellido(apellido);
+        u.setEmail(email); u.setPassword(password);
+        session.setAttribute("usuario", usuarioService.registrar(u));
+        return "redirect:/";
+    }
+
+    @GetMapping("/logout")
+    public String logout(HttpSession session) {
+        session.invalidate();
+        return "redirect:/";
+    }
+
+    @GetMapping("/mi-estado")
+    public String miEstado(HttpSession session, Model model) {
+        model.addAttribute("usuario", session.getAttribute("usuario"));
         return "mi-estado";
-    }
-
-    @GetMapping({"/mis-respuestas", "/mis-respuestas.html"})
-    public String misRespuestas() {
-        return "mis-respuestas";
     }
 }

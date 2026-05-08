@@ -6,19 +6,18 @@
   <header class="site-header"><div class="container">
     <a th:href="@{/}" class="brand">ContiTalent</a>
     <nav class="primary-nav">
-      <a th:href="@{/}">Inicio</a><a th:href="@{/areas}">Areas</a>
-      <a th:href="@{/ofertas}">Ofertas</a><a th:href="@{/contacto}">Contacto</a>
-      <span id="session-area"></span>
+      <a th:href="@{/areas}">Areas</a><a th:href="@{/ofertas}">Ofertas</a>
+      <a th:href="@{/contacto}">Contacto</a>
     </nav>
   </div></header>
   <main class="container">
     <h1 class="section-title">Areas</h1>
-    <p class="section-sub">Explora las areas disponibles.</p>
-    <div class="grid grid--3" id="lista-areas"><p>Cargando...</p></div>
+    <div class="grid grid--3">
+      <div class="card" th:each="area : ${areas}">
+        <h3 th:text="${area.nombre}"></h3>
+        <p th:text="${area.descripcion}"></p>
+      </div>
+    </div>
   </main>
   <footer class="site-footer"><p>© 2026 Universidad Continental · Conti Talent</p></footer>
-  <script th:src="@{/js/storage.js}"></script>
-  <script th:src="@{/js/auth.js}"></script>
-  <script th:src="@{/js/main.js}"></script>
-  <script th:src="@{/js/page-areas.js}"></script>
 </body></html>
