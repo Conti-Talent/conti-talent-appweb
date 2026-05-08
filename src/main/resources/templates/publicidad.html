@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="UTF-8" />
-  <title>Sobre nosotros - Conti Talent</title>
-  <link rel="stylesheet" th:href="@{/css/base.css}" />
-</head>
+<head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Sobre nosotros - Conti Talent</title><link rel="stylesheet" th:href="@{/css/base.css}"/></head>
 <body>
-  <a th:href="@{/}">Inicio</a>
-  <hr>
-  <h1>Sobre nosotros</h1>
-  <p>Conti Talent es la plataforma oficial de la Universidad Continental Huancayo para reclutar talento.</p>
-</body>
-</html>
+  <header class="site-header"><div class="container">
+    <a th:href="@{/}" class="brand">ContiTalent</a>
+    <nav class="primary-nav">
+      <a th:href="@{/}">Inicio</a><a th:href="@{/ofertas}">Ofertas</a>
+    </nav>
+  </div></header>
+  <main class="container">
+    <h1>Sobre nosotros</h1>
+    <p style="max-width:600px;margin-top:16px;">Conti Talent es la plataforma oficial de la Universidad Continental Huancayo para descubrir y desarrollar talento academico y profesional.</p>
+  </main>
+  <footer class="site-footer"><p>© 2026 Universidad Continental · Conti Talent</p></footer>
+</body></html>

@@ -2,23 +2,53 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Conti Talent</title>
   <link rel="stylesheet" th:href="@{/css/base.css}" />
 </head>
 <body>
-  <h1>Conti Talent</h1>
-  <p>Plataforma de reclutamiento de la Universidad Continental Huancayo.</p>
-  <hr>
-  <nav>
-    <a th:href="@{/areas}">Areas</a> |
-    <a th:href="@{/ofertas}">Ofertas</a> |
-    <a th:href="@{/contacto}">Contacto</a> |
-    <a th:href="@{/login}">Iniciar sesion</a> |
-    <a th:href="@{/registro}">Registrarse</a>
-  </nav>
-  <hr>
-  <h2>Bienvenido</h2>
-  <p>Explora nuestras areas y ofertas de trabajo.</p>
-  <a th:href="@{/ofertas}">Ver ofertas</a>
+  <header class="site-header">
+    <div class="container">
+      <span class="brand">ContiTalent</span>
+      <nav class="primary-nav">
+        <a th:href="@{/}">Inicio</a>
+        <a th:href="@{/areas}">Areas</a>
+        <a th:href="@{/ofertas}">Ofertas</a>
+        <a th:href="@{/contacto}">Contacto</a>
+        <span id="session-area"></span>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <h1>Encuentra tu lugar en la Universidad Continental</h1>
+      <p>Plataforma oficial de reclutamiento de docentes, practicantes e investigadores.</p>
+      <div class="hero-ctas">
+        <a th:href="@{/ofertas}" class="btn btn--primary">Ver ofertas</a>
+        <a th:href="@{/registro}" class="btn btn--outline">Crear cuenta</a>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Areas disponibles</h2>
+      <p class="section-sub">Explora las areas de la universidad.</p>
+      <div class="grid grid--3" id="home-areas"></div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Ofertas destacadas</h2>
+      <div class="grid grid--2" id="home-ofertas"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>© 2026 Universidad Continental · Conti Talent · Huancayo, Peru</p>
+  </footer>
+
+  <script th:src="@{/js/storage.js}"></script>
+  <script th:src="@{/js/auth.js}"></script>
+  <script th:src="@{/js/main.js}"></script>
+  <script th:src="@{/js/page-home.js}"></script>
 </body>
 </html>

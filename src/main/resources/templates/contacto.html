@@ -1,16 +1,26 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="UTF-8" />
-  <title>Contacto - Conti Talent</title>
-  <link rel="stylesheet" th:href="@{/css/base.css}" />
-</head>
+<head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Contacto - Conti Talent</title><link rel="stylesheet" th:href="@{/css/base.css}"/></head>
 <body>
-  <a th:href="@{/}">Inicio</a>
-  <hr>
-  <h1>Contacto</h1>
-  <p>Universidad Continental Huancayo</p>
-  <p>Email: contacto@continental.edu.pe</p>
-  <p>Telefono: (064) 481-430</p>
-</body>
-</html>
+  <header class="site-header"><div class="container">
+    <a th:href="@{/}" class="brand">ContiTalent</a>
+    <nav class="primary-nav">
+      <a th:href="@{/}">Inicio</a><a th:href="@{/areas}">Areas</a>
+      <a th:href="@{/ofertas}">Ofertas</a><a th:href="@{/contacto}">Contacto</a>
+    </nav>
+  </div></header>
+  <main class="container">
+    <h1>Contacto</h1>
+    <div class="card" style="max-width:500px;margin-top:24px;">
+      <h3>Universidad Continental Huancayo</h3>
+      <p>Email: contacto@continental.edu.pe</p>
+      <p>Telefono: (064) 481-430</p>
+      <p>Direccion: Av. Universitaria s/n, Huancayo</p>
+    </div>
+  </main>
+  <footer class="site-footer"><p>© 2026 Universidad Continental · Conti Talent</p></footer>
+  <script th:src="@{/js/storage.js}"></script>
+  <script th:src="@{/js/auth.js}"></script>
+  <script th:src="@{/js/main.js}"></script>
+</body></html>

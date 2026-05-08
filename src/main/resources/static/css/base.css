@@ -1,7 +1,120 @@
-body { font-family: Arial, sans-serif; margin: 20px; }
-a { color: black; }
-table { border-collapse: collapse; width: 100%; }
-td, th { border: 1px solid black; padding: 8px; text-align: left; }
-input, textarea, select { display: block; margin: 5px 0; padding: 5px; width: 300px; }
-button { padding: 5px 15px; margin-top: 10px; }
-hr { margin: 20px 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #ffffff;
+  color: #111111;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+a { color: #16a34a; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+h2 { font-size: 1.4rem; margin-bottom: 0.5rem; }
+h3 { font-size: 1.1rem; margin-bottom: 0.25rem; }
+p  { margin-bottom: 0.75rem; color: #444; }
+
+/* Layout */
+.container { max-width: 960px; margin: 0 auto; padding: 0 20px; }
+
+/* Header */
+.site-header {
+  border-bottom: 2px solid #16a34a;
+  padding: 14px 0;
+  margin-bottom: 32px;
+}
+.site-header .container { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.brand { font-size: 1.3rem; font-weight: 700; color: #16a34a; }
+.primary-nav { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+.primary-nav a { color: #111; font-size: 0.95rem; }
+.primary-nav a:hover { color: #16a34a; text-decoration: none; }
+
+/* Buttons */
+.btn {
+  display: inline-block;
+  padding: 8px 18px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-family: inherit;
+}
+.btn--primary { background: #16a34a; color: #fff; }
+.btn--primary:hover { background: #15803d; }
+.btn--outline { background: #fff; color: #16a34a; border: 1px solid #16a34a; }
+.btn--outline:hover { background: #f0fdf4; }
+.btn--danger { background: #dc2626; color: #fff; }
+
+/* Forms */
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; font-size: 0.9rem; margin-bottom: 4px; color: #555; }
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  font-family: inherit;
+}
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #16a34a;
+}
+
+/* Cards */
+.card {
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.card h3 { color: #16a34a; margin-bottom: 6px; }
+
+/* Grid */
+.grid { display: grid; gap: 16px; }
+.grid--2 { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+.grid--3 { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+
+/* Table */
+table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+th { background: #f0fdf4; color: #16a34a; padding: 10px; text-align: left; border-bottom: 2px solid #16a34a; }
+td { padding: 10px; border-bottom: 1px solid #e5e7eb; }
+
+/* Section */
+.section { margin-bottom: 48px; }
+.section-title { font-size: 1.6rem; margin-bottom: 6px; }
+.section-sub { color: #666; margin-bottom: 20px; }
+
+/* Alert */
+.alert { padding: 10px 14px; border-radius: 4px; margin-bottom: 16px; font-size: 0.9rem; }
+.alert--error { background: #fef2f2; color: #dc2626; border: 1px solid #fca5a5; }
+.alert--ok { background: #f0fdf4; color: #16a34a; border: 1px solid #86efac; }
+
+/* Footer */
+.site-footer {
+  border-top: 1px solid #e5e7eb;
+  margin-top: 48px;
+  padding: 24px 0;
+  color: #888;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+/* Hero */
+.hero { padding: 48px 0; }
+.hero h1 { font-size: 2.4rem; margin-bottom: 12px; }
+.hero p { font-size: 1.1rem; color: #555; max-width: 600px; margin-bottom: 24px; }
+.hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; }
+
+/* Sidebar admin */
+.admin-layout { display: flex; gap: 24px; }
+.admin-sidebar { width: 200px; flex-shrink: 0; }
+.admin-sidebar nav { display: flex; flex-direction: column; gap: 8px; }
+.admin-sidebar a { padding: 8px 12px; border-radius: 4px; color: #111; font-size: 0.9rem; }
+.admin-sidebar a:hover { background: #f0fdf4; color: #16a34a; text-decoration: none; }
+.admin-main { flex: 1; }

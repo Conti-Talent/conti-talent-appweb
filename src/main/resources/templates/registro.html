@@ -1,26 +1,25 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="UTF-8" />
-  <title>Registro - Conti Talent</title>
-  <link rel="stylesheet" th:href="@{/css/base.css}" />
-</head>
+<head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Registro - Conti Talent</title>
+<link rel="stylesheet" th:href="@{/css/base.css}"/></head>
 <body>
-  <a th:href="@{/}">Inicio</a>
-  <hr>
-  <h1>Crear cuenta</h1>
-  <form id="form-registro">
-    <label>Nombre:</label>
-    <input type="text" id="nombre" required />
-    <label>Apellido:</label>
-    <input type="text" id="apellido" required />
-    <label>Email:</label>
-    <input type="email" id="email" required />
-    <label>Password:</label>
-    <input type="password" id="password" required />
-    <button type="submit">Registrarse</button>
-  </form>
-  <p><a th:href="@{/login}">Ya tengo cuenta</a></p>
+  <header class="site-header"><div class="container">
+    <a th:href="@{/}" class="brand">ContiTalent</a>
+  </div></header>
+  <main class="container" style="max-width:420px;margin-top:40px;">
+    <h1>Crear cuenta</h1>
+    <div id="error-msg"></div>
+    <form id="form-registro">
+      <div class="form-group"><label>Nombre</label><input type="text" id="nombre" required/></div>
+      <div class="form-group"><label>Apellido</label><input type="text" id="apellido" required/></div>
+      <div class="form-group"><label>Email</label><input type="email" id="email" required/></div>
+      <div class="form-group"><label>Password</label><input type="password" id="password" required/></div>
+      <button class="btn btn--primary" type="submit">Registrarse</button>
+    </form>
+    <p style="margin-top:16px;">¿Ya tienes cuenta? <a th:href="@{/login}">Inicia sesion</a></p>
+  </main>
+  <script th:src="@{/js/storage.js}"></script>
+  <script th:src="@{/js/auth.js}"></script>
   <script th:src="@{/js/page-registro.js}"></script>
-</body>
-</html>
+</body></html>

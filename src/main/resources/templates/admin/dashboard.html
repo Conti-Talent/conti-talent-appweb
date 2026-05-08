@@ -1,22 +1,35 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="UTF-8" />
-  <title>Panel Admin - Conti Talent</title>
-  <link rel="stylesheet" th:href="@{/css/base.css}" />
-</head>
+<head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Dashboard - Admin</title><link rel="stylesheet" th:href="@{/css/base.css}"/></head>
 <body>
-  <h1>Panel de Administracion</h1>
-  <hr>
-  <nav>
-    <a th:href="@{/admin/areas}">Areas</a> |
-    <a th:href="@{/admin/ofertas}">Ofertas</a> |
-    <a th:href="@{/admin/postulantes}">Postulantes</a> |
-    <a th:href="@{/admin/usuarios}">Usuarios</a> |
-    <a th:href="@{/admin/preguntas}">Preguntas</a> |
-    <a th:href="@{/admin/metricas}">Metricas</a>
-  </nav>
-  <hr>
-  <a th:href="@{/}">Ir al sitio</a>
-</body>
-</html>
+  <header class="site-header"><div class="container">
+    <a th:href="@{/admin}" class="brand">ContiTalent Admin</a>
+    <nav class="primary-nav"><span id="session-area"></span></nav>
+  </div></header>
+  <main class="container">
+    <div class="admin-layout">
+      <nav class="admin-sidebar">
+        <strong>Menu</strong>
+        <a th:href="@{/admin}">Dashboard</a>
+        <a th:href="@{/admin/areas}">Areas</a>
+        <a th:href="@{/admin/ofertas}">Ofertas</a>
+        <a th:href="@{/admin/postulantes}">Postulantes</a>
+        <a th:href="@{/admin/usuarios}">Usuarios</a>
+        <a th:href="@{/admin/preguntas}">Preguntas</a>
+        <a th:href="@{/admin/metricas}">Metricas</a>
+        <hr style="margin:12px 0;"/>
+        <a th:href="@{/}">Sitio publico</a>
+      </nav>
+      <div class="admin-main">
+        <h1>Panel de Administracion</h1>
+        <p>Bienvenido al panel de control de Conti Talent.</p>
+        <div class="grid grid--3" style="margin-top:24px;" id="stats"></div>
+      </div>
+    </div>
+  </main>
+  <script th:src="@{/js/storage.js}"></script>
+  <script th:src="@{/js/auth.js}"></script>
+  <script th:src="@{/js/main.js}"></script>
+  <script th:src="@{/js/page-admin-dashboard.js}"></script>
+</body></html>

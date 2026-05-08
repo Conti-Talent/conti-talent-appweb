@@ -1,24 +1,34 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="UTF-8" />
-  <title>Admin Areas - Conti Talent</title>
-  <link rel="stylesheet" th:href="@{/css/base.css}" />
-</head>
+<head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Areas - Admin</title><link rel="stylesheet" th:href="@{/css/base.css}"/></head>
 <body>
-  <a th:href="@{/admin}">Panel admin</a>
-  <hr>
-  <h1>Gestion de Areas</h1>
-  <form id="form-area">
-    <label>Nombre:</label>
-    <input type="text" id="nombre" required />
-    <label>Descripcion:</label>
-    <input type="text" id="descripcion" />
-    <button type="submit">Agregar area</button>
-  </form>
-  <hr>
-  <h2>Lista de areas</h2>
-  <div id="lista-areas"><p>Cargando...</p></div>
+  <header class="site-header"><div class="container">
+    <a th:href="@{/admin}" class="brand">ContiTalent Admin</a>
+    <nav class="primary-nav"><span id="session-area"></span></nav>
+  </div></header>
+  <main class="container">
+    <div class="admin-layout">
+      <nav class="admin-sidebar">
+        <strong>Menu</strong>
+        <a th:href="@{/admin}">Dashboard</a>
+        <a th:href="@{/admin/areas}">Areas</a>
+        <a th:href="@{/admin/ofertas}">Ofertas</a>
+        <a th:href="@{/admin/postulantes}">Postulantes</a>
+        <a th:href="@{/admin/usuarios}">Usuarios</a>
+        <a th:href="@{/admin/preguntas}">Preguntas</a>
+        <a th:href="@{/admin/metricas}">Metricas</a>
+        <hr style="margin:12px 0;"/>
+        <a th:href="@{/}">Sitio publico</a>
+      </nav>
+      <div class="admin-main">
+        <h1>Areas</h1>
+        <div id="contenido"><p>Cargando...</p></div>
+      </div>
+    </div>
+  </main>
+  <script th:src="@{/js/storage.js}"></script>
+  <script th:src="@{/js/auth.js}"></script>
+  <script th:src="@{/js/main.js}"></script>
   <script th:src="@{/js/page-admin-areas.js}"></script>
-</body>
-</html>
+</body></html>

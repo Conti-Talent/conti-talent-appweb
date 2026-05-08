@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="UTF-8" />
-  <title>Detalle oferta - Conti Talent</title>
-  <link rel="stylesheet" th:href="@{/css/base.css}" />
-</head>
+<head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Oferta - Conti Talent</title><link rel="stylesheet" th:href="@{/css/base.css}"/></head>
 <body>
-  <a th:href="@{/ofertas}">Volver a ofertas</a>
-  <hr>
-  <div id="detalle"><p>Cargando...</p></div>
-  <a th:href="@{/postular}">Postular</a>
+  <header class="site-header"><div class="container">
+    <a th:href="@{/}" class="brand">ContiTalent</a>
+    <nav class="primary-nav"><a th:href="@{/ofertas}">← Volver a ofertas</a><span id="session-area"></span></nav>
+  </div></header>
+  <main class="container" style="max-width:680px;">
+    <div id="detalle"><p>Cargando...</p></div>
+  </main>
+  <footer class="site-footer"><p>© 2026 Universidad Continental · Conti Talent</p></footer>
+  <script th:src="@{/js/storage.js}"></script>
+  <script th:src="@{/js/auth.js}"></script>
+  <script th:src="@{/js/main.js}"></script>
   <script th:src="@{/js/page-detalle-oferta.js}"></script>
-</body>
-</html>
+</body></html>

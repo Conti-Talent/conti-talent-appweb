@@ -1,15 +1,19 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="UTF-8" />
-  <title>Evaluacion - Conti Talent</title>
-  <link rel="stylesheet" th:href="@{/css/base.css}" />
-</head>
+<head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Evaluacion - Conti Talent</title><link rel="stylesheet" th:href="@{/css/base.css}"/></head>
 <body>
-  <a th:href="@{/}">Inicio</a>
-  <hr>
-  <h1>Evaluacion</h1>
-  <div id="preguntas"><p>Cargando preguntas...</p></div>
+  <header class="site-header"><div class="container">
+    <a th:href="@{/}" class="brand">ContiTalent</a>
+    <nav class="primary-nav"><span id="session-area"></span></nav>
+  </div></header>
+  <main class="container" style="max-width:680px;">
+    <h1>Evaluacion</h1>
+    <form id="form-evaluacion"><div id="preguntas"><p>Cargando preguntas...</p></div></form>
+  </main>
+  <footer class="site-footer"><p>© 2026 Universidad Continental · Conti Talent</p></footer>
+  <script th:src="@{/js/storage.js}"></script>
+  <script th:src="@{/js/auth.js}"></script>
+  <script th:src="@{/js/main.js}"></script>
   <script th:src="@{/js/page-evaluacion.js}"></script>
-</body>
-</html>
+</body></html>
