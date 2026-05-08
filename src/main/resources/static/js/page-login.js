@@ -3,11 +3,12 @@
    ========================================================= */
 
 (() => {
-  const init = () => {
+  const init = async () => {
+    await Storage.ready;
     const form = document.getElementById('login-form');
     if (!form) return;
 
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const result = Validators.validateForm(form, {
         email:    [{ test: Validators.required, message: 'Ingresa tu correo' },
@@ -16,7 +17,7 @@
       });
       if (!result.valid) return;
 
-      const out = Auth.login(result.values.email, result.values.password);
+      const out = await Auth.login(result.values.email, result.values.password);
       if (!out.ok) {
         UI.showToast(out.error, 'error');
         return;

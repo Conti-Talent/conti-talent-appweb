@@ -6,12 +6,13 @@
   const params = new URLSearchParams(window.location.search);
   const ofertaId = params.get('oferta');
 
-  const init = () => {
-    if (!Auth.requireAuth('/login?next=' + encodeURIComponent(window.location.href))) return;
+  const init = async () => {
+    await Storage.ready;
+    if (!Auth.requireAuth('login.html?next=' + encodeURIComponent(window.location.href))) return;
 
     const oferta = Ofertas.get(ofertaId);
     if (!oferta) {
-      window.location.href = '/ofertas';
+      window.location.href = 'ofertas.html';
       return;
     }
 
@@ -53,7 +54,7 @@
     });
   };
 
-  const onSubmit = (e, oferta) => {
+  const onSubmit = async (e, oferta) => {
     e.preventDefault();
     const form = e.currentTarget;
     const result = Validators.validateForm(form, {
@@ -73,20 +74,27 @@
     const cvName = document.getElementById('cv-input').files[0]?.name || 'cv.pdf';
     const session = Auth.getSession();
 
-    const postulante = Postulantes.create({
-      usuarioId: session?.id || null,
-      ofertaId: oferta.id,
-      nombre:      result.values.nombre,
-      email:       result.values.email,
-      telefono:    result.values.telefono,
-      experiencia: result.values.experiencia,
-      habilidades: result.values.habilidades,
-      cv: cvName
-    });
+    let postulante;
+    try {
+      postulante = await ContiAPI.postular({
+        usuarioId: Storage.toNumber(session?.id),
+        ofertaId: Storage.toNumber(oferta.id),
+        nombre: result.values.nombre,
+        email: result.values.email,
+        telefono: result.values.telefono,
+        experiencia: result.values.experiencia,
+        habilidades: result.values.habilidades,
+        cv: cvName
+      });
+      postulante = Storage.upsert('postulantes', postulante);
+    } catch (err) {
+      UI.showToast(err.message || 'No se pudo registrar la postulacion', 'error');
+      return;
+    }
 
     UI.showToast('Postulación registrada con éxito', 'success');
     setTimeout(() => {
-      window.location.href = `/evaluacion?postulante=${postulante.id}`;
+      window.location.href = `evaluacion.html?postulante=${postulante.id}`;
     }, 700);
   };
 

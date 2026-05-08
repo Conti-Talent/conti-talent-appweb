@@ -3,7 +3,8 @@
    ========================================================= */
 
 (() => {
-  const init = () => {
+  const init = async () => {
+    await Storage.ready;
     if (!Auth.requireAuth()) return;
     const session = Auth.getSession();
     const wrap    = document.getElementById('estado-list');

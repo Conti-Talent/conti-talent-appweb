@@ -1,44 +1,50 @@
 /* =========================================================
-   evaluacion.js — Cuestionarios y calificación automática
+   evaluacion.js — Preguntas y calificacion contra API REST
    ========================================================= */
 
 const Evaluacion = (() => {
   const ENTITY = 'preguntas';
 
-  const list           = ()         => Storage.read(ENTITY, []);
-  const byOferta       = (ofertaId) => list().filter((q) => q.ofertaId === ofertaId);
-  const get            = (id)       => list().find((q) => q.id === id) || null;
+  const list = () => Storage.read(ENTITY, []);
+  const byOferta = (ofertaId) => list().filter((q) => String(q.ofertaId) === String(ofertaId));
+  const get = (id) => list().find((q) => String(q.id) === String(id)) || null;
+
+  const payload = (data) => ({
+    ofertaId: Storage.toNumber(data.ofertaId),
+    pregunta: data.pregunta?.trim(),
+    opciones: data.opciones || [],
+    correcta: parseInt(data.correcta, 10)
+  });
 
   const create = (data) => {
-    const items = list();
-    const newItem = {
-      id: Storage.generateId(),
-      ofertaId: data.ofertaId,
-      pregunta: data.pregunta.trim(),
-      opciones: data.opciones,
-      correcta: parseInt(data.correcta, 10)
-    };
-    items.push(newItem);
-    Storage.write(ENTITY, items);
-    return newItem;
+    const temp = { id: Storage.generateId(), ...data, ofertaId: String(data.ofertaId) };
+    Storage.upsert(ENTITY, temp);
+    ContiAPI.crearPregunta(payload(data))
+      .then((created) => Storage.upsert(ENTITY, created))
+      .catch((err) => { Storage.removeCached(ENTITY, temp.id); UI.showToast(err.message, 'error'); });
+    return temp;
   };
 
   const update = (id, data) => {
-    const items = list().map((q) => q.id === id ? { ...q, ...data } : q);
-    Storage.write(ENTITY, items);
+    const current = get(id);
+    const updated = Storage.upsert(ENTITY, { ...current, ...data, id, ofertaId: String(data.ofertaId ?? current?.ofertaId) });
+    ContiAPI.actualizarPregunta(id, payload(updated))
+      .then((saved) => Storage.upsert(ENTITY, saved))
+      .catch((err) => { if (current) Storage.upsert(ENTITY, current); UI.showToast(err.message, 'error'); });
+    return updated;
   };
 
-  const remove = (id) => Storage.write(ENTITY, list().filter((q) => q.id !== id));
+  const remove = (id) => {
+    const current = get(id);
+    Storage.removeCached(ENTITY, id);
+    ContiAPI.eliminarPregunta(id)
+      .catch((err) => { if (current) Storage.upsert(ENTITY, current); UI.showToast(err.message, 'error'); });
+  };
 
-  /**
-   * Calcula puntaje sobre 100 dadas las respuestas del postulante.
-   * @param {string} ofertaId
-   * @param {Record<string, number>} respuestas  preguntaId -> índice elegido
-   */
   const calificar = (ofertaId, respuestas) => {
     const preguntas = byOferta(ofertaId);
     if (preguntas.length === 0) return { puntaje: 0, correctas: 0, total: 0 };
-    const correctas = preguntas.reduce((acc, q) => acc + (respuestas[q.id] === q.correcta ? 1 : 0), 0);
+    const correctas = preguntas.reduce((acc, q) => acc + (Number(respuestas[q.id]) === Number(q.correcta) ? 1 : 0), 0);
     const puntaje = Math.round((correctas / preguntas.length) * 100);
     return { puntaje, correctas, total: preguntas.length };
   };

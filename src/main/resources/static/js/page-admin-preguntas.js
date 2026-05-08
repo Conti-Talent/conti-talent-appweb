@@ -6,8 +6,9 @@
   const params   = new URLSearchParams(window.location.search);
   let ofertaId   = params.get('oferta') || '';
 
-  const init = () => {
-    if (!Auth.requireAdmin('/login')) return;
+  const init = async () => {
+    await Storage.ready;
+    if (!Auth.requireAdmin('../login.html')) return;
     populateOfertaSelect();
     document.getElementById('preguntas-oferta-select').addEventListener('change', (e) => {
       ofertaId = e.target.value;

@@ -13,7 +13,8 @@
   let preguntas  = [];
   const respuestas = {};
 
-  const init = () => {
+  const init = async () => {
+    await Storage.ready;
     postulante = Postulantes.get(postulanteId);
     if (!postulante) {
       UI.showToast('No se encontró tu postulación', 'error');

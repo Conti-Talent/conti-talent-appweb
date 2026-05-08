@@ -3,8 +3,9 @@
    ========================================================= */
 
 (() => {
-  const init = () => {
-    if (!Auth.requireAdmin('/login')) return;
+  const init = async () => {
+    await Storage.ready;
+    if (!Auth.requireAdmin('../login.html')) return;
     renderKPIs();
     renderEstadosBreakdown();
     renderRecientes();

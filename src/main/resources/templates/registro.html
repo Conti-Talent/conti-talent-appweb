@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,21 +7,20 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" th:href="@{/css/base.css}" />
-  <link rel="stylesheet" th:href="@{/css/layout.css}" />
-  <link rel="stylesheet" th:href="@{/css/components.css}" />
-  <link rel="stylesheet" th:href="@{/css/pages.css}" />
-  <link rel="stylesheet" th:href="@{/css/animations.css}" />
+  <link rel="stylesheet" href="css/base.css?v=logo-big" />
+  <link rel="stylesheet" href="css/layout.css?v=logo-full" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/pages.css" />
+  <link rel="stylesheet" href="css/animations.css" />
 </head>
 <body>
   <header class="site-header">
     <div class="site-header__inner">
-      <a class="brand" th:href="@{/}">
-        <span class="brand__mark">C</span>
-        <span class="brand__name">Conti<span>Talent</span></span>
+      <a class="brand" href="index.html">
+        <img class="brand__logo" src="img/contitalent.png" alt="Conti Talent" />
       </a>
       <nav class="primary-nav">
-        <a th:href="@{/login}" class="btn btn--ghost btn--sm">Iniciar sesión</a>
+        <a href="login.html" class="btn btn--ghost btn--sm">Iniciar sesión</a>
       </nav>
     </div>
   </header>
@@ -36,7 +35,7 @@
       <div class="auth-art-content anim-fade-up">
         <span class="badge anim-pulse">Únete</span>
         <h2 class="mt-4">Forma parte de la <em>Universidad Continental</em></h2>
-        <p>Crea una cuenta para postular a prácticas, vacantes docentes y oportunidades de investigación.</p>
+        <p>Crea una cuenta para postular a prácticas, vacantes docentes y otras oportunidades.</p>
       </div>
     </aside>
 
@@ -82,17 +81,16 @@
           <button class="btn btn--primary btn--block btn--lg" type="submit">Crear cuenta</button>
         </form>
 
-        <p class="soft text-center mt-5">¿Ya tienes cuenta? <a th:href="@{/login}">Inicia sesión</a></p>
+        <p class="soft text-center mt-5">¿Ya tienes cuenta? <a href="login.html">Inicia sesión</a></p>
       </div>
     </section>
   </main>
 
-  <script th:src="@{/js/storage.js}"></script>
-  <script th:src="@{/js/seed.js}"></script>
-  <script th:src="@{/js/ui.js}"></script>
-  <script th:src="@{/js/validators.js}"></script>
-  <script th:src="@{/js/auth.js}"></script>
-  <script th:src="@{/js/main.js}"></script>
-  <script th:src="@{/js/page-registro.js}"></script>
+  <script src="js/storage-api.js?v=rest3"></script>
+  <script src="js/ui.js?v=rest3"></script>
+  <script src="js/validators.js?v=rest3"></script>
+  <script src="js/auth.js?v=rest3"></script>
+  <script src="js/main.js?v=rest3"></script>
+  <script src="js/page-registro.js?v=rest3"></script>
 </body>
 </html>

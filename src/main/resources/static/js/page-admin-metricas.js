@@ -6,7 +6,8 @@
 (() => {
   const COLORS = ['#8b95ff', '#6ee7b7', '#fcd34d', '#7dd3fc', '#fda4af'];
 
-  const init = () => {
+  const init = async () => {
+    await Storage.ready;
     if (!Auth.requireAdmin('../login.html')) return;
     renderTimeSeriesCharts();
     renderPunctualKPIs();

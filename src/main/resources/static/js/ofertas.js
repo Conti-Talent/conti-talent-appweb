@@ -1,47 +1,54 @@
 /* =========================================================
-   ofertas.js — CRUD de ofertas laborales
+   ofertas.js — CRUD de ofertas contra API REST
    ========================================================= */
 
 const Ofertas = (() => {
   const ENTITY = 'ofertas';
+  const TIPOS = ['Practica', 'Trabajo'];
 
-  const list   = ()       => Storage.read(ENTITY, []);
-  const get    = (id)     => list().find((o) => o.id === id) || null;
+  const list = () => Storage.read(ENTITY, []);
+  const get = (id) => list().find((o) => String(o.id) === String(id)) || null;
+  const filterByArea = (areaId) => list().filter((o) => String(o.areaId) === String(areaId));
+  const featured = () => list().filter((o) => !!o.destacada);
 
-  const filterByArea = (areaId) => list().filter((o) => o.areaId === areaId);
-  const featured     = ()       => list().filter((o) => !!o.destacada);
-
-  const TIPOS = ['Práctica', 'Trabajo'];
+  const payload = (data) => ({
+    titulo: data.titulo?.trim(),
+    tipo: data.tipo || 'Trabajo',
+    areaId: Storage.toNumber(data.areaId),
+    modalidad: data.modalidad || 'Presencial',
+    ubicacion: data.ubicacion || '',
+    vacantes: parseInt(data.vacantes, 10) || 1,
+    destacada: !!data.destacada,
+    descripcion: (data.descripcion || '').trim(),
+    requisitos: data.requisitos || [],
+    beneficios: data.beneficios || [],
+    creadaEn: data.creadaEn || Date.now()
+  });
 
   const create = (data) => {
-    const items = list();
-    const newItem = {
-      id: Storage.generateId(),
-      titulo: data.titulo.trim(),
-      tipo: data.tipo || 'Trabajo',
-      areaId: data.areaId,
-      modalidad: data.modalidad,
-      ubicacion: data.ubicacion || '',
-      vacantes: parseInt(data.vacantes, 10) || 1,
-      destacada: !!data.destacada,
-      descripcion: (data.descripcion || '').trim(),
-      requisitos: data.requisitos || [],
-      beneficios: data.beneficios || [],
-      creadaEn: Date.now()
-    };
-    items.push(newItem);
-    Storage.write(ENTITY, items);
-    return newItem;
+    const temp = { id: Storage.generateId(), ...payload(data), areaId: String(data.areaId), creadaEn: Date.now() };
+    Storage.upsert(ENTITY, temp);
+    ContiAPI.crearOferta(payload(data))
+      .then((created) => Storage.upsert(ENTITY, created))
+      .catch((err) => { Storage.removeCached(ENTITY, temp.id); UI.showToast(err.message, 'error'); });
+    return temp;
   };
 
   const update = (id, data) => {
-    const items = list().map((o) => o.id === id ? { ...o, ...data, vacantes: parseInt(data.vacantes ?? o.vacantes, 10) } : o);
-    Storage.write(ENTITY, items);
+    const current = get(id);
+    const updated = Storage.upsert(ENTITY, { ...current, ...data, id, areaId: String(data.areaId ?? current?.areaId) });
+    ContiAPI.actualizarOferta(id, payload(updated))
+      .then((saved) => Storage.upsert(ENTITY, saved))
+      .catch((err) => { if (current) Storage.upsert(ENTITY, current); UI.showToast(err.message, 'error'); });
+    return updated;
   };
 
   const remove = (id) => {
-    Storage.write(ENTITY, list().filter((o) => o.id !== id));
-    Storage.write('preguntas', Storage.read('preguntas', []).filter((q) => q.ofertaId !== id));
+    const current = get(id);
+    Storage.removeCached(ENTITY, id);
+    Storage.write('preguntas', Storage.read('preguntas', []).filter((q) => String(q.ofertaId) !== String(id)));
+    ContiAPI.eliminarOferta(id)
+      .catch((err) => { if (current) Storage.upsert(ENTITY, current); UI.showToast(err.message, 'error'); });
   };
 
   return { list, get, filterByArea, featured, create, update, remove, TIPOS };

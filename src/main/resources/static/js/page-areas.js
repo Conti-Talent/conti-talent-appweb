@@ -3,7 +3,8 @@
    ========================================================= */
 
 (() => {
-  const init = () => {
+  const init = async () => {
+    await Storage.ready;
     const grid = document.getElementById('areas-grid');
     if (!grid) return;
     UI.clear(grid);
