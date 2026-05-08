@@ -1,9 +1,11 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.dto.request;
 
+import java.time.LocalDateTime;
+
 public class EntrevistaRequest {
     private String tipoEntrevista;
-    private long fechaProgramada;
-    private long fechaEntrevista;
+    private LocalDateTime fechaProgramada;
+    private LocalDateTime fechaEntrevista;
     private String horaInicio;
     private String horaFin;
     private String modalidad;
@@ -22,11 +24,11 @@ public class EntrevistaRequest {
     public String getTipoEntrevista() { return tipoEntrevista; }
     public void setTipoEntrevista(String tipoEntrevista) { this.tipoEntrevista = tipoEntrevista; }
 
-    public long getFechaProgramada() { return fechaProgramada; }
-    public void setFechaProgramada(long fechaProgramada) { this.fechaProgramada = fechaProgramada; }
+    public LocalDateTime getFechaProgramada() { return fechaProgramada; }
+    public void setFechaProgramada(LocalDateTime fechaProgramada) { this.fechaProgramada = fechaProgramada; }
 
-    public long getFechaEntrevista() { return fechaEntrevista; }
-    public void setFechaEntrevista(long fechaEntrevista) { this.fechaEntrevista = fechaEntrevista; }
+    public LocalDateTime getFechaEntrevista() { return fechaEntrevista; }
+    public void setFechaEntrevista(LocalDateTime fechaEntrevista) { this.fechaEntrevista = fechaEntrevista; }
 
     public String getHoraInicio() { return horaInicio; }
     public void setHoraInicio(String horaInicio) { this.horaInicio = horaInicio; }

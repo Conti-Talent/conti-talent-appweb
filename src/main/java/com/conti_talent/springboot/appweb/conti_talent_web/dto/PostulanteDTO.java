@@ -1,5 +1,7 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.dto;
 
+import java.time.LocalDateTime;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,8 +17,8 @@ public class PostulanteDTO {
     private String experiencia;
     private String habilidades;
     private String cv;
-    private long fechaPostulacion;
-    private Long fechaEvaluacion;
+    private LocalDateTime fechaPostulacion;
+    private LocalDateTime fechaEvaluacion;
     private int aniosExperiencia;
     private String nivelEstudios;
     private String carrera;
@@ -36,7 +38,7 @@ public class PostulanteDTO {
     private int puntajeHabilidades;
     private int puntajeFinal;
     private Map<Long, Integer> respuestas;
-    private long creadoEn;
+    private LocalDateTime creadoEn;
     private List<DocumentoPostulanteDTO> documentos;
     private List<HistorialEstadoDTO> historialEstados;
     private List<EntrevistaDTO> entrevistas;
@@ -73,11 +75,11 @@ public class PostulanteDTO {
     public String getCv() { return cv; }
     public void setCv(String cv) { this.cv = cv; }
 
-    public long getFechaPostulacion() { return fechaPostulacion; }
-    public void setFechaPostulacion(long fechaPostulacion) { this.fechaPostulacion = fechaPostulacion; }
+    public LocalDateTime getFechaPostulacion() { return fechaPostulacion; }
+    public void setFechaPostulacion(LocalDateTime fechaPostulacion) { this.fechaPostulacion = fechaPostulacion; }
 
-    public Long getFechaEvaluacion() { return fechaEvaluacion; }
-    public void setFechaEvaluacion(Long fechaEvaluacion) { this.fechaEvaluacion = fechaEvaluacion; }
+    public LocalDateTime getFechaEvaluacion() { return fechaEvaluacion; }
+    public void setFechaEvaluacion(LocalDateTime fechaEvaluacion) { this.fechaEvaluacion = fechaEvaluacion; }
 
     public int getAniosExperiencia() { return aniosExperiencia; }
     public void setAniosExperiencia(int aniosExperiencia) { this.aniosExperiencia = aniosExperiencia; }
@@ -135,8 +137,8 @@ public class PostulanteDTO {
         this.respuestas = respuestas != null ? new HashMap<>(respuestas) : new HashMap<>();
     }
 
-    public long getCreadoEn() { return creadoEn; }
-    public void setCreadoEn(long creadoEn) { this.creadoEn = creadoEn; }
+    public LocalDateTime getCreadoEn() { return creadoEn; }
+    public void setCreadoEn(LocalDateTime creadoEn) { this.creadoEn = creadoEn; }
 
     public List<DocumentoPostulanteDTO> getDocumentos() { return documentos; }
     public void setDocumentos(List<DocumentoPostulanteDTO> documentos) { this.documentos = documentos; }

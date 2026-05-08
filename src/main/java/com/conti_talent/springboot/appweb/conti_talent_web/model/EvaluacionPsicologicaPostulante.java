@@ -1,5 +1,7 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.model;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -16,7 +18,7 @@ public class EvaluacionPsicologicaPostulante {
     private Postulante postulante;
 
     @Column(name = "fecha_evaluacion", nullable = false)
-    private long fechaEvaluacion;
+    private LocalDateTime fechaEvaluacion;
 
     @Column(name = "resultado", length = 40)
     private String resultado;
@@ -28,7 +30,7 @@ public class EvaluacionPsicologicaPostulante {
     private String usuarioAdmin;
 
     @Column(name = "creado_en", nullable = false)
-    private long creadoEn;
+    private LocalDateTime creadoEn;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -38,8 +40,8 @@ public class EvaluacionPsicologicaPostulante {
 
     public Long getPostulanteId() { return postulante != null ? postulante.getId() : null; }
 
-    public long getFechaEvaluacion() { return fechaEvaluacion; }
-    public void setFechaEvaluacion(long fechaEvaluacion) { this.fechaEvaluacion = fechaEvaluacion; }
+    public LocalDateTime getFechaEvaluacion() { return fechaEvaluacion; }
+    public void setFechaEvaluacion(LocalDateTime fechaEvaluacion) { this.fechaEvaluacion = fechaEvaluacion; }
 
     public String getResultado() { return resultado; }
     public void setResultado(String resultado) { this.resultado = resultado; }
@@ -50,6 +52,6 @@ public class EvaluacionPsicologicaPostulante {
     public String getUsuarioAdmin() { return usuarioAdmin; }
     public void setUsuarioAdmin(String usuarioAdmin) { this.usuarioAdmin = usuarioAdmin; }
 
-    public long getCreadoEn() { return creadoEn; }
-    public void setCreadoEn(long creadoEn) { this.creadoEn = creadoEn; }
+    public LocalDateTime getCreadoEn() { return creadoEn; }
+    public void setCreadoEn(LocalDateTime creadoEn) { this.creadoEn = creadoEn; }
 }

@@ -1,5 +1,7 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.service.impl;
 
+import java.time.LocalDateTime;
+
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.PostulanteDTO;
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.request.EntrevistaRequest;
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.request.EvaluacionPsicologicaRequest;
@@ -44,13 +46,13 @@ public class EvaluacionManualServiceImpl implements IEvaluacionManualService {
         EntrevistaPostulante entrevista = new EntrevistaPostulante();
         entrevista.setPostulante(postulante);
         entrevista.setTipoEntrevista("ENTREVISTA_NORMAL");
-        entrevista.setFechaEntrevista(request.getFechaEntrevista() > 0 ? request.getFechaEntrevista() : System.currentTimeMillis());
+        entrevista.setFechaEntrevista(request.getFechaEntrevista() != null ? request.getFechaEntrevista() : LocalDateTime.now());
         entrevista.setModalidad("VIRTUAL");
         entrevista.setEstadoEntrevista("PROGRAMADA");
         entrevista.setResultado(texto(request.getResultado(), "PENDIENTE"));
         entrevista.setObservacion(request.getObservacion());
         entrevista.setUsuarioAdmin(texto(request.getUsuarioAdmin(), "Admin"));
-        entrevista.setCreadoEn(System.currentTimeMillis());
+        entrevista.setCreadoEn(LocalDateTime.now());
         entrevistaRepository.save(entrevista);
 
         String resultado = entrevista.getResultado().toUpperCase();
@@ -82,11 +84,11 @@ public class EvaluacionManualServiceImpl implements IEvaluacionManualService {
 
         EvaluacionPsicologicaPostulante evaluacion = new EvaluacionPsicologicaPostulante();
         evaluacion.setPostulante(postulante);
-        evaluacion.setFechaEvaluacion(request.getFechaEvaluacion() > 0 ? request.getFechaEvaluacion() : System.currentTimeMillis());
+        evaluacion.setFechaEvaluacion(request.getFechaEvaluacion() != null ? request.getFechaEvaluacion() : LocalDateTime.now());
         evaluacion.setResultado(texto(request.getResultado(), "PENDIENTE"));
         evaluacion.setObservacion(request.getObservacion());
         evaluacion.setUsuarioAdmin(texto(request.getUsuarioAdmin(), "Admin"));
-        evaluacion.setCreadoEn(System.currentTimeMillis());
+        evaluacion.setCreadoEn(LocalDateTime.now());
         psicologicaRepository.save(evaluacion);
 
         String resultado = evaluacion.getResultado().toUpperCase();

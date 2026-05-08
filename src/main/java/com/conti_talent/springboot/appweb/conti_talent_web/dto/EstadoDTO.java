@@ -1,5 +1,7 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.dto;
 
+import java.time.LocalDateTime;
+
 public class EstadoDTO {
 
     private Long id;
@@ -9,13 +11,13 @@ public class EstadoDTO {
     private int orden;
     private boolean terminal;
     private boolean activo;
-    private long creadoEn;
+    private LocalDateTime creadoEn;
 
     public EstadoDTO() {
     }
 
     public EstadoDTO(Long id, String codigo, String nombre, String descripcion,
-                     int orden, boolean terminal, boolean activo, long creadoEn) {
+                     int orden, boolean terminal, boolean activo, LocalDateTime creadoEn) {
         this.id = id;
         this.codigo = codigo;
         this.nombre = nombre;
@@ -47,6 +49,6 @@ public class EstadoDTO {
     public boolean isActivo() { return activo; }
     public void setActivo(boolean activo) { this.activo = activo; }
 
-    public long getCreadoEn() { return creadoEn; }
-    public void setCreadoEn(long creadoEn) { this.creadoEn = creadoEn; }
+    public LocalDateTime getCreadoEn() { return creadoEn; }
+    public void setCreadoEn(LocalDateTime creadoEn) { this.creadoEn = creadoEn; }
 }

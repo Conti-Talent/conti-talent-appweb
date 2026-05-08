@@ -1,5 +1,7 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.service.impl;
 
+import java.time.LocalDateTime;
+
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.UsuarioDTO;
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.request.UsuarioRequest;
 import com.conti_talent.springboot.appweb.conti_talent_web.exception.BusinessException;
@@ -61,7 +63,7 @@ public class UsuarioServiceImpl implements IUsuarioService {
         nuevoUsuario.setPassword(request.getPassword());
         nuevoUsuario.setRol(rolAsignado);
         nuevoUsuario.setActivo(request.getActivo() == null || request.getActivo());
-        nuevoUsuario.setCreadoEn(System.currentTimeMillis());
+        nuevoUsuario.setCreadoEn(LocalDateTime.now());
         return usuarioMapper.convertirADTO(usuarioRepository.save(nuevoUsuario));
     }
 

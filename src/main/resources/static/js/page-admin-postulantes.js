@@ -208,7 +208,7 @@
     const area = oferta ? Areas.get(oferta.areaId) : null;
     const initials = p.nombre.split(' ').map((n) => n[0]).slice(0, 2).join('');
     const docs = p.documentos || [];
-    const historial = (p.historialEstados || []).slice().sort((a, b) => (a.fechaCambio || 0) - (b.fechaCambio || 0));
+    const historial = (p.historialEstados || []).slice().sort((a, b) => (UI.dateValue(a.fechaCambio)?.getTime() || 0) - (UI.dateValue(b.fechaCambio)?.getTime() || 0));
     const entrevistas = p.entrevistas || [];
     const psicologicas = p.evaluacionesPsicologicas || [];
     const cvDoc = docs.find((d) => d.tipoDocumento === 'CV');
@@ -624,7 +624,7 @@
   };
 
   const openInterviewForm = ({ title, tipo, item = {}, submitText, includeChangeReason = false, onSave }) => {
-    const fechaInput = UI.el('input', { class: 'input', type: 'date', name: 'fecha', value: item.fechaProgramada ? new Date(item.fechaProgramada).toISOString().slice(0, 10) : '' });
+    const fechaInput = UI.el('input', { class: 'input', type: 'date', name: 'fecha', value: item.fechaProgramada ? (UI.dateValue(item.fechaProgramada)?.toISOString().slice(0, 10) || '') : '' });
     const form = UI.el('form', { class: 'form-grid' }, [
       UI.el('div', { class: 'form-grid form-grid--2' }, [
         UI.el('div', { class: 'field' }, [UI.el('label', { text: 'Fecha programada' }), fechaInput]),
@@ -656,7 +656,7 @@
         await onSave({
           ...values,
           tipoEntrevista: tipo,
-          fechaProgramada: new Date(`${values.fecha}T00:00:00`).getTime(),
+          fechaProgramada: `${values.fecha}T00:00:00`,
           usuarioAdmin: Auth.getSession()?.email || 'Admin'
         });
         await Storage.refresh('postulantes');

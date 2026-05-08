@@ -2,6 +2,15 @@ HELP.md
 target/
 uploads/postulantes/*
 !uploads/postulantes/.gitkeep
+uploads/cv/*
+!uploads/cv/.gitkeep
+!uploads/cv/lucia_cv.pdf
+!uploads/cv/carlos_cv.pdf
+!uploads/cv/pedro_cv.pdf
+!uploads/cv/andrea_cv.pdf
+uploads/certificados/*
+!uploads/certificados/.gitkeep
+!uploads/certificados/certificado_spring.pdf
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/

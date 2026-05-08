@@ -1,5 +1,7 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.model;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.*;
 
 /**
@@ -29,12 +31,12 @@ public class Rol {
     private boolean activo;
 
     @Column(name = "creado_en", nullable = false)
-    private long creadoEn;
+    private LocalDateTime creadoEn;
 
     public Rol() {
     }
 
-    public Rol(String codigo, String nombre, String descripcion, boolean activo, long creadoEn) {
+    public Rol(String codigo, String nombre, String descripcion, boolean activo, LocalDateTime creadoEn) {
         this.codigo = codigo;
         this.nombre = nombre;
         this.descripcion = descripcion;
@@ -57,6 +59,6 @@ public class Rol {
     public boolean isActivo() { return activo; }
     public void setActivo(boolean activo) { this.activo = activo; }
 
-    public long getCreadoEn() { return creadoEn; }
-    public void setCreadoEn(long creadoEn) { this.creadoEn = creadoEn; }
+    public LocalDateTime getCreadoEn() { return creadoEn; }
+    public void setCreadoEn(LocalDateTime creadoEn) { this.creadoEn = creadoEn; }
 }

@@ -1,5 +1,7 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.service.impl;
 
+import java.time.LocalDateTime;
+
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.UsuarioDTO;
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.auth.LoginRequest;
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.auth.RegistroRequest;
@@ -70,7 +72,7 @@ public class AuthServiceImpl implements IAuthService {
         nuevoUsuario.setPassword(request.getPassword());
         nuevoUsuario.setRol(rolPostulante);
         nuevoUsuario.setActivo(true);
-        nuevoUsuario.setCreadoEn(System.currentTimeMillis());
+        nuevoUsuario.setCreadoEn(LocalDateTime.now());
 
         Usuario usuarioGuardado = usuarioRepository.save(nuevoUsuario);
         return usuarioMapper.convertirADTO(usuarioGuardado);

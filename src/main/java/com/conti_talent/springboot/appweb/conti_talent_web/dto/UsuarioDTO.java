@@ -1,5 +1,7 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.dto;
 
+import java.time.LocalDateTime;
+
 /**
  * DTO de Usuario. Nunca incluye password. Embebe RolDTO resuelto.
  */
@@ -12,13 +14,13 @@ public class UsuarioDTO {
     private Long rolId;
     private RolDTO rol;
     private boolean activo;
-    private long creadoEn;
+    private LocalDateTime creadoEn;
 
     public UsuarioDTO() {
     }
 
     public UsuarioDTO(Long id, String nombre, String apellido, String email,
-                      Long rolId, RolDTO rol, boolean activo, long creadoEn) {
+                      Long rolId, RolDTO rol, boolean activo, LocalDateTime creadoEn) {
         this.id = id;
         this.nombre = nombre;
         this.apellido = apellido;
@@ -50,6 +52,6 @@ public class UsuarioDTO {
     public boolean isActivo() { return activo; }
     public void setActivo(boolean activo) { this.activo = activo; }
 
-    public long getCreadoEn() { return creadoEn; }
-    public void setCreadoEn(long creadoEn) { this.creadoEn = creadoEn; }
+    public LocalDateTime getCreadoEn() { return creadoEn; }
+    public void setCreadoEn(LocalDateTime creadoEn) { this.creadoEn = creadoEn; }
 }

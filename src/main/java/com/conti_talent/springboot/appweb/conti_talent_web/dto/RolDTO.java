@@ -1,5 +1,7 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.dto;
 
+import java.time.LocalDateTime;
+
 public class RolDTO {
 
     private Long id;
@@ -7,13 +9,13 @@ public class RolDTO {
     private String nombre;
     private String descripcion;
     private boolean activo;
-    private long creadoEn;
+    private LocalDateTime creadoEn;
 
     public RolDTO() {
     }
 
     public RolDTO(Long id, String codigo, String nombre, String descripcion,
-                  boolean activo, long creadoEn) {
+                  boolean activo, LocalDateTime creadoEn) {
         this.id = id;
         this.codigo = codigo;
         this.nombre = nombre;
@@ -37,6 +39,6 @@ public class RolDTO {
     public boolean isActivo() { return activo; }
     public void setActivo(boolean activo) { this.activo = activo; }
 
-    public long getCreadoEn() { return creadoEn; }
-    public void setCreadoEn(long creadoEn) { this.creadoEn = creadoEn; }
+    public LocalDateTime getCreadoEn() { return creadoEn; }
+    public void setCreadoEn(LocalDateTime creadoEn) { this.creadoEn = creadoEn; }
 }

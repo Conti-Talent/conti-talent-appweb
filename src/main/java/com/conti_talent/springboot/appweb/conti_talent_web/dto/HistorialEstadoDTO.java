@@ -1,11 +1,13 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.dto;
 
+import java.time.LocalDateTime;
+
 public class HistorialEstadoDTO {
     private Long id;
     private Long postulanteId;
     private String estadoAnterior;
     private String estadoNuevo;
-    private long fechaCambio;
+    private LocalDateTime fechaCambio;
     private String usuarioAdmin;
     private String observacionInterna;
     private String observacionPostulante;
@@ -22,8 +24,8 @@ public class HistorialEstadoDTO {
     public String getEstadoNuevo() { return estadoNuevo; }
     public void setEstadoNuevo(String estadoNuevo) { this.estadoNuevo = estadoNuevo; }
 
-    public long getFechaCambio() { return fechaCambio; }
-    public void setFechaCambio(long fechaCambio) { this.fechaCambio = fechaCambio; }
+    public LocalDateTime getFechaCambio() { return fechaCambio; }
+    public void setFechaCambio(LocalDateTime fechaCambio) { this.fechaCambio = fechaCambio; }
 
     public String getUsuarioAdmin() { return usuarioAdmin; }
     public void setUsuarioAdmin(String usuarioAdmin) { this.usuarioAdmin = usuarioAdmin; }

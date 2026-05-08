@@ -1,5 +1,7 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.model;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -77,13 +79,13 @@ public class Oferta {
     private List<OfertaHabilidad> habilidadesEntidades = new ArrayList<>();
 
     @Column(name = "creada_en", nullable = false)
-    private long creadaEn;
+    private LocalDateTime creadaEn;
 
     public Oferta() {}
 
     public Oferta(String titulo, String tipo, Area area, String modalidad,
                   String ubicacion, int vacantes, boolean destacada, String descripcion,
-                  List<String> requisitos, List<String> beneficios, long creadaEn) {
+                  List<String> requisitos, List<String> beneficios, LocalDateTime creadaEn) {
         this.titulo = titulo;
         this.tipo = tipo;
         this.area = area;
@@ -131,8 +133,8 @@ public class Oferta {
     public String getDescripcion() { return descripcion; }
     public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
 
-    public long getCreadaEn() { return creadaEn; }
-    public void setCreadaEn(long creadaEn) { this.creadaEn = creadaEn; }
+    public LocalDateTime getCreadaEn() { return creadaEn; }
+    public void setCreadaEn(LocalDateTime creadaEn) { this.creadaEn = creadaEn; }
 
     /* =========================================================
      * Acceso a las entidades intermedias (uso interno / servicios)

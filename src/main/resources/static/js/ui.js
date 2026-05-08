@@ -77,15 +77,21 @@ const UI = (() => {
   };
 
   /* ----- Formatters ----- */
-  const formatDate = (ts) => {
-    if (!ts) return '—';
-    const d = new Date(ts);
+  const dateValue = (value) => {
+    if (!value) return null;
+    const d = new Date(value);
+    return Number.isNaN(d.getTime()) ? null : d;
+  };
+
+  const formatDate = (value) => {
+    const d = dateValue(value);
+    if (!d) return '—';
     return d.toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric' });
   };
 
-  const formatDateTime = (ts) => {
-    if (!ts) return '—';
-    const d = new Date(ts);
+  const formatDateTime = (value) => {
+    const d = dateValue(value);
+    if (!d) return '—';
     return d.toLocaleString('es-PE', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
   };
 
@@ -119,7 +125,7 @@ const UI = (() => {
     });
   };
 
-  return { $, $$, el, clear, showToast, openModal, confirm, formatDate, formatDateTime, ESTADOS, renderEstadoBadge };
+  return { $, $$, el, clear, showToast, openModal, confirm, dateValue, formatDate, formatDateTime, ESTADOS, renderEstadoBadge };
 })();
 
 window.UI = UI;

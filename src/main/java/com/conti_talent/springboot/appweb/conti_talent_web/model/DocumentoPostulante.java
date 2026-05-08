@@ -1,5 +1,7 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.model;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -34,7 +36,7 @@ public class DocumentoPostulante {
     private long tamanio;
 
     @Column(name = "fecha_subida", nullable = false)
-    private long fechaSubida;
+    private LocalDateTime fechaSubida;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -62,6 +64,6 @@ public class DocumentoPostulante {
     public long getTamanio() { return tamanio; }
     public void setTamanio(long tamanio) { this.tamanio = tamanio; }
 
-    public long getFechaSubida() { return fechaSubida; }
-    public void setFechaSubida(long fechaSubida) { this.fechaSubida = fechaSubida; }
+    public LocalDateTime getFechaSubida() { return fechaSubida; }
+    public void setFechaSubida(LocalDateTime fechaSubida) { this.fechaSubida = fechaSubida; }
 }

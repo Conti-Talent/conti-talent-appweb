@@ -49,7 +49,7 @@
     const tbody = document.getElementById('admin-recientes');
     if (!tbody) return;
     UI.clear(tbody);
-    const recientes = [...Postulantes.list()].sort((a, b) => b.creadoEn - a.creadoEn);
+    const recientes = [...Postulantes.list()].sort((a, b) => (UI.dateValue(b.creadoEn)?.getTime() || 0) - (UI.dateValue(a.creadoEn)?.getTime() || 0));
     recientes.forEach((p) => {
       const oferta = Ofertas.get(p.ofertaId);
       const tr = UI.el('tr', {}, [

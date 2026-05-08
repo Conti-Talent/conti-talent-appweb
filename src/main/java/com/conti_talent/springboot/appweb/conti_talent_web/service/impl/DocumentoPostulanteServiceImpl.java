@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
@@ -34,6 +35,8 @@ public class DocumentoPostulanteServiceImpl implements IDocumentoPostulanteServi
     private final IPostulanteRepository postulanteRepository;
     private final DocumentoPostulanteMapper documentoMapper;
     private final Path uploadsDir;
+    private final Path cvDir;
+    private final Path certificadosDir;
     private final long maxFileSizeBytes;
 
     public DocumentoPostulanteServiceImpl(IDocumentoPostulanteRepository documentoRepository,
@@ -45,6 +48,8 @@ public class DocumentoPostulanteServiceImpl implements IDocumentoPostulanteServi
         this.postulanteRepository = postulanteRepository;
         this.documentoMapper = documentoMapper;
         this.uploadsDir = Paths.get(uploadsDir).toAbsolutePath().normalize();
+        this.cvDir = this.uploadsDir.resolve("cv").normalize();
+        this.certificadosDir = this.uploadsDir.resolve("certificados").normalize();
         this.maxFileSizeBytes = maxFileSizeBytes;
     }
 
@@ -57,29 +62,32 @@ public class DocumentoPostulanteServiceImpl implements IDocumentoPostulanteServi
 
         String original = StringUtils.cleanPath(archivo.getOriginalFilename() != null ? archivo.getOriginalFilename() : "documento");
         String extension = obtenerExtension(original);
-        String nombreUnico = postulanteId + "_" + System.currentTimeMillis() + "_" + UUID.randomUUID() + "." + extension;
+        String tipoNormalizado = normalizarTipo(tipoDocumento);
+        String nombreUnico = postulanteId + "_" + UUID.randomUUID() + "." + extension;
+        Path carpetaDestino = carpetaPorTipo(tipoNormalizado);
 
         try {
-            Files.createDirectories(uploadsDir);
-            Path destino = uploadsDir.resolve(nombreUnico).normalize();
-            if (!destino.startsWith(uploadsDir)) {
+            Files.createDirectories(cvDir);
+            Files.createDirectories(certificadosDir);
+            Path destino = carpetaDestino.resolve(nombreUnico).normalize();
+            if (!destino.startsWith(carpetaDestino)) {
                 throw new BusinessException("Ruta de archivo invalida");
             }
             archivo.transferTo(destino);
 
             DocumentoPostulante documento = new DocumentoPostulante();
             documento.setPostulante(postulante);
-            documento.setTipoDocumento(normalizarTipo(tipoDocumento));
+            documento.setTipoDocumento(tipoNormalizado);
             documento.setNombreOriginal(original);
             documento.setNombreArchivo(nombreUnico);
             documento.setRutaArchivo(destino.toString());
             documento.setExtension(extension);
             documento.setTamanio(archivo.getSize());
-            documento.setFechaSubida(System.currentTimeMillis());
+            documento.setFechaSubida(LocalDateTime.now());
             DocumentoPostulante guardado = documentoRepository.save(documento);
 
             if ("CV".equals(guardado.getTipoDocumento())) {
-                postulante.setCv(guardado.getNombreOriginal());
+                postulante.setCv(guardado.getNombreArchivo());
                 postulanteRepository.save(postulante);
             }
             return documentoMapper.convertirADTO(guardado);
@@ -135,7 +143,13 @@ public class DocumentoPostulanteServiceImpl implements IDocumentoPostulanteServi
     }
 
     private String normalizarTipo(String tipoDocumento) {
-        if (tipoDocumento == null || tipoDocumento.trim().isEmpty()) return "ADICIONAL";
-        return tipoDocumento.trim().toUpperCase(Locale.ROOT);
+        if (tipoDocumento == null || tipoDocumento.trim().isEmpty()) return "OTRO";
+        String normalizado = tipoDocumento.trim().toUpperCase(Locale.ROOT);
+        return "ADICIONAL".equals(normalizado) ? "OTRO" : normalizado;
+    }
+
+    private Path carpetaPorTipo(String tipoDocumento) {
+        if ("CV".equals(tipoDocumento)) return cvDir;
+        return certificadosDir;
     }
 }

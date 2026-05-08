@@ -9,7 +9,7 @@
     const session = Auth.getSession();
     const wrap = document.getElementById('postulaciones-list');
     const postulaciones = Postulantes.byUsuario(session.id)
-      .sort((a, b) => (b.fechaPostulacion || b.creadoEn || 0) - (a.fechaPostulacion || a.creadoEn || 0));
+      .sort((a, b) => (UI.dateValue(b.fechaPostulacion || b.creadoEn)?.getTime() || 0) - (UI.dateValue(a.fechaPostulacion || a.creadoEn)?.getTime() || 0));
     UI.clear(wrap);
 
     if (postulaciones.length === 0) {

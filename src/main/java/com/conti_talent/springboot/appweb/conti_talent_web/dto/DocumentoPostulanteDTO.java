@@ -1,5 +1,7 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.dto;
 
+import java.time.LocalDateTime;
+
 public class DocumentoPostulanteDTO {
     private Long id;
     private Long postulanteId;
@@ -8,7 +10,7 @@ public class DocumentoPostulanteDTO {
     private String nombreArchivo;
     private String extension;
     private long tamanio;
-    private long fechaSubida;
+    private LocalDateTime fechaSubida;
     private String urlDescarga;
 
     public Long getId() { return id; }
@@ -32,8 +34,8 @@ public class DocumentoPostulanteDTO {
     public long getTamanio() { return tamanio; }
     public void setTamanio(long tamanio) { this.tamanio = tamanio; }
 
-    public long getFechaSubida() { return fechaSubida; }
-    public void setFechaSubida(long fechaSubida) { this.fechaSubida = fechaSubida; }
+    public LocalDateTime getFechaSubida() { return fechaSubida; }
+    public void setFechaSubida(LocalDateTime fechaSubida) { this.fechaSubida = fechaSubida; }
 
     public String getUrlDescarga() { return urlDescarga; }
     public void setUrlDescarga(String urlDescarga) { this.urlDescarga = urlDescarga; }

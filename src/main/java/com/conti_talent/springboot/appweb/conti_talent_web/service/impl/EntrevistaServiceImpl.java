@@ -1,5 +1,7 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.service.impl;
 
+import java.time.LocalDateTime;
+
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.EntrevistaDTO;
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.PostulanteDTO;
 import com.conti_talent.springboot.appweb.conti_talent_web.dto.request.EntrevistaRequest;
@@ -18,9 +20,8 @@ import com.conti_talent.springboot.appweb.conti_talent_web.service.IPostulanteSe
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 
@@ -74,7 +75,7 @@ public class EntrevistaServiceImpl implements IEntrevistaService {
         entrevista.setObservacionPostulante(limpiar(request.getObservacionPostulante()));
         entrevista.setUsuarioAdmin(texto(request.getUsuarioAdmin(), "Admin"));
         entrevista.setCreadoPorAdmin(buscarAdmin(request.getUsuarioAdmin()));
-        entrevista.setCreadoEn(System.currentTimeMillis());
+        entrevista.setCreadoEn(LocalDateTime.now());
         EntrevistaPostulante guardada = entrevistaRepository.save(entrevista);
 
         if (NORMAL.equals(tipo) && EstadoCodigo.APROBADO_TECNICO.name().equals(codigoEstado(postulante))) {
@@ -148,7 +149,7 @@ public class EntrevistaServiceImpl implements IEntrevistaService {
             entrevista.setObservacionPostulante(limpiar(request.getObservacionPostulante()));
             registrarAuditoria(entrevista, request);
         } else {
-            entrevista.setActualizadoEn(System.currentTimeMillis());
+            entrevista.setActualizadoEn(LocalDateTime.now());
         }
         return entrevistaMapper.convertirADTO(entrevistaRepository.save(entrevista));
     }
@@ -193,7 +194,7 @@ public class EntrevistaServiceImpl implements IEntrevistaService {
     }
 
     private void copiarDatosProgramacion(EntrevistaPostulante entrevista, EntrevistaRequest request) {
-        long fecha = request.getFechaProgramada() > 0 ? request.getFechaProgramada() : request.getFechaEntrevista();
+        LocalDateTime fecha = request.getFechaProgramada() != null ? request.getFechaProgramada() : request.getFechaEntrevista();
         validarFecha(fecha);
         validarHoras(request.getHoraInicio(), request.getHoraFin());
         String modalidad = normalizar(request.getModalidad(), "VIRTUAL");
@@ -209,9 +210,9 @@ public class EntrevistaServiceImpl implements IEntrevistaService {
         entrevista.setEntrevistadorCargo(limpiar(request.getEntrevistadorCargo()));
     }
 
-    private void validarFecha(long fecha) {
-        if (fecha <= 0) throw new BusinessException("Fecha programada requerida.");
-        LocalDate programada = Instant.ofEpochMilli(fecha).atZone(ZoneId.systemDefault()).toLocalDate();
+    private void validarFecha(LocalDateTime fecha) {
+        if (fecha == null) throw new BusinessException("Fecha programada requerida.");
+        LocalDate programada = fecha.toLocalDate();
         if (programada.isBefore(LocalDate.now())) throw new BusinessException("La fecha programada no puede ser anterior a hoy.");
     }
 
@@ -225,7 +226,7 @@ public class EntrevistaServiceImpl implements IEntrevistaService {
         entrevista.setActualizadoPorAdmin(buscarAdmin(request.getUsuarioAdmin()));
         entrevista.setActualizadoPorAdminNombre(texto(request.getUsuarioAdmin(), "Admin"));
         entrevista.setObservacionCambio(limpiar(request.getObservacionCambio()));
-        entrevista.setActualizadoEn(System.currentTimeMillis());
+        entrevista.setActualizadoEn(LocalDateTime.now());
     }
 
     private Usuario buscarAdmin(String email) {

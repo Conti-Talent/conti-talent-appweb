@@ -1,5 +1,6 @@
 package com.conti_talent.springboot.appweb.conti_talent_web.dto;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,14 +12,14 @@ public class EvaluacionDTO {
     private int correctas;
     private int total;
     private Map<Long, Integer> respuestas;
-    private long evaluadoEn;
+    private LocalDateTime evaluadoEn;
 
     public EvaluacionDTO() {
         this.respuestas = new HashMap<>();
     }
 
     public EvaluacionDTO(Long postulanteId, Long ofertaId, int puntaje,
-                         int correctas, int total, Map<Long, Integer> respuestas, long evaluadoEn) {
+                         int correctas, int total, Map<Long, Integer> respuestas, LocalDateTime evaluadoEn) {
         this.postulanteId = postulanteId;
         this.ofertaId = ofertaId;
         this.puntaje = puntaje;
@@ -48,6 +49,6 @@ public class EvaluacionDTO {
         this.respuestas = respuestas != null ? new HashMap<>(respuestas) : new HashMap<>();
     }
 
-    public long getEvaluadoEn() { return evaluadoEn; }
-    public void setEvaluadoEn(long evaluadoEn) { this.evaluadoEn = evaluadoEn; }
+    public LocalDateTime getEvaluadoEn() { return evaluadoEn; }
+    public void setEvaluadoEn(LocalDateTime evaluadoEn) { this.evaluadoEn = evaluadoEn; }
 }
